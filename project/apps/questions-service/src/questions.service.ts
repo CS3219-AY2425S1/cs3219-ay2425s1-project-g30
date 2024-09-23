@@ -39,10 +39,11 @@ export class QuestionsService {
       this.handleError('fetch questions', error);
     }
 
+    this.logger.log('fetched all questions');
     return data;
   }
 
-  async findById(id: bigint): Promise<QuestionDto | null> {
+  async findById(id: bigint): Promise<QuestionDto> {
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .select()
@@ -53,10 +54,11 @@ export class QuestionsService {
       this.handleError('fetch question by id', error);
     }
 
+    this.logger.log(`fetched question with id ${id}`);
     return data;
   }
 
-  async create(question: CreateQuestionDto): Promise<QuestionDto | null> {
+  async create(question: CreateQuestionDto): Promise<QuestionDto> {
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .insert(question)
@@ -65,11 +67,14 @@ export class QuestionsService {
     if (error) {
       this.handleError('create question', error);
     }
+    // explicitly cast to QuestionDto, as Supabase's type inference is currently not supported
+    const questionData = data as QuestionDto;
 
-    return data;
+    this.logger.log(`created question with id ${questionData?.id}`);
+    return questionData;
   }
 
-  async update(question: UpdateQuestionDto): Promise<QuestionDto | null> {
+  async update(question: UpdateQuestionDto): Promise<QuestionDto> {
     const updatedQuestion = {
       ...question,
       updated_at: new Date(),
@@ -85,6 +90,7 @@ export class QuestionsService {
       this.handleError('update question', error);
     }
 
+    this.logger.log(`updated question with id ${question.id}`);
     return data;
   }
 
@@ -98,6 +104,7 @@ export class QuestionsService {
       this.handleError('delete question', error);
     }
 
+    this.logger.log(`deleted question with id ${id}`);
     return true;
   }
 }
