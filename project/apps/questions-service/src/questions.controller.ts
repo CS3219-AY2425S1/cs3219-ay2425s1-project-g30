@@ -1,4 +1,4 @@
-import { Controller, Query, UsePipes } from '@nestjs/common';
+import { Controller, UsePipes } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { QuestionsService } from './questions.service';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
@@ -13,7 +13,7 @@ export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @MessagePattern({ cmd: 'get_questions' })
-  async getQuestions(@Query('includeDeleted') includeDeleted: boolean) {
+  async getQuestions(includeDeleted: boolean) {
     return await this.questionsService.findAll(includeDeleted);
   }
 

@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -22,8 +23,11 @@ export class QuestionsController {
   ) {}
 
   @Get()
-  async getQuestions() {
-    return this.questionsServiceClient.send({ cmd: 'get_questions' }, {});
+  async getQuestions(@Query('includeDeleted') includeDeleted: boolean = false) {
+    return this.questionsServiceClient.send(
+      { cmd: 'get_questions' },
+      includeDeleted,
+    );
   }
 
   @Get(':id')

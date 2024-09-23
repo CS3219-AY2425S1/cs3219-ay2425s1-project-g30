@@ -43,7 +43,9 @@ export class QuestionsService {
       this.handleError('fetch questions', error);
     }
 
-    this.logger.log('fetched all questions');
+    this.logger.log(
+      `fetched ${data.length} questions, includeDeleted: ${includeDeleted}`,
+    );
     return data;
   }
 
