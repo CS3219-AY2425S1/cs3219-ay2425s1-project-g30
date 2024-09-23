@@ -40,7 +40,13 @@ export class QuestionsController {
   }
 
   @Put(':id')
-  async updateQuestion(@Body() updateQuestionDto: UpdateQuestionDto) {
+  async updateQuestion(
+    @Param('id') id: bigint,
+    @Body() updateQuestionDto: UpdateQuestionDto,
+  ) {
+    if (id != updateQuestionDto.id) {
+      throw new Error('ID in URL does not match ID in request body');
+    }
     return this.questionsServiceClient.send(
       { cmd: 'update_question' },
       updateQuestionDto,
