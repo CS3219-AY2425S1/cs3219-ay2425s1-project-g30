@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CreateQuestionDto,
+  DeleteQuestionDto,
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
@@ -63,10 +64,14 @@ export class QuestionsService {
   }
 
   async update(question: UpdateQuestionDto): Promise<QuestionDto | null> {
-    // potentially update updated_at field
+    const updatedQuestion = {
+      ...question,
+      updated_at: new Date(),
+    };
+
     const { data, error } = await this.supabase
       .from('questions')
-      .update(question)
+      .update(updatedQuestion)
       .eq('id', question.id)
       .single();
 
@@ -78,6 +83,17 @@ export class QuestionsService {
     return data;
   }
 
-  // TODO: Implement delete: potentially soft delete
-  // async delete(id: bigint): Promise<boolean> {}
+  async delete(question: DeleteQuestionDto): Promise<boolean> {
+    const { error } = await this.supabase
+      .from('questions')
+      .delete()
+      .eq('id', question.id);
+
+    if (error) {
+      console.log('Error deleting question', error);
+      return false;
+    }
+
+    return true;
+  }
 }

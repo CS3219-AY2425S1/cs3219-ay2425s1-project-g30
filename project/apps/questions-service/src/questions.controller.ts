@@ -5,6 +5,7 @@ import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import {
   CreateQuestionDto,
   createQuestionSchema,
+  DeleteQuestionDto,
   UpdateQuestionDto,
   updateQuestionSchema,
 } from '@repo/dtos/questions';
@@ -37,8 +38,7 @@ export class QuestionsController {
   // probably need to add some middleware to check if the user is an admin
   // not sure to do it here or in the service
   @MessagePattern({ cmd: 'delete_question' })
-  async deleteQuestion(@Payload() id: bigint) {
-    return `Not implemented: deleteQuestion(${id})`;
-    // return await this.questionsService.delete(id);
+  async deleteQuestion(@Payload() deleteQuestionDto: DeleteQuestionDto) {
+    return await this.questionsService.delete(deleteQuestionDto);
   }
 }

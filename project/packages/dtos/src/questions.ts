@@ -24,8 +24,8 @@ export const questionSchema = z
   .object({
     id: z.bigint(),
     created_at: z.date(),
-    // updated_at: z.date(),
-    // deleted_at: z.date().nullable(),
+    updated_at: z.date(),
+    deleted_at: z.date().nullable(),
     q_title: z.string(),
     q_desc: z.string(),
     q_category: CategorySchema,
