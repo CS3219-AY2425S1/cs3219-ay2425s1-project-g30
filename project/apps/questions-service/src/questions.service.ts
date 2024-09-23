@@ -43,7 +43,7 @@ export class QuestionsService {
     return data;
   }
 
-  async findById(id: bigint): Promise<QuestionDto> {
+  async findById(id: string): Promise<QuestionDto> {
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .select()
@@ -94,7 +94,7 @@ export class QuestionsService {
     return data;
   }
 
-  async deleteById(id: bigint): Promise<boolean> {
+  async deleteById(id: string): Promise<boolean> {
     const { error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .delete()
