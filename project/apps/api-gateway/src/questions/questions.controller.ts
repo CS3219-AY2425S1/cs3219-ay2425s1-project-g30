@@ -27,7 +27,7 @@ export class QuestionsController {
   }
 
   @Get(':id')
-  async getQuestionById(@Param('id') id: bigint) {
+  async getQuestionById(@Param('id') id: string) {
     return this.questionsServiceClient.send({ cmd: 'get_question' }, id);
   }
 
@@ -41,7 +41,7 @@ export class QuestionsController {
 
   @Put(':id')
   async updateQuestion(
-    @Param('id') id: bigint,
+    @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     if (id != updateQuestionDto.id) {
@@ -54,7 +54,7 @@ export class QuestionsController {
   }
 
   @Delete(':id')
-  async deleteQuestion(@Param('id') id: bigint) {
+  async deleteQuestion(@Param('id') id: string) {
     return this.questionsServiceClient.send({ cmd: 'delete_question' }, { id });
   }
 }

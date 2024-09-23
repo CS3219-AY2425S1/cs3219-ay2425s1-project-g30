@@ -23,12 +23,12 @@ const CategorySchema = z.nativeEnum(Category);
 const commonQuestionFields = z.object({
   q_title: z.string().min(1),
   q_desc: z.string().min(1),
-  q_category: CategorySchema,
+  q_category: z.array(CategorySchema),
   q_complexity: ComplexitySchema,
 });
 
 export const questionSchema = commonQuestionFields.extend({
-  id: z.bigint(),
+  id: z.string().uuid(),
   created_at: z.date(),
   updated_at: z.date(),
   deleted_at: z.date().nullable(),
@@ -37,7 +37,7 @@ export const questionSchema = commonQuestionFields.extend({
 export const createQuestionSchema = commonQuestionFields;
 
 export const updateQuestionSchema = commonQuestionFields.extend({
-  id: z.bigint(),
+  id: z.string().uuid(),
 });
 
 export type QuestionDto = z.infer<typeof questionSchema>;

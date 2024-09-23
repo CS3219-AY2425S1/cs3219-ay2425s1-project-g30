@@ -18,7 +18,7 @@ export class QuestionsController {
   }
 
   @MessagePattern({ cmd: 'get_question' })
-  async getQuestionById(id: bigint) {
+  async getQuestionById(id: string) {
     return await this.questionsService.findById(id);
   }
 
@@ -35,7 +35,7 @@ export class QuestionsController {
   }
 
   @MessagePattern({ cmd: 'delete_question' })
-  async deleteQuestionById(id: bigint) {
+  async deleteQuestionById(id: string) {
     return await this.questionsService.deleteById(id);
   }
 }
