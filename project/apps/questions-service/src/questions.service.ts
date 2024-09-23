@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CreateQuestionDto,
@@ -11,6 +11,9 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 @Injectable()
 export class QuestionsService {
   private supabase: SupabaseClient;
+  private readonly logger = new Logger(QuestionsService.name);
+
+  private readonly QUESTIONS_TABLE = 'question_bank';
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
@@ -23,12 +26,18 @@ export class QuestionsService {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
+  private handleError(operation: string, error: unknown): never {
+    this.logger.error(`Error during ${operation}:`, error);
+    throw error;
+  }
+
   async findAll(): Promise<QuestionDto[]> {
-    const { data, error } = await this.supabase.from('questions').select();
+    const { data, error } = await this.supabase
+      .from(this.QUESTIONS_TABLE)
+      .select();
 
     if (error) {
-      console.log('Error fetching questions', error);
-      return [];
+      this.handleError('fetch questions', error);
     }
 
     return data;
@@ -36,14 +45,13 @@ export class QuestionsService {
 
   async findById(id: bigint): Promise<QuestionDto | null> {
     const { data, error } = await this.supabase
-      .from('questions')
+      .from(this.QUESTIONS_TABLE)
       .select()
       .eq('id', id)
       .single();
 
     if (error) {
-      console.log('Error fetching question', error);
-      return null;
+      this.handleError('fetch question by id', error);
     }
 
     return data;
@@ -51,13 +59,12 @@ export class QuestionsService {
 
   async create(question: CreateQuestionDto): Promise<QuestionDto | null> {
     const { data, error } = await this.supabase
-      .from('questions')
+      .from(this.QUESTIONS_TABLE)
       .insert(question)
       .single();
 
     if (error) {
-      console.log('Error creating question', error);
-      return null;
+      this.handleError('create question', error);
     }
 
     return data;
@@ -70,14 +77,13 @@ export class QuestionsService {
     };
 
     const { data, error } = await this.supabase
-      .from('questions')
+      .from(this.QUESTIONS_TABLE)
       .update(updatedQuestion)
       .eq('id', question.id)
       .single();
 
     if (error) {
-      console.log('Error updating question', error);
-      return null;
+      this.handleError('update question', error);
     }
 
     return data;
@@ -85,13 +91,12 @@ export class QuestionsService {
 
   async delete(question: DeleteQuestionDto): Promise<boolean> {
     const { error } = await this.supabase
-      .from('questions')
+      .from(this.QUESTIONS_TABLE)
       .delete()
       .eq('id', question.id);
 
     if (error) {
-      console.log('Error deleting question', error);
-      return false;
+      this.handleError('delete question', error);
     }
 
     return true;
