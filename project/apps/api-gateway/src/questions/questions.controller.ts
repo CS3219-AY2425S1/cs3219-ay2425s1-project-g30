@@ -55,6 +55,6 @@ export class QuestionsController {
 
   @Delete(':id')
   async deleteQuestion(@Param('id') id: string) {
-    return this.questionsServiceClient.send({ cmd: 'delete_question' }, { id });
+    return this.questionsServiceClient.send({ cmd: 'delete_question' }, id);
   }
 }

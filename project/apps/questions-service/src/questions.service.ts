@@ -30,10 +30,14 @@ export class QuestionsService {
     throw error;
   }
 
-  async findAll(): Promise<QuestionDto[]> {
-    const { data, error } = await this.supabase
-      .from(this.QUESTIONS_TABLE)
-      .select();
+  async findAll(includeDeleted: boolean = false): Promise<QuestionDto[]> {
+    const query = this.supabase.from(this.QUESTIONS_TABLE).select();
+
+    if (!includeDeleted) {
+      query.is('deleted_at', null);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       this.handleError('fetch questions', error);
@@ -59,19 +63,19 @@ export class QuestionsService {
   }
 
   async create(question: CreateQuestionDto): Promise<QuestionDto> {
+    // supabase doesnt return the created data
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .insert(question)
-      .single();
+      .select()
+      .single<QuestionDto>();
 
     if (error) {
       this.handleError('create question', error);
     }
-    // explicitly cast to QuestionDto, as Supabase's type inference is currently not supported
-    const questionData = data as QuestionDto;
 
-    this.logger.log(`created question with id ${questionData?.id}`);
-    return questionData;
+    this.logger.log(`created question ${data.id}`);
+    return data;
   }
 
   async update(question: UpdateQuestionDto): Promise<QuestionDto> {
@@ -84,6 +88,7 @@ export class QuestionsService {
       .from(this.QUESTIONS_TABLE)
       .update(updatedQuestion)
       .eq('id', question.id)
+      .select()
       .single();
 
     if (error) {
@@ -94,17 +99,19 @@ export class QuestionsService {
     return data;
   }
 
-  async deleteById(id: string): Promise<boolean> {
-    const { error } = await this.supabase
+  async deleteById(id: string): Promise<QuestionDto> {
+    const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
-      .delete()
-      .eq('id', id);
+      .update({ deleted_at: new Date() })
+      .eq('id', id)
+      .select()
+      .single();
 
     if (error) {
       this.handleError('delete question', error);
     }
 
     this.logger.log(`deleted question with id ${id}`);
-    return true;
+    return data;
   }
 }
