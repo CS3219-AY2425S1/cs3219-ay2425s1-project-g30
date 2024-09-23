@@ -20,37 +20,25 @@ export enum Category {
 const ComplexitySchema = z.nativeEnum(Complexity);
 const CategorySchema = z.nativeEnum(Category);
 
-export const questionSchema = z
-  .object({
-    id: z.bigint(),
-    created_at: z.date(),
-    updated_at: z.date(),
-    deleted_at: z.date().nullable(),
-    q_title: z.string(),
-    q_desc: z.string(),
-    q_category: CategorySchema,
-    q_complexity: ComplexitySchema,
-  })
-  .required();
+const commonQuestionFields = z.object({
+  q_title: z.string().min(1),
+  q_desc: z.string().min(1),
+  q_category: CategorySchema,
+  q_complexity: ComplexitySchema,
+});
 
-export const createQuestionSchema = z
-  .object({
-    q_title: z.string().min(1),
-    q_desc: z.string().min(1),
-    q_category: CategorySchema,
-    q_complexity: ComplexitySchema,
-  })
-  .required();
+export const questionSchema = commonQuestionFields.extend({
+  id: z.bigint(),
+  created_at: z.date(),
+  updated_at: z.date(),
+  deleted_at: z.date().nullable(),
+});
 
-export const updateQuestionSchema = z
-  .object({
-    id: z.bigint(),
-    q_title: z.string().min(1),
-    q_desc: z.string().min(1),
-    q_category: CategorySchema,
-    q_complexity: ComplexitySchema,
-  })
-  .required();
+export const createQuestionSchema = commonQuestionFields;
+
+export const updateQuestionSchema = commonQuestionFields.extend({
+  id: z.bigint(),
+});
 
 export const deleteQuestionSchema = z.object({
   id: z.bigint(),
