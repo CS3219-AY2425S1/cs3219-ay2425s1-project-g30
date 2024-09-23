@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CreateQuestionDto,
-  DeleteQuestionDto,
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
@@ -89,11 +88,11 @@ export class QuestionsService {
     return data;
   }
 
-  async delete(question: DeleteQuestionDto): Promise<boolean> {
+  async deleteById(id: bigint): Promise<boolean> {
     const { error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .delete()
-      .eq('id', question.id);
+      .eq('id', id);
 
     if (error) {
       this.handleError('delete question', error);

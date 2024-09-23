@@ -40,11 +40,6 @@ export const updateQuestionSchema = commonQuestionFields.extend({
   id: z.bigint(),
 });
 
-export const deleteQuestionSchema = z.object({
-  id: z.bigint(),
-});
-
 export type QuestionDto = z.infer<typeof questionSchema>;
 export type CreateQuestionDto = z.infer<typeof createQuestionSchema>;
 export type UpdateQuestionDto = z.infer<typeof updateQuestionSchema>;
-export type DeleteQuestionDto = z.infer<typeof deleteQuestionSchema>;
