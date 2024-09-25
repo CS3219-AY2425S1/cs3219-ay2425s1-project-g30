@@ -9,15 +9,5 @@ const apiClient = axios.create({
   withCredentials: true,
   timeout: 10000,
 });
-// Request interceptor for logging
-apiClient.interceptors.request.use(
-  (config) => {
-    console.log("Outgoing request:", config);
-    return config;
-  },
-  (error) => {
-    console.error("Request error:", error);
-    return Promise.reject(error);
-  }
-);
+
 export default apiClient;

@@ -20,7 +20,6 @@ export class AuthService {
       .auth.getUser(token);
 
     if (error) {
-      console.log(error.message);
       throw new UnauthorizedException(error.message);
     }
     const { user } = data;
