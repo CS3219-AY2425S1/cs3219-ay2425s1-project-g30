@@ -1,25 +1,23 @@
 import {
-  Controller,
-  Post,
   Body,
-  Res,
-  HttpStatus,
-  UsePipes,
-  Req,
+  Controller,
   Get,
-  UseGuards,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UsePipes,
 } from '@nestjs/common';
 
-import { Response, Request } from 'express';
-import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import {
-  signInSchema,
   SignInDto,
-  signUpSchema,
+  signInSchema,
   SignUpDto,
+  signUpSchema,
 } from '@repo/dtos/auth';
+import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
