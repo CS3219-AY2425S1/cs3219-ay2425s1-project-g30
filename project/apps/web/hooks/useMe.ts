@@ -15,7 +15,6 @@ export const useMe = () => {
     removeLoginStateFlag();
   }
   const logoutMutation = useMutation({ mutationFn: signOut });
-  const { userData } = data;
 
   const logout = useCallback(
     (redirectToSignIn = true) => {
@@ -31,5 +30,5 @@ export const useMe = () => {
     [logoutMutation, removeLoginStateFlag]
   );
 
-  return { userData, logout };
+  return { userData: data, logout };
 };
