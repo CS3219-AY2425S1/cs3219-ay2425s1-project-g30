@@ -1,21 +1,12 @@
-import apiClient from "./apiClient";
+import { apiCall } from "./apiClient";
 import { SignInDto, SignUpDto } from "@repo/dtos/auth";
 
-export const signUp = async (signUpDto: SignUpDto) => {
-  const res = await apiClient.post("/auth/signup", signUpDto);
-  return res.data;
-};
+export const signUp = (signUpDto: SignUpDto) =>
+  apiCall("post", "/auth/signup", signUpDto);
 
-export const signIn = async (signInDto: SignInDto) => {
-  const res = await apiClient.post("/auth/signin", signInDto);
-  return res.data;
-};
+export const signIn = (signInDto: SignInDto) =>
+  apiCall("post", "/auth/signin", signInDto);
 
-export const signOut = async () => {
-  await apiClient.post("/auth/signout");
-};
+export const signOut = () => apiCall<void>("post", "/auth/signout");
 
-export const me = async () => {
-  const res = await apiClient.get("/auth/me");
-  return res.data;
-};
+export const me = () => apiCall("get", "/auth/me");

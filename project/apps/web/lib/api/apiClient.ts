@@ -1,13 +1,35 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
-const apiClient = axios.create({
+export class ApiError extends Error {
+  constructor(
+    public message: string,
+    public statusCode: number
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
   withCredentials: true,
-  timeout: 10000,
 });
 
-export default apiClient;
+export const apiCall = async <T>(
+  method: "get" | "post" | "put" | "delete",
+  url: string,
+  data?: any
+): Promise<T> => {
+  try {
+    const response = await apiClient[method]<T>(url, data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new ApiError(
+        error.response?.data?.message || error.message,
+        error.response?.status || 500
+      );
+    }
+    throw new ApiError("An unexpected error occurred", 500);
+  }
+};

@@ -32,6 +32,14 @@
 $ pnpm install
 ```
 
+Copy the `.env.example` file to create a new `.env` file:
+
+```bash
+$ cp .env.example .env
+```
+
+Modify the `.env` file with your environment-specific configuration.
+
 ## Compile and run the project
 
 ```bash

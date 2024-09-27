@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
     "@repo/dtos": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
     "axios": "^1.7.7",
