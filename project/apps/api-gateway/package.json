@@ -22,8 +22,6 @@
     "update-types": "npx supabase gen types --lang=typescript --project-id kamxbsekjfdzemvoevgz > src/supabase/database.types.ts"
   },
   "dependencies": {
-    "@repo/pipes": "workspace:*",
-    "@repo/dtos": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
