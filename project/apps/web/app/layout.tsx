@@ -1,8 +1,8 @@
-import { LoginStateProvider } from "@/contexts/LoginStateContext";
-import "./globals.css";
 import ReactQueryProvider from "@/components/ReactQueryProvider";
 import Suspense from "@/components/Suspense";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoginStateProvider } from "@/contexts/LoginStateContext";
+import "./globals.css";
 
 export default function RootLayout({
   children,

@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./project
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # We un-hoist packages to ensure that each package has the necessary
+      # dependencies and do not rely implicitly on dependencies from other packages.
+      - name: Un-hoist packages
+        run: |
+          sed -i 's/node-linker=hoisted/node-linker=isolated/g' .npmrc
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+  lint:
+    name: Type Check & Lint
+    needs:
+      - install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./project
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Un-hoist packages
+        run: |
+          sed -i 's/node-linker=hoisted/node-linker=isolated/g' .npmrc
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run type checking
+        run: pnpm type-check
+
+      - name: Run linting
+        run: pnpm lint
