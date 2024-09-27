@@ -18,6 +18,7 @@ export const useLocalStorage = <T>(
     try {
       const item = window.localStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : initialValue;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return initialValue;
     }
