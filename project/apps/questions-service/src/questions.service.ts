@@ -65,7 +65,6 @@ export class QuestionsService {
   }
 
   async create(question: CreateQuestionDto): Promise<QuestionDto> {
-    // supabase doesnt return the created data
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .insert(question)
