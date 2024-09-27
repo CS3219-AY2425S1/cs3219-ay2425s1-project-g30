@@ -18,7 +18,7 @@ module.exports = {
     node: true,
     browser: true,
   },
-  plugins: ["only-warn"],
+  plugins: ["only-warn", "@typescript-eslint"],
   settings: {
     "import/resolver": {
       typescript: {
@@ -32,5 +32,8 @@ module.exports = {
     "node_modules/",
     "tailwind.config.js",
   ],
+  rules: {
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+  },
   overrides: [{ files: ["*.js?(x)", "*.ts?(x)"] }],
 };
