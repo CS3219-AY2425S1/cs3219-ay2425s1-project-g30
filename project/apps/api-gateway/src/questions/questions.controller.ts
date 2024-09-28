@@ -12,8 +12,7 @@ import {
   Delete,
   Query,
   UsePipes,
-  HttpException,
-  HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -62,10 +61,7 @@ export class QuestionsController {
     updateQuestionDto: UpdateQuestionDto,
   ) {
     if (id != updateQuestionDto.id) {
-      throw new HttpException(
-        'ID in URL does not match ID in request body',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('ID in URL does not match ID in body');
     }
     return this.questionsServiceClient.send(
       { cmd: 'update_question' },

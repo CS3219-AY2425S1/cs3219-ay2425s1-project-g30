@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import {
@@ -7,11 +7,7 @@ import {
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
-import {
-  createClient,
-  PostgrestError,
-  SupabaseClient,
-} from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class QuestionsService {
@@ -31,12 +27,18 @@ export class QuestionsService {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  private handleDbError(operation: string, error: PostgrestError): never {
-    this.logger.error(`Error during ${operation}:`, error);
-    throw new RpcException({
-      message: `Error during ${operation}`,
-      error,
-    });
+  /**
+   * Handles errors by logging the error message and throwing an RpcException.
+   *
+   * @private
+   * @param {string} operation - The name of the operation where the error occurred.
+   * @param {any} error - The error object that was caught. This can be any type of error, including a NestJS HttpException.
+   * @throws {RpcException} - Throws an RpcException wrapping the original error.
+   */
+  private handleError(operation: string, error: any): never {
+    this.logger.error(`Error at ${operation}: ${error.message}`);
+
+    throw new RpcException(error);
   }
 
   async findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]> {
@@ -60,7 +62,7 @@ export class QuestionsService {
     const { data, error } = await query;
 
     if (error) {
-      this.handleDbError('fetch questions', error);
+      this.handleError('fetch questions', error);
     }
 
     this.logger.log(
@@ -77,7 +79,7 @@ export class QuestionsService {
       .single();
 
     if (error) {
-      this.handleDbError('fetch question by id', error);
+      this.handleError('fetch question by id', error);
     }
 
     this.logger.log(`fetched question with id ${id}`);
@@ -85,6 +87,21 @@ export class QuestionsService {
   }
 
   async create(question: CreateQuestionDto): Promise<QuestionDto> {
+    const { data: existingQuestion } = await this.supabase
+      .from(this.QUESTIONS_TABLE)
+      .select()
+      .eq('q_title', question.q_title)
+      .single<QuestionDto>();
+
+    if (existingQuestion) {
+      this.handleError(
+        'create question',
+        new BadRequestException(
+          `Question with title ${question.q_title} already exists`,
+        ),
+      );
+    }
+
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .insert(question)
@@ -92,7 +109,7 @@ export class QuestionsService {
       .single<QuestionDto>();
 
     if (error) {
-      this.handleDbError('create question', error);
+      this.handleError('create question', error);
     }
 
     this.logger.log(`created question ${data.id}`);
@@ -100,6 +117,21 @@ export class QuestionsService {
   }
 
   async update(question: UpdateQuestionDto): Promise<QuestionDto> {
+    const { data: existingQuestion } = await this.supabase
+      .from(this.QUESTIONS_TABLE)
+      .select()
+      .eq('q_title', question.q_title)
+      .single<QuestionDto>();
+
+    if (existingQuestion) {
+      this.handleError(
+        'create question',
+        new BadRequestException(
+          `Question with title ${question.q_title} already exists`,
+        ),
+      );
+    }
+
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .update(question)
@@ -108,7 +140,7 @@ export class QuestionsService {
       .single();
 
     if (error) {
-      this.handleDbError('update question', error);
+      this.handleError('update question', error);
     }
 
     this.logger.log(`updated question with id ${question.id}`);
@@ -124,7 +156,7 @@ export class QuestionsService {
       .single();
 
     if (error) {
-      this.handleDbError('delete question', error);
+      this.handleError('delete question', error);
     }
 
     this.logger.log(`deleted question with id ${id}`);
