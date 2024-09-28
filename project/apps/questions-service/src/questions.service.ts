@@ -121,6 +121,7 @@ export class QuestionsService {
       .from(this.QUESTIONS_TABLE)
       .select()
       .eq('q_title', question.q_title)
+      .neq('id', question.id)
       .single<QuestionDto>();
 
     if (existingQuestion) {
