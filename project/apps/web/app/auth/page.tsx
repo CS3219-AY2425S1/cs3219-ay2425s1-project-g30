@@ -10,8 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SignInForm } from "./signInForm";
-import { SignUpForm } from "./signUpForm";
+import { SignInForm } from "./SignInForm";
+import { SignUpForm } from "./SignUpForm";
 import { PublicPageWrapper } from "@/components/AuthWrappers/PublicPageWrapper";
 import { LANDING } from "@/lib/routes";
 
