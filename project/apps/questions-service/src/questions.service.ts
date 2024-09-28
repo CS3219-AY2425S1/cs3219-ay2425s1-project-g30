@@ -94,12 +94,12 @@ export class QuestionsService {
       .single<QuestionDto>();
 
     if (existingQuestion) {
-      this.handleError(
-        'create question',
-        new BadRequestException(
-          `Question with title ${question.q_title} already exists`,
-        ),
-      );
+      // this.handleError(
+      //   'create question',
+      //   new BadRequestException(
+      //     `Question with title ${question.q_title} already exists`,
+      //   ),
+      // );
     }
 
     const { data, error } = await this.supabase
@@ -117,6 +117,22 @@ export class QuestionsService {
   }
 
   async update(question: UpdateQuestionDto): Promise<QuestionDto> {
+    // check if the question is soft deleted
+    const { data: deletedQuestion } = await this.supabase
+      .from(this.QUESTIONS_TABLE)
+      .select()
+      .eq('id', question.id)
+      .neq('deleted_at', null)
+      .single<QuestionDto>();
+
+    if (deletedQuestion) {
+      this.handleError(
+        'update question',
+        new BadRequestException('Cannot update a deleted question'),
+      );
+    }
+
+    // check if a question with the same title already exists
     const { data: existingQuestion } = await this.supabase
       .from(this.QUESTIONS_TABLE)
       .select()
@@ -126,7 +142,7 @@ export class QuestionsService {
 
     if (existingQuestion) {
       this.handleError(
-        'create question',
+        'update question',
         new BadRequestException(
           `Question with title ${question.q_title} already exists`,
         ),
