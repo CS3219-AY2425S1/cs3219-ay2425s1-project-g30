@@ -1,20 +1,18 @@
-import { Controller, UsePipes } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { QuestionsService } from './questions.service';
-import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import {
   CreateQuestionDto,
-  createQuestionSchema,
+  GetQuestionsQueryDto,
   UpdateQuestionDto,
-  updateQuestionSchema,
 } from '@repo/dtos/questions';
 @Controller()
 export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @MessagePattern({ cmd: 'get_questions' })
-  async getQuestions(includeDeleted: boolean) {
-    return await this.questionsService.findAll(includeDeleted);
+  async getQuestions(@Payload() filters: GetQuestionsQueryDto) {
+    return await this.questionsService.findAll(filters);
   }
 
   @MessagePattern({ cmd: 'get_question' })
@@ -23,15 +21,13 @@ export class QuestionsController {
   }
 
   @MessagePattern({ cmd: 'create_question' })
-  @UsePipes(new ZodValidationPipe(createQuestionSchema))
   async createQuestion(@Payload() createQuestionDto: CreateQuestionDto) {
     return await this.questionsService.create(createQuestionDto);
   }
 
   @MessagePattern({ cmd: 'update_question' })
-  @UsePipes(new ZodValidationPipe(updateQuestionSchema))
-  async updateQuestion(@Payload() createQuestionDto: UpdateQuestionDto) {
-    return await this.questionsService.update(createQuestionDto);
+  async updateQuestion(@Payload() updateQuestionDto: UpdateQuestionDto) {
+    return await this.questionsService.update(updateQuestionDto);
   }
 
   @MessagePattern({ cmd: 'delete_question' })

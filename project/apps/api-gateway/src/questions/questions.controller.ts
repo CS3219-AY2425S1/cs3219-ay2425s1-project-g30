@@ -11,10 +11,21 @@ import {
   Put,
   Delete,
   Query,
+  UsePipes,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { CreateQuestionDto, UpdateQuestionDto } from '@repo/dtos/questions';
+import {
+  CreateQuestionDto,
+  createQuestionSchema,
+  GetQuestionsQueryDto,
+  getQuestionsQuerySchema,
+  UpdateQuestionDto,
+  updateQuestionSchema,
+} from '@repo/dtos/questions';
+import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 
 @Controller('questions')
 @UseGuards(AuthGuard) // Can comment out if we dw auth for now
@@ -25,11 +36,9 @@ export class QuestionsController {
   ) {}
 
   @Get()
-  async getQuestions(@Query('includeDeleted') includeDeleted: boolean = false) {
-    return this.questionsServiceClient.send(
-      { cmd: 'get_questions' },
-      includeDeleted,
-    );
+  @UsePipes(new ZodValidationPipe(getQuestionsQuerySchema))
+  async getQuestions(@Query() filters: GetQuestionsQueryDto) {
+    return this.questionsServiceClient.send({ cmd: 'get_questions' }, filters);
   }
 
   @Get(':id')
@@ -38,6 +47,7 @@ export class QuestionsController {
   }
 
   @Post()
+  @UsePipes(new ZodValidationPipe(createQuestionSchema))
   async createQuestion(@Body() createQuestionDto: CreateQuestionDto) {
     return this.questionsServiceClient.send(
       { cmd: 'create_question' },
@@ -48,10 +58,14 @@ export class QuestionsController {
   @Put(':id')
   async updateQuestion(
     @Param('id') id: string,
-    @Body() updateQuestionDto: UpdateQuestionDto,
+    @Body(new ZodValidationPipe(updateQuestionSchema)) // validation on the body only
+    updateQuestionDto: UpdateQuestionDto,
   ) {
     if (id != updateQuestionDto.id) {
-      throw new Error('ID in URL does not match ID in request body');
+      throw new HttpException(
+        'ID in URL does not match ID in request body',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return this.questionsServiceClient.send(
       { cmd: 'update_question' },

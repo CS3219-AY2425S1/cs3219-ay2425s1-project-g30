@@ -1,11 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { RpcException } from '@nestjs/microservices';
 import {
   CreateQuestionDto,
+  GetQuestionsQueryDto,
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import {
+  createClient,
+  PostgrestError,
+  SupabaseClient,
+} from '@supabase/supabase-js';
 
 @Injectable()
 export class QuestionsService {
@@ -25,26 +31,40 @@ export class QuestionsService {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  private handleError(operation: string, error: unknown): never {
+  private handleDbError(operation: string, error: PostgrestError): never {
     this.logger.error(`Error during ${operation}:`, error);
-    throw error;
+    throw new RpcException({
+      message: `Error during ${operation}`,
+      error,
+    });
   }
 
-  async findAll(includeDeleted: boolean = false): Promise<QuestionDto[]> {
-    const query = this.supabase.from(this.QUESTIONS_TABLE).select();
+  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]> {
+    const { title, category, complexity, includeDeleted } = filters;
 
+    let query = this.supabase.from(this.QUESTIONS_TABLE).select();
+
+    if (title) {
+      query = query.ilike('q_title', `%${title}%`);
+    }
+    if (category) {
+      query = query.contains('q_category', [category]);
+    }
+    if (complexity) {
+      query = query.eq('q_complexity', complexity);
+    }
     if (!includeDeleted) {
-      query.is('deleted_at', null);
+      query = query.is('deleted_at', null);
     }
 
     const { data, error } = await query;
 
     if (error) {
-      this.handleError('fetch questions', error);
+      this.handleDbError('fetch questions', error);
     }
 
     this.logger.log(
-      `fetched ${data.length} questions, includeDeleted: ${includeDeleted}`,
+      `fetched ${data.length} questions with filters: ${JSON.stringify(filters)}`,
     );
     return data;
   }
@@ -57,7 +77,7 @@ export class QuestionsService {
       .single();
 
     if (error) {
-      this.handleError('fetch question by id', error);
+      this.handleDbError('fetch question by id', error);
     }
 
     this.logger.log(`fetched question with id ${id}`);
@@ -72,7 +92,7 @@ export class QuestionsService {
       .single<QuestionDto>();
 
     if (error) {
-      this.handleError('create question', error);
+      this.handleDbError('create question', error);
     }
 
     this.logger.log(`created question ${data.id}`);
@@ -80,20 +100,15 @@ export class QuestionsService {
   }
 
   async update(question: UpdateQuestionDto): Promise<QuestionDto> {
-    const updatedQuestion = {
-      ...question,
-      updated_at: new Date(),
-    };
-
     const { data, error } = await this.supabase
       .from(this.QUESTIONS_TABLE)
-      .update(updatedQuestion)
+      .update(question)
       .eq('id', question.id)
       .select()
       .single();
 
     if (error) {
-      this.handleError('update question', error);
+      this.handleDbError('update question', error);
     }
 
     this.logger.log(`updated question with id ${question.id}`);
@@ -109,7 +124,7 @@ export class QuestionsService {
       .single();
 
     if (error) {
-      this.handleError('delete question', error);
+      this.handleDbError('delete question', error);
     }
 
     this.logger.log(`deleted question with id ${id}`);

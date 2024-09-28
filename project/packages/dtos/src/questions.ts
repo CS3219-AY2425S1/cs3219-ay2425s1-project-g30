@@ -1,30 +1,20 @@
 import { z } from "zod";
 
-export enum Complexity {
-  Easy = "Easy",
-  Medium = "Medium",
-  Hard = "Hard",
-}
+export const categorySchema = z.string().min(1);
+export const complexitySchema = z.string().min(1);
 
-export enum Category {
-  Strings = "Strings",
-  Algorithms = "Algorithms",
-  DataStructures = "Data Structures",
-  BitManipulation = "Bit Manipulation",
-  Recursion = "Recursion",
-  Databases = "Databases",
-  BrainTeaser = "Brain Teaser",
-  Arrays = "Arrays",
-}
-
-const ComplexitySchema = z.nativeEnum(Complexity);
-const CategorySchema = z.nativeEnum(Category);
+export const getQuestionsQuerySchema = z.object({
+  title: z.string().optional(),
+  category: categorySchema.optional(),
+  complexity: complexitySchema.optional(),
+  includeDeleted: z.coerce.boolean().optional(),
+});
 
 const commonQuestionFields = z.object({
   q_title: z.string().min(1),
   q_desc: z.string().min(1),
-  q_category: z.array(CategorySchema),
-  q_complexity: ComplexitySchema,
+  q_category: z.array(categorySchema).min(1),
+  q_complexity: complexitySchema,
 });
 
 export const questionSchema = commonQuestionFields.extend({
@@ -39,6 +29,8 @@ export const createQuestionSchema = commonQuestionFields;
 export const updateQuestionSchema = commonQuestionFields.extend({
   id: z.string().uuid(),
 });
+
+export type GetQuestionsQueryDto = z.infer<typeof getQuestionsQuerySchema>;
 
 export type QuestionDto = z.infer<typeof questionSchema>;
 export type CreateQuestionDto = z.infer<typeof createQuestionSchema>;

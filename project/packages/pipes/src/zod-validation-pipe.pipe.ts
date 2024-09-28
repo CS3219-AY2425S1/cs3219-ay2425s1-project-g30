@@ -1,8 +1,4 @@
-import {
-  PipeTransform,
-  ArgumentMetadata,
-  BadRequestException,
-} from "@nestjs/common";
+import { PipeTransform, ArgumentMetadata } from "@nestjs/common";
 import { ZodError, ZodSchema } from "zod";
 import { RpcException } from "@nestjs/microservices";
 
@@ -11,15 +7,31 @@ export class ZodValidationPipe implements PipeTransform {
 
   transform(value: unknown, _metadata: ArgumentMetadata) {
     try {
+      // Parse the incoming value with Zod
+      console.log("i am parsing: ", value);
       const parsedValue = this.schema.parse(value);
       return parsedValue;
     } catch (error) {
       if (error instanceof ZodError) {
-        throw new RpcException(
-          new BadRequestException(`Validation failed: ${error.errors}`),
-        );
+        // Format Zod errors into a readable structure
+        const formattedErrors = error.errors.map((err) => ({
+          path: err.path.join("."),
+          message: err.message,
+        }));
+
+        // Throw RpcException with the structured error
+        throw new RpcException({
+          statusCode: 400,
+          message: "Validation failed",
+          errors: formattedErrors,
+        });
       }
-      throw new RpcException(new BadRequestException(`Validation failed`));
+
+      // Fallback for unknown errors
+      throw new RpcException({
+        statusCode: 500,
+        message: "Internal server error during validation",
+      });
     }
   }
 }
