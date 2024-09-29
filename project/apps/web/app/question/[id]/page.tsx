@@ -23,7 +23,7 @@ import QuestionSkeleton from "./components/QuestionSkeleton";
 import EditModal from "./components/EditModal";
 import DeleteModal from "./components/DeleteModal";
 import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuestionPageProps {
   params: {
@@ -37,7 +37,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-
+  const { toast } = useToast();
   const { data: question } = useSuspenseQuery<QuestionDto>({
     queryKey: [QUERY_KEYS.Question, id],
     queryFn: () => fetchQuestionById(id),
@@ -52,12 +52,19 @@ const QuestionPageContent = ({ id }: { id: string }) => {
         queryKey: [QUERY_KEYS.Question, id],
       });
       setEditModalOpen(false);
-      toast({ variant: "success", title: "Success", description: "Question updated successfully" });
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Question updated successfully",
+      });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
-      console.error("Error updating question:", error);
-      toast({ variant: "destructive", title: "Error", description: "Error updating question" + error });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error updating question" + error,
+      });
     },
   });
 
@@ -70,12 +77,19 @@ const QuestionPageContent = ({ id }: { id: string }) => {
       });
       setDeleteModalOpen(false);
       router.push("/questions");
-      toast({ variant: "success", title: "Success", description: "Question deleted successfully" });
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Question deleted successfully",
+      });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
-      console.error("Error deleting question:", error);
-      toast({ variant: "destructive", title: "Error", description: "Error deleting question" + error });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error deleting question" + error,
+      });
     },
   });
 
@@ -92,12 +106,12 @@ const QuestionPageContent = ({ id }: { id: string }) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container p-4 mx-auto">
       {/* Back Button */}
       <div className="flex items-center my-4">
         <Link href="/questions">
           <Button variant="outline" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="w-4 h-4" />
             Back to Questions
           </Button>
         </Link>
@@ -107,30 +121,30 @@ const QuestionPageContent = ({ id }: { id: string }) => {
       <div
         className={`bg-white shadow-md rounded-lg p-6 relative ${confirmLoading ? "opacity-50" : "opacity-100"}`}
       >
-        <div className="absolute top-4 right-4 flex gap-2">
+        <div className="absolute flex gap-2 top-4 right-4">
           <Button
             variant="outline"
             disabled={confirmLoading}
             onClick={() => setEditModalOpen(true)}
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="w-4 h-4" />
           </Button>
           <Button
             variant="destructive"
             disabled={confirmLoading}
             onClick={() => setDeleteModalOpen(true)}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
 
-        <div className="flex items-center mb-4 gap-4">
+        <div className="flex items-center gap-4 mb-4">
           <h1 className="text-2xl font-bold text-gray-800">
             {question.q_title}
           </h1>
           <DifficultyBadge complexity={question.q_complexity} />
         </div>
-        <p className="text-gray-600 mb-6">{question.q_desc}</p>
+        <p className="mb-6 text-gray-600">{question.q_desc}</p>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="font-bold text-gray-700">Categories </div>

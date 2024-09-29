@@ -20,7 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import CreateModal from "./components/CreateModal";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { createQuestion, fetchQuestions } from "@/lib/api/question";
 import Link from "next/link";
 import DifficultyBadge from "@/components/DifficultyBadge";
@@ -31,7 +31,7 @@ const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-
+  const { toast } = useToast();
   const { data } = useSuspenseQuery<QuestionDto[]>({
     queryKey: [QUERY_KEYS.Question],
     queryFn: fetchQuestions,
@@ -42,12 +42,19 @@ const QuestionRepositoryContent = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Question] });
       setCreateModalOpen(false);
-      toast({ variant: "success", title: "Success", description: "Question created successfully"});
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Question created successfully",
+      });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
-      console.error("Error creating question:", error);
-      toast({ variant: "destructive", title: "Error", description: "Error creating question: " + error });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error creating question: " + error,
+      });
     },
   });
 
@@ -56,15 +63,15 @@ const QuestionRepositoryContent = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center my-4">
+    <div className="container p-4 mx-auto">
+      <div className="flex items-center justify-between my-4">
         <h1 className="text-xl font-semibold">Question Repository</h1>
         <Button
           variant="outline"
           disabled={confirmLoading}
           onClick={() => setCreateModalOpen(true)}
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="w-4 h-4" />
         </Button>
       </div>
 
@@ -96,7 +103,7 @@ const QuestionRepositoryContent = () => {
                   <DifficultyBadge complexity={question.q_complexity} />
                 </TableCell>
                 <TableCell style={{ width: "50%" }}>
-                  <div className="flex flex-wrap gap-2 max-w-md">
+                  <div className="flex flex-wrap max-w-md gap-2">
                     {question.q_category.map((category) => (
                       <Badge
                         key={category}
