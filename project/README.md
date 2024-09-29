@@ -40,6 +40,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
+- [TurboRepo](https://turbo.build/repo/docs) for easily managing monorepo
 - [shadcn/ui](https://ui.shadcn.com/) for CSS
 - [Zod](https://zod.dev/) for validation
 - [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for querying
