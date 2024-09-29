@@ -42,6 +42,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 - [Prettier](https://prettier.io) for code formatting
 - [shadcn/ui](https://ui.shadcn.com/) for CSS
 - [Zod](https://zod.dev/) for validation
+- [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for querying
 
 ## Getting Started
 
