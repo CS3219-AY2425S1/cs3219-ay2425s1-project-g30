@@ -53,7 +53,7 @@ const QuestionRepositoryContent = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error creating question: " + error,
+        description: "Error creating question: " + error.message,
       });
     },
   });

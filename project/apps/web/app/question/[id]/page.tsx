@@ -63,7 +63,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error updating question" + error,
+        description: "Error updating question" + error.message,
       });
     },
   });
@@ -88,7 +88,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error deleting question" + error,
+        description: "Error deleting question" + error.message,
       });
     },
   });
