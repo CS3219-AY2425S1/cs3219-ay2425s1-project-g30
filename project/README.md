@@ -53,6 +53,17 @@ To build all apps and packages, run the following command:
 pnpm build
 ```
 
+### Setup Environment Variables
+
+Each `project/apps` has a `.env` that you should create.
+Copy the `.env.example` file in each of these apps to create a new `.env` file:
+
+```bash
+$ cp .env.example .env
+```
+
+Then, replace the variables accordingly.
+
 ### Develop
 
 To develop all apps and packages, run the following command:
