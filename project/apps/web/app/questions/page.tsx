@@ -74,11 +74,11 @@ const QuestionRepositoryContent = () => {
   const [filterDifficulty, setFilterDifficulty] = useState<Array<{ value: COMPLEXITY; label: string }>>([]);
   const [filterCategories, setFilterCategories] = useState<Array<{ value: CATEGORY; label: string }>>([]);
 
-  const difficultyOptions = [
-    { value: COMPLEXITY.Easy, label: 'Easy' },
-    { value: COMPLEXITY.Medium, label: 'Medium' },
-    { value: COMPLEXITY.Hard, label: 'Hard' },
-  ];
+  const complexityOrder: { [key in COMPLEXITY]: number } = {
+    [COMPLEXITY.Easy]: 1,
+    [COMPLEXITY.Medium]: 2,
+    [COMPLEXITY.Hard]: 3,
+  };
   
   const categoryOptions = [
     { value: CATEGORY.DataStructures, label: 'Data Structures' },
@@ -120,20 +120,20 @@ const QuestionRepositoryContent = () => {
     return [...filteredData].sort((a, b) => {
       let aValue: string | number;
       let bValue: string | number;
-
+  
       if (sortField === 'q_title') {
         aValue = a.q_title.toLowerCase();
         bValue = b.q_title.toLowerCase();
       } else if (sortField === 'q_complexity') {
-        aValue = a.q_complexity;
-        bValue = b.q_complexity;
+        aValue = complexityOrder[a.q_complexity as COMPLEXITY];
+        bValue = complexityOrder[b.q_complexity as COMPLEXITY];
       } else if (sortField === 'q_category') {
         aValue = a.q_category.join(', ').toLowerCase();
         bValue = b.q_category.join(', ').toLowerCase();
       } else {
         return 0;
       }
-
+  
       if (aValue < bValue) {
         return sortOrder === 'asc' ? -1 : 1;
       }
@@ -164,7 +164,11 @@ const QuestionRepositoryContent = () => {
           <h2 className="font-semibold mb-2">Filter by Difficulty</h2>
           <Select
             isMulti
-            options={difficultyOptions}
+            options={[
+              { value: COMPLEXITY.Easy, label: 'Easy' },
+              { value: COMPLEXITY.Medium, label: 'Medium' },
+              { value: COMPLEXITY.Hard, label: 'Hard' },
+            ]}
             value={filterDifficulty}
             onChange={(selectedOptions) => {
               setFilterDifficulty(selectedOptions as { value: COMPLEXITY; label: string }[] || []);
