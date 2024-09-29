@@ -11,11 +11,11 @@ export const getQuestionsQuerySchema = z.object({
 });
 
 const commonQuestionFields = z.object({
-  q_title: z.string().min(1),
-  q_desc: z.string().min(1),
+  q_title: z.string().min(1, { message: "Title must not be empty" }),
+  q_desc: z.string().min(1, { message: "Description must not be empty" }),
   q_category: z
     .array(categorySchema)
-    .min(1)
+    .min(1, { message: "At least one category is required" })
     // enforce uniqueness of categories
     .refine((categories) => new Set(categories).size === categories.length, {
       message: "Categories must be unique",
