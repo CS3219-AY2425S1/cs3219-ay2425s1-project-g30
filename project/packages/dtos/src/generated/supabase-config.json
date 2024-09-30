@@ -1,0 +1,13 @@
+
+[
+    {
+      "projectId": "ncxgumrscmhhksignpks",
+      "schema": "public",
+      "outputPath": "./types/questions.types.ts"
+    },
+    {
+      "projectId": "kamxbsekjfdzemvoevgz",
+      "schema": "public",
+      "outputPath": "./types/auth.types.ts"
+    }
+]

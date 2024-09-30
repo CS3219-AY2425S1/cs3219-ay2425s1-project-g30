@@ -10,7 +10,7 @@ function sanitizeEnumName(enumName: string): string {
 // Helper function to parse string literal unions and convert to enums
 function parseUnionTypeToEnum(
   typeNode: ts.TypeNode,
-  enumName: string
+  enumName: string,
 ): string | null {
   if (!ts.isUnionTypeNode(typeNode)) return null;
 
@@ -57,7 +57,7 @@ const generateEnumsFromDatabase = (dbFilePath: string): string | null => {
       const publicMember = databaseType.members.find(
         (member) =>
           ts.isPropertySignature(member) &&
-          (member.name as ts.Identifier).text === "public"
+          (member.name as ts.Identifier).text === "public",
       ) as ts.PropertySignature;
 
       if (
@@ -71,7 +71,7 @@ const generateEnumsFromDatabase = (dbFilePath: string): string | null => {
         const enumsMember = publicMembers.find(
           (member) =>
             ts.isPropertySignature(member) &&
-            (member.name as ts.Identifier).text === "Enums"
+            (member.name as ts.Identifier).text === "Enums",
         ) as ts.PropertySignature;
 
         if (
@@ -87,7 +87,7 @@ const generateEnumsFromDatabase = (dbFilePath: string): string | null => {
               const enumName = (enumMember.name as ts.Identifier).text;
               const enumDefinition = parseUnionTypeToEnum(
                 enumMember.type,
-                enumName
+                enumName,
               );
               if (enumDefinition) {
                 generatedEnums.push(enumDefinition);
@@ -130,7 +130,7 @@ const cleanEnumsDirectory = (enumsDirectory: string) => {
 // Main function to process all .types.ts files in the types directory and generate corresponding .enums.ts files in the enums directory
 const processAllTypeFiles = (
   typesDirectory: string,
-  enumsDirectory: string
+  enumsDirectory: string,
 ) => {
   const typeFiles = findTypeFilesInDirectory(typesDirectory);
 
