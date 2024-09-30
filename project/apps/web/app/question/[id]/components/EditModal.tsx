@@ -22,6 +22,10 @@ import {
 } from "@/components/ui/select";
 import { UpdateQuestionDto, updateQuestionSchema } from "@repo/dtos/questions";
 import {
+  QuestionCategories,
+  QuestionComplexity,
+} from "@repo/dtos/generated/enums/questions.enums";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -29,7 +33,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY, COMPLEXITY } from "@/constants/question";
 
 interface EditModalProps {
   open: boolean;
@@ -54,7 +57,8 @@ export default function EditModal({
     },
   });
 
-  const categories = Object.values(CATEGORY);
+  const categories = Object.values(QuestionCategories);
+  const complexities = Object.values(QuestionComplexity);
 
   const handleSubmit = (data: UpdateQuestionDto) => {
     const updatedData: UpdateQuestionDto = {
@@ -139,7 +143,7 @@ export default function EditModal({
                         <SelectValue placeholder="Select complexity" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.values(COMPLEXITY).map((level) => (
+                        {complexities.map((level) => (
                           <SelectItem key={level} value={level}>
                             {level}
                           </SelectItem>
