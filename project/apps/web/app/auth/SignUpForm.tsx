@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signUp } from "@/lib/api/auth";
 import { useZodForm } from "@/lib/form";
 import { useLoginState } from "@/contexts/LoginStateContext";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useToast } from "@/hooks/use-toast";
 
 export function SignUpForm() {
@@ -26,7 +27,7 @@ export function SignUpForm() {
     mutationFn: signUp,
     onSuccess: async () => {
       setHasLoginStateFlag();
-      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
     },
     onError: (error) => {
       toast({

@@ -40,8 +40,10 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
+- [TurboRepo](https://turbo.build/repo/docs) for easily managing monorepo
 - [shadcn/ui](https://ui.shadcn.com/) for CSS
 - [Zod](https://zod.dev/) for validation
+- [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for querying
 
 ## Getting Started
 
@@ -52,6 +54,17 @@ To build all apps and packages, run the following command:
 ```
 pnpm build
 ```
+
+### Setup Environment Variables
+
+Each `project/apps` has a `.env` that you should create.
+Copy the `.env.example` file in each of these apps to create a new `.env` file:
+
+```bash
+$ cp .env.example .env
+```
+
+Then, replace the variables accordingly.
 
 ### Develop
 

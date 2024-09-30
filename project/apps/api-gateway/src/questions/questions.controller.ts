@@ -7,7 +7,7 @@ import {
   Inject,
   Body,
   Post,
-  UseGuards,
+  // UseGuards,
   Put,
   Delete,
   Query,
@@ -15,7 +15,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { AuthGuard } from 'src/auth/auth.guard';
+// import { AuthGuard } from 'src/auth/auth.guard';
 import {
   CreateQuestionDto,
   createQuestionSchema,
@@ -27,7 +27,7 @@ import {
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 
 @Controller('questions')
-@UseGuards(AuthGuard) // Can comment out if we dw auth for now
+// @UseGuards(AuthGuard) // comment out if we dw auth for now
 export class QuestionsController {
   constructor(
     @Inject('QUESTIONS_SERVICE')

@@ -94,12 +94,12 @@ export class QuestionsService {
       .single<QuestionDto>();
 
     if (existingQuestion) {
-      // this.handleError(
-      //   'create question',
-      //   new BadRequestException(
-      //     `Question with title ${question.q_title} already exists`,
-      //   ),
-      // );
+      this.handleError(
+        'create question',
+        new BadRequestException(
+          `Question with title ${question.q_title} already exists`,
+        ),
+      );
     }
 
     const { data, error } = await this.supabase

@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-roboto), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-inter), sans-serif;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -30,6 +45,9 @@
 
     --destructive: 0 100% 50%;
     --destructive-foreground: 210 40% 98%;
+
+    --green: 120 100% 25%;
+    --green-foreground: 0 0% 100%;
 
     --ring: 215 20.2% 65.1%;
 

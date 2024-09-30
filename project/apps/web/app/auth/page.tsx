@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
-import { PublicPageWrapper } from "@/components/AuthWrappers/PublicPageWrapper";
+import { PublicPageWrapper } from "@/components/auth-wrappers/PublicPageWrapper";
 import { LANDING } from "@/lib/routes";
 
 export default function AuthPage() {

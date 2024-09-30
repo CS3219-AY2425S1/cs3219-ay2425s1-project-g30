@@ -6,10 +6,14 @@ import { useCallback } from "react";
 import { useLoginState } from "@/contexts/LoginStateContext";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { me, signOut } from "@/lib/api/auth";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 
 export const useMe = () => {
   const router = useRouter();
-  const { data, error } = useSuspenseQuery({ queryKey: ["me"], queryFn: me });
+  const { data, error } = useSuspenseQuery({
+    queryKey: [QUERY_KEYS.Me],
+    queryFn: me,
+  });
   const { removeLoginStateFlag } = useLoginState();
   if (error) {
     removeLoginStateFlag();
@@ -27,7 +31,7 @@ export const useMe = () => {
         },
       });
     },
-    [logoutMutation, removeLoginStateFlag]
+    [logoutMutation, removeLoginStateFlag],
   );
 
   return { userData: data, logout };

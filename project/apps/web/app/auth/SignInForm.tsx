@@ -16,6 +16,7 @@ import { signIn } from "@/lib/api/auth";
 import { useZodForm } from "@/lib/form";
 import { useLoginState } from "@/contexts/LoginStateContext";
 import { useToast } from "@/hooks/use-toast";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 
 export function SignInForm() {
   const form = useZodForm({ schema: signInSchema });
@@ -27,7 +28,7 @@ export function SignInForm() {
     mutationFn: signIn,
     onSuccess: async () => {
       setHasLoginStateFlag();
-      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
     },
     onError(error) {
       toast({

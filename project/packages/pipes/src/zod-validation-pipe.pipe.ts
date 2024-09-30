@@ -27,12 +27,12 @@ export class ZodValidationPipe implements PipeTransform {
 
         // Throw HTTP exception wrapped in an RpcException
         throw new RpcException(
-          new BadRequestException(`Validation failed: ${formattedErrors}`)
+          new BadRequestException(`Validation failed: ${formattedErrors}`),
         );
       }
       // Fallback for unknown errors
       throw new RpcException(
-        new InternalServerErrorException("Validation failed, unknown error")
+        new InternalServerErrorException("Validation failed, unknown error"),
       );
     }
   }
