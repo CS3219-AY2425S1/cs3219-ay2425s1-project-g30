@@ -7,7 +7,10 @@
     "dev": "pnpm build --watch",
     "build": "tsc -b -v",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "gen:types": "npx ts-node ./src/generated/generate-types-script.ts && pnpm lint",
+    "gen:enums": "npx ts-node ./src/generated/generate-enums-script.ts && pnpm lint",
+    "gen:all": "pnpm gen:types && pnpm gen:enums"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
