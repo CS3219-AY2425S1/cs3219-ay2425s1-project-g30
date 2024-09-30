@@ -51,9 +51,9 @@ const QuestionRepositoryContent = () => {
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
       toast({
-        variant: "destructive",
+        variant: "error",
         title: "Error",
-        description: "Error creating question: " + error.message,
+        description: error.message,
       });
     },
   });

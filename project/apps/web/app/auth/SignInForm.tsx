@@ -32,8 +32,9 @@ export function SignInForm() {
     },
     onError(error) {
       toast({
+        title: "Error",
         description: error.message,
-        variant: "destructive",
+        variant: "error",
       });
     },
   });
