@@ -2,6 +2,16 @@ import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
 
+/*
+ * This script generates TypeScript enums from string literal unions in .types.ts files.
+ * The enums are then written to .enums.ts files in a specified directory.
+ *
+ * This is necessary because Supabase generates string literal unions for enums in the database schema,
+ * but string literal unions cannot be directly used with Zod validations or converted to TypeScript enums.
+ * This script transforms those string literal unions into TypeScript enums
+ * that are easier to use for validation and type safety.
+ */
+
 // Helper function to sanitize enum names (e.g., remove whitespaces, punctuation)
 function sanitizeEnumName(enumName: string): string {
   return enumName.replace(/\s+/g, "").replace(/[^a-zA-Z0-9_]/g, "");
