@@ -14,8 +14,8 @@ export type Database = {
           created_at: string;
           deleted_at: string | null;
           id: string;
-          q_category: Database["public"]["Enums"]["Question Categories"][];
-          q_complexity: Database["public"]["Enums"]["Question Complexity"];
+          q_category: Database["public"]["Enums"]["Category"][];
+          q_complexity: Database["public"]["Enums"]["Complexity"];
           q_desc: string | null;
           q_title: string;
           updated_at: string | null;
@@ -24,8 +24,8 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           id?: string;
-          q_category: Database["public"]["Enums"]["Question Categories"][];
-          q_complexity: Database["public"]["Enums"]["Question Complexity"];
+          q_category: Database["public"]["Enums"]["Category"][];
+          q_complexity: Database["public"]["Enums"]["Complexity"];
           q_desc?: string | null;
           q_title: string;
           updated_at?: string | null;
@@ -34,8 +34,8 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           id?: string;
-          q_category?: Database["public"]["Enums"]["Question Categories"][];
-          q_complexity?: Database["public"]["Enums"]["Question Complexity"];
+          q_category?: Database["public"]["Enums"]["Category"][];
+          q_complexity?: Database["public"]["Enums"]["Complexity"];
           q_desc?: string | null;
           q_title?: string;
           updated_at?: string | null;
@@ -50,7 +50,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      "Question Categories":
+      Category:
         | "Strings"
         | "Algorithms"
         | "Data Structures"
@@ -59,7 +59,7 @@ export type Database = {
         | "Databases"
         | "Brain Teaser"
         | "Arrays";
-      "Question Complexity": "Easy" | "Medium" | "Hard";
+      Complexity: "Easy" | "Medium" | "Hard";
     };
     CompositeTypes: {
       [_ in never]: never;

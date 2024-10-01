@@ -94,7 +94,9 @@ const generateEnumsFromDatabase = (dbFilePath: string): string | null => {
           // Generate enums for each entry under Enums
           enumsMembers.forEach((enumMember) => {
             if (ts.isPropertySignature(enumMember) && enumMember.type) {
-              const enumName = (enumMember.name as ts.Identifier).text;
+              const enumName = (
+                enumMember.name as ts.Identifier
+              ).text.toUpperCase();
               const enumDefinition = parseUnionTypeToEnum(
                 enumMember.type,
                 enumName,

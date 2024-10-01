@@ -30,8 +30,8 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import {
-  QuestionCategories,
-  QuestionComplexity,
+  CATEGORY,
+  COMPLEXITY,
 } from "@repo/dtos/generated/enums/questions.enums";
 interface CreateModalProps {
   open: boolean;
@@ -54,8 +54,8 @@ export default function CreateModal({
     },
   });
 
-  const categories = Object.values(QuestionCategories);
-  const complexities = Object.values(QuestionComplexity);
+  const categories = Object.values(CATEGORY);
+  const complexities = Object.values(COMPLEXITY);
 
   const handleSubmit = (data: CreateQuestionDto) => {
     onCreate(data);

@@ -22,10 +22,6 @@ import {
 } from "@/components/ui/select";
 import { UpdateQuestionDto, updateQuestionSchema } from "@repo/dtos/questions";
 import {
-  QuestionCategories,
-  QuestionComplexity,
-} from "@repo/dtos/generated/enums/questions.enums";
-import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -33,6 +29,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from "@repo/dtos/generated/enums/questions.enums";
 
 interface EditModalProps {
   open: boolean;
@@ -57,8 +57,8 @@ export default function EditModal({
     },
   });
 
-  const categories = Object.values(QuestionCategories);
-  const complexities = Object.values(QuestionComplexity);
+  const CATEGORIES = Object.values(CATEGORY);
+  const COMPLEXITIES = Object.values(COMPLEXITY);
 
   const handleSubmit = (data: UpdateQuestionDto) => {
     const updatedData: UpdateQuestionDto = {
@@ -143,7 +143,7 @@ export default function EditModal({
                         <SelectValue placeholder="Select complexity" />
                       </SelectTrigger>
                       <SelectContent>
-                        {complexities.map((level) => (
+                        {COMPLEXITIES.map((level) => (
                           <SelectItem key={level} value={level}>
                             {level}
                           </SelectItem>
@@ -165,7 +165,7 @@ export default function EditModal({
                   <FormLabel className="text-black">Categories</FormLabel>
                   <FormControl>
                     <div className="flex flex-wrap gap-2">
-                      {categories.map((cat) => (
+                      {CATEGORIES.map((cat) => (
                         <Badge
                           key={cat}
                           onClick={() =>

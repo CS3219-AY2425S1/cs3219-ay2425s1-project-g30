@@ -1,4 +1,4 @@
-export enum QuestionCategories {
+export enum CATEGORY {
   Strings = "Strings",
   Algorithms = "Algorithms",
   DataStructures = "Data Structures",
@@ -9,7 +9,7 @@ export enum QuestionCategories {
   Arrays = "Arrays",
 }
 
-export enum QuestionComplexity {
+export enum COMPLEXITY {
   Easy = "Easy",
   Medium = "Medium",
   Hard = "Hard",

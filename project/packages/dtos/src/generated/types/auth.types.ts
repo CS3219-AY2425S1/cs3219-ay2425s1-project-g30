@@ -14,21 +14,21 @@ export type Database = {
           created_at: string;
           email: string;
           id: string;
-          role: Database["public"]["Enums"]["role"];
+          role: Database["public"]["Enums"]["Role"];
           username: string;
         };
         Insert: {
           created_at?: string;
           email: string;
           id: string;
-          role?: Database["public"]["Enums"]["role"];
+          role?: Database["public"]["Enums"]["Role"];
           username: string;
         };
         Update: {
           created_at?: string;
           email?: string;
           id?: string;
-          role?: Database["public"]["Enums"]["role"];
+          role?: Database["public"]["Enums"]["Role"];
           username?: string;
         };
         Relationships: [
@@ -49,7 +49,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      role: "user" | "admin";
+      Role: "User" | "Admin";
     };
     CompositeTypes: {
       [_ in never]: never;
