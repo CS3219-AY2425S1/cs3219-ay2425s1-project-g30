@@ -12,6 +12,8 @@ jobs:
   install:
     name: Install Dependencies
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
     defaults:
       run:
         working-directory: ./project
@@ -52,7 +54,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Fetch and generate Supabase types and enums
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Generate Supabase types and enums
         run: pnpm --filter dtos gen:types-and-enums
 
   lint:
