@@ -3,6 +3,35 @@ import * as path from "path";
 import * as fs from "fs";
 import projects from "./supabase-config.json";
 
+/**
+ * This script is responsible for generating TypeScript types from Supabase schemas
+ * for multiple Supabase projects defined in the `supabase-config.json` file. It automates
+ * the process of generating types and saving them into a fixed output directory within a monorepo.
+ *
+ * Key functionalities of the script:
+ *
+ * 1. **Root Directory Setup**:
+ *    - The script identifies the root directory of the monorepo and sets a fixed output directory
+ *      (`src/generated`) where the generated TypeScript types will be stored.
+ *
+ * 2. **Type Generation**:
+ *    - The `generateTypes` function is responsible for generating TypeScript types for a specific Supabase project.
+ *    - It ensures the output directory exists, then runs the Supabase CLI command (`npx supabase gen types typescript`)
+ *      to generate types for the given `projectId` and `schema`. The types are written to the specified output file.
+ *
+ * 3. **Handling Multiple Projects**:
+ *    - The `generateAllTypes` function loops over all projects defined in the `supabase-config.json` file.
+ *    - For each project, it calculates the absolute output path within the fixed directory (`src/generated`)
+ *      and invokes `generateTypes` to generate the types.
+ *
+ * 4. **Error Handling**:
+ *    - The `main` function calls `generateAllTypes` and includes basic error handling to catch and log any
+ *      issues that occur during type generation.
+ *
+ * The script is designed to be run manually or as part of an automated process to ensure the latest TypeScript types
+ * are generated for Supabase projects and saved in the correct directory structure within the monorepo.
+ */
+
 // Get the root directory of the monorepo (assuming this script is inside the repo)
 const PACKAGE_ROOT_DIR = path.resolve(__dirname, "../../"); // Adjust the depth as necessary
 

@@ -38,6 +38,9 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
+      - name: Build Project
+        run: pnpm build
+
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
@@ -59,8 +62,8 @@ jobs:
         with:
           version: latest
 
-      - name: Generate Supabase types and enums
-        run: pnpm --filter dtos gen:types-and-enums
+      - name: Check Database Types
+        run: pnpm --filter dtos check-db-types
 
   lint:
     name: Type Check & Lint
@@ -88,6 +91,9 @@ jobs:
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Build Project
+        run: pnpm build
 
       - name: Cache turbo build setup
         uses: actions/cache@v4

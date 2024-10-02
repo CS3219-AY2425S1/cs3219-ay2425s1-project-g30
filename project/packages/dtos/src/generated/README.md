@@ -16,6 +16,7 @@ generated/
 │   ├── questions.enums.ts
 │   └── ... (generated .enums.ts files)
 ├── supabase-config.json 
+├── check-types-script.ts
 ├── generate-types-script.ts 
 ├── generate-enums-script.ts
 └── README.md
