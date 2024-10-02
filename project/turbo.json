@@ -14,6 +14,9 @@
     "type-check": {
       "dependsOn": ["^type-check"]
     },
+    "gen:types-and-enums": {
+      "dependsOn": ["^gen:types-and-enums"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

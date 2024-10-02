@@ -26,7 +26,7 @@ generated/
 To generate both types and enums, run the following command:
 
 ```bash
-pnpm gen:all
+pnpm gen:types-and-enums
 ```
 
 ## Generating Types

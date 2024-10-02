@@ -52,6 +52,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Fetch and generate Supabase types and enums
+        run: turbo gen:types-and-enums
+
   lint:
     name: Type Check & Lint
     needs:
