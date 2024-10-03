@@ -1,16 +1,14 @@
-# Specify the version of the Docker Compose.
 version: "3.9"
 
-# Define the services and applications that make up your application.
 services:
   api-gateway:
     build:
       context: .
       dockerfile: ./apps/api-gateway/Dockerfile
     ports:
-      - 4000:4000 # Maps port 3000 on the host to port 3000 in the container, making the app accessible on the host.
+      - 4000:4000
     networks:
-      - backend # Connects the demo-app to the 'demo' network.
+      - backend
     environment:
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       SUPABASE_URL: ${API_GATEWAY_SUPABASE_URL}
@@ -29,5 +27,5 @@ services:
       SUPABASE_KEY: ${QUESTION_SERVICE_SUPABASE_KEY}
 
 networks:
-  backend: # Defines a network named 'demo'.
-    driver: bridge # Uses the bridge driver for the network, which is the default and most common network type in Docker.
+  backend:
+    driver: bridge

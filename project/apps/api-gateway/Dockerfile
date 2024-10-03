@@ -55,6 +55,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 WORKDIR /app
 
+# Copy the files from the installer and set the ownership to the non-root user (nodejs)
 COPY --from=installer --chown=nodejs:nodejs /app .
 
 # Set the working directory to the service directory
