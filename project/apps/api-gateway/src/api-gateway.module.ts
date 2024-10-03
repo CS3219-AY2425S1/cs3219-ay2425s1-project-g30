@@ -22,9 +22,10 @@ import { LoggerModule } from 'nestjs-pino';
     // Client for Questions Service
     ClientsModule.register([
       {
-        name: 'QUESTIONS_SERVICE',
+        name: 'QUESTION_SERVICE',
         transport: Transport.TCP,
         options: {
+          host: process.env.QUESTION_SERVICE_HOST || 'question-service',
           port: 3001,
         },
       },
