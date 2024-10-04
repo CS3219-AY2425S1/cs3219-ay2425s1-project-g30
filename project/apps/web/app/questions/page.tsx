@@ -20,7 +20,7 @@ import QuestionsSkeleton from "./components/QuestionsSkeleton";
 import {
   QuestionsStateProvider,
   useQuestionsState,
-} from "@/contexts/QuestionsContext";
+} from "@/contexts/QuestionsStateContext";
 import { ActionModals } from "@/components/question/ActionModals";
 
 const QuestionRepositoryContent = () => {

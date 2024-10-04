@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { QuestionDto } from "@repo/dtos/questions";
 import { Pencil, Trash2 } from "lucide-react";
-import { useQuestionsState } from "@/contexts/QuestionsContext";
+import { useQuestionsState } from "@/contexts/QuestionsStateContext";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
