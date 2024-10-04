@@ -6,8 +6,8 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import DifficultyBadge from "@/components/DifficultyBadge";
-import { COMPLEXITY } from "@/constants/question";
 import { QuestionDto } from "@repo/dtos/questions";
+import { COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
 
 // Complexity sorting order
 const complexityOrder: { [key in COMPLEXITY]: number } = {
@@ -30,23 +30,32 @@ const categorySortingFn: SortingFn<QuestionDto> = (rowA, rowB, columnId) => {
   return valueA.length - valueB.length;
 };
 
-
 // Filtering functions
-const complexityFilter = (row: any, columnId: string, filterValue: string[]) => {
-  return filterValue.length === 0 || filterValue.includes(row.getValue(columnId));
+const complexityFilter = (
+  row: any,
+  columnId: string,
+  filterValue: string[],
+) => {
+  return (
+    filterValue.length === 0 || filterValue.includes(row.getValue(columnId))
+  );
 };
 
 const categoryFilter = (row: any, columnId: string, filterValue: string[]) => {
   const rowValues = row.getValue(columnId) as string[];
   return (
-      filterValue.length === 0 || (rowValues.length === filterValue.length && 
+    filterValue.length === 0 ||
+    (rowValues.length === filterValue.length &&
       rowValues.every((value) => filterValue.includes(value)))
   );
 };
 
 const titleFilter = (row: any, columnId: string, filterValue: string) => {
-  return row.getValue(columnId).toLowerCase().includes(filterValue.toLowerCase());
-}
+  return row
+    .getValue(columnId)
+    .toLowerCase()
+    .includes(filterValue.toLowerCase());
+};
 
 // Column definitions
 export const columns: ColumnDef<QuestionDto>[] = [
@@ -68,7 +77,10 @@ export const columns: ColumnDef<QuestionDto>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <Link href={`/question/${row.original.id}`} className="text-blue-500 hover:text-blue-700">
+      <Link
+        href={`/question/${row.original.id}`}
+        className="text-blue-500 hover:text-blue-700"
+      >
         {row.original.q_title}
       </Link>
     ),
@@ -91,7 +103,9 @@ export const columns: ColumnDef<QuestionDto>[] = [
         )}
       </Button>
     ),
-    cell: ({ row }) => <DifficultyBadge complexity={row.original.q_complexity} />,
+    cell: ({ row }) => (
+      <DifficultyBadge complexity={row.original.q_complexity} />
+    ),
     filterFn: complexityFilter,
     sortingFn: complexitySortingFn,
   },
@@ -122,6 +136,6 @@ export const columns: ColumnDef<QuestionDto>[] = [
       </div>
     ),
     filterFn: categoryFilter,
-    sortingFn: categorySortingFn
+    sortingFn: categorySortingFn,
   },
 ];
