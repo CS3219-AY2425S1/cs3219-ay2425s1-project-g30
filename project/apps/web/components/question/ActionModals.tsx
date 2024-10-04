@@ -8,7 +8,6 @@ import { deleteQuestion, updateQuestion } from "@/lib/api/question";
 import { QuestionDto, UpdateQuestionDto } from "@repo/dtos/questions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 interface ActionModalsProps {
   id: string;
@@ -41,6 +40,7 @@ export const ActionModals = ({
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.Question, id],
       });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Question] });
       setEditModalOpen(false);
       toast({
         variant: "success",
@@ -65,6 +65,7 @@ export const ActionModals = ({
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.Question, id],
       });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Question] });
       setDeleteModalOpen(false);
       router.push("/questions");
       toast({

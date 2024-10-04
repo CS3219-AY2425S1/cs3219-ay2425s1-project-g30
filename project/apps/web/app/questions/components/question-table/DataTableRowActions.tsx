@@ -10,10 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
-import { ActionModals } from "@/components/question/ActionModals";
 import { QuestionDto } from "@repo/dtos/questions";
 import { Pencil, Trash2 } from "lucide-react";
+import { useQuestionsState } from "@/contexts/QuestionsContext";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -22,9 +21,18 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { setEditModalOpen, setDeleteModalOpen, setSelectedQuestion } =
+    useQuestionsState();
   const question = row.original as QuestionDto;
+  const handleOpenEdit = () => {
+    setSelectedQuestion(question);
+    setEditModalOpen(true);
+  };
+
+  const handleOpenDelete = () => {
+    setSelectedQuestion(question);
+    setDeleteModalOpen(true);
+  };
   return (
     <>
       <DropdownMenu>
@@ -38,29 +46,14 @@ export function DataTableRowActions<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem
-            className="gap-2"
-            onSelect={() => setEditModalOpen(true)}
-          >
+          <DropdownMenuItem className="gap-2" onSelect={handleOpenEdit}>
             <Pencil className="w-4 h-4" /> Edit
           </DropdownMenuItem>
-          <DropdownMenuItem
-            className="gap-2"
-            onSelect={() => setDeleteModalOpen(true)}
-          >
+          <DropdownMenuItem className="gap-2" onSelect={handleOpenDelete}>
             <Trash2 className="w-4 h-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ActionModals
-        id={question.id}
-        question={question}
-        setConfirmLoading={() => {}}
-        isEditModalOpen={isEditModalOpen}
-        setEditModalOpen={setEditModalOpen}
-        isDeleteModalOpen={isDeleteModalOpen}
-        setDeleteModalOpen={setDeleteModalOpen}
-      />
     </>
   );
 }

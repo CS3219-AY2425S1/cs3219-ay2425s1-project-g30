@@ -17,11 +17,24 @@ import EmptyPlaceholder from "./components/EmptyPlaceholder";
 import { columns } from "./components/question-table/columns";
 import { DataTable } from "./components/question-table/DataTable";
 import QuestionsSkeleton from "./components/QuestionsSkeleton";
+import {
+  QuestionsStateProvider,
+  useQuestionsState,
+} from "@/contexts/QuestionsContext";
+import { ActionModals } from "@/components/question/ActionModals";
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const {
+    confirmLoading,
+    setConfirmLoading,
+    selectedQuestion,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    setEditModalOpen,
+    setDeleteModalOpen,
+  } = useQuestionsState();
   const { toast } = useToast();
   const { data } = useSuspenseQuery<QuestionDto[]>({
     queryKey: [QUERY_KEYS.Question],
@@ -84,6 +97,17 @@ const QuestionRepositoryContent = () => {
         setOpen={setCreateModalOpen}
         onCreate={handleCreateQuestion}
       />
+      {selectedQuestion && (
+        <ActionModals
+          id={selectedQuestion.id}
+          question={selectedQuestion}
+          setConfirmLoading={setConfirmLoading}
+          isEditModalOpen={isEditModalOpen}
+          setEditModalOpen={setEditModalOpen}
+          isDeleteModalOpen={isDeleteModalOpen}
+          setDeleteModalOpen={setDeleteModalOpen}
+        />
+      )}
     </div>
   );
 };
@@ -91,7 +115,9 @@ const QuestionRepositoryContent = () => {
 const QuestionRepository = () => {
   return (
     <Suspense fallback={<QuestionsSkeleton />}>
-      <QuestionRepositoryContent />
+      <QuestionsStateProvider>
+        <QuestionRepositoryContent />
+      </QuestionsStateProvider>
     </Suspense>
   );
 };
