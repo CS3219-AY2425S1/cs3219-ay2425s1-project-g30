@@ -8,6 +8,7 @@ import DifficultyBadge from "@/components/DifficultyBadge";
 import { Badge } from "@/components/ui/badge";
 import { COMPLEXITY } from "@/constants/question";
 import Link from "next/link";
+import { DataTableRowActions } from "./DataTableRowActions";
 
 // Complexity sorting order
 const complexityOrder: { [key in COMPLEXITY]: number } = {
@@ -84,5 +85,9 @@ export const columns: ColumnDef<QuestionDto>[] = [
       );
     },
     sortingFn: categorySortingFn,
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];

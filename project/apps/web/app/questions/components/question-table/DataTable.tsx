@@ -27,6 +27,7 @@ import {
 
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
+import clsx from "clsx";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -79,7 +80,11 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={clsx(header.id === "actions" ? "w-20" : "")}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
