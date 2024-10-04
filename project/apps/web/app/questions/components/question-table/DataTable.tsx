@@ -31,11 +31,13 @@ import { DataTableToolbar } from "./DataTableToolbar";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  confirmLoading: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  confirmLoading,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -71,7 +73,7 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <DataTableToolbar table={table} />
       <div className="rounded-md border">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -90,7 +92,9 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody
+            className={`${confirmLoading ? "opacity-50" : "opacity-100"}`}
+          >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

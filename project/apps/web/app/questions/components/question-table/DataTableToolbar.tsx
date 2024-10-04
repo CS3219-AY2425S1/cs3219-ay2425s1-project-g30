@@ -18,7 +18,6 @@ const CATEGORIES = Object.entries(CATEGORY).map(([value, label]) => ({
   label,
   value,
 }));
-console.log(CATEGORIES);
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }

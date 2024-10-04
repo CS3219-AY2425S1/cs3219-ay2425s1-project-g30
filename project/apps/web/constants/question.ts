@@ -14,15 +14,3 @@ export enum CATEGORY {
   BrainTeaser = "Brain Teaser",
   Arrays = "Arrays",
 }
-
-export const COMPLEXITIES = Object.entries(COMPLEXITY).map(
-  ([label, value]) => ({
-    label,
-    value,
-  }),
-);
-
-export const CATEGORIES = Object.entries(CATEGORY).map(([label, value]) => ({
-  label,
-  value,
-}));

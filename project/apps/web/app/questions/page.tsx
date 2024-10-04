@@ -1,23 +1,22 @@
-// page.tsx
 "use client";
 
-import { Suspense, useState } from "react";
-import { Plus } from "lucide-react";
-import { QuestionDto, CreateQuestionDto } from "@repo/dtos/questions";
+import { Button } from "@/components/ui/button";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { useToast } from "@/hooks/use-toast";
+import { createQuestion, fetchQuestions } from "@/lib/api/question";
+import { CreateQuestionDto, QuestionDto } from "@repo/dtos/questions";
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { Suspense, useState } from "react";
 import CreateModal from "./components/CreateModal";
-import { createQuestion, fetchQuestions } from "@/lib/api/question";
 import EmptyPlaceholder from "./components/EmptyPlaceholder";
-import { QUERY_KEYS } from "@/constants/queryKeys";
+import { columns } from "./components/question-table/columns";
 import { DataTable } from "./components/question-table/DataTable";
 import QuestionsSkeleton from "./components/QuestionsSkeleton";
-import { useToast } from "@/hooks/use-toast";
-import { columns } from "./components/question-table/columns";
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
@@ -43,7 +42,6 @@ const QuestionRepositoryContent = () => {
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error: any) => {
-      console.error("Error creating question:", error);
       toast({
         variant: "error",
         title: "Error",
@@ -74,7 +72,11 @@ const QuestionRepositoryContent = () => {
       {data?.length === 0 ? (
         <EmptyPlaceholder />
       ) : (
-        <DataTable data={data} columns={columns} />
+        <DataTable
+          data={data}
+          columns={columns}
+          confirmLoading={confirmLoading}
+        />
       )}
 
       <CreateModal
