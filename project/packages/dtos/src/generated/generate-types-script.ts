@@ -32,11 +32,8 @@ import projects from "./supabase-config.json";
  * are generated for Supabase projects and saved in the correct directory structure within the monorepo.
  */
 
-// Get the root directory of the monorepo (assuming this script is inside the repo)
-const PACKAGE_ROOT_DIR = path.resolve(__dirname, "../../"); // Adjust the depth as necessary
-
-// Define a fixed output directory within the monorepo (for example, "generated" folder in the repo root)
-const FIXED_OUTPUT_DIR = path.join(PACKAGE_ROOT_DIR, "src/generated");
+// Define a fixed output directory
+const FIXED_OUTPUT_DIR = path.join(__dirname, "types");
 
 // Function to generate types for a specific Supabase project
 const generateTypes = (
@@ -61,11 +58,11 @@ const generateTypes = (
 // Generate types for all projects
 const generateAllTypes = () => {
   projects.forEach(
-    (project: { projectId: string; schema: string; outputPath: string }) => {
+    (project: { projectId: string; schema: string; fileName: string }) => {
       // Ensure the output path is absolute and within the fixed output directory
       const absoluteOutputPath = path.resolve(
         FIXED_OUTPUT_DIR,
-        project.outputPath,
+        project.fileName,
       );
       generateTypes(project.projectId, project.schema, absoluteOutputPath);
     },

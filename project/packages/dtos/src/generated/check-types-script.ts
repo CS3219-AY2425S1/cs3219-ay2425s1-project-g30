@@ -23,14 +23,13 @@ import projects from "./supabase-config.json";
  * instructed to run the `pnpm gen:all` command to regenerate the types.
  */
 
-// Get the root directory of the monorepo (assuming this script is inside the repo)
-const PACKAGE_ROOT_DIR = path.resolve(__dirname, "../../"); // Adjust the depth as necessary
+const GENERATED_DIR = __dirname;
 
-// Define the fixed output directory within the monorepo (for example, "src/generated" folder in the repo root)
-const FIXED_OUTPUT_DIR = path.join(PACKAGE_ROOT_DIR, "src/generated");
+// Existing directory for generated types
+const EXISTING_DIR = path.join(GENERATED_DIR, "types");
 
 // Temporary directory for generating new types
-const TEMP_DIR = path.join(FIXED_OUTPUT_DIR, "check-types-tmp");
+const TEMP_DIR = path.join(GENERATED_DIR, "check-types-tmp");
 
 // Function to generate types for a specific Supabase project in a temp directory
 const generateTypesInTemp = (
@@ -52,7 +51,7 @@ const generateTypesInTemp = (
   execSync(supabaseCommand, { stdio: "inherit" });
 
   console.log(
-    `Supabase types generated in temp at ${path.relative(PACKAGE_ROOT_DIR, tempOutputPath)}`,
+    `Supabase types generated in temp at ${path.relative(GENERATED_DIR, tempOutputPath)}`,
   );
 };
 
@@ -63,7 +62,7 @@ const compareFiles = (
 ): boolean => {
   if (!fs.existsSync(existingFilePath)) {
     console.warn(
-      `Warning: Existing file not found at ${path.relative(PACKAGE_ROOT_DIR, existingFilePath)}`,
+      `Warning: Existing file not found at ${path.relative(GENERATED_DIR, existingFilePath)}`,
     );
     return false;
   }
@@ -77,14 +76,12 @@ const compareFiles = (
 // Function to run eslint on the files
 const lintFiles = (filePath: string) => {
   try {
-    console.log(`Linting files: ${path.relative(PACKAGE_ROOT_DIR, filePath)}`);
+    console.log(`Linting files: ${path.relative(GENERATED_DIR, filePath)}`);
     execSync(`eslint --fix ${filePath}`, { stdio: "inherit" });
-    console.log(
-      `Linting completed: ${path.relative(PACKAGE_ROOT_DIR, filePath)}`,
-    );
+    console.log(`Linting completed: ${path.relative(GENERATED_DIR, filePath)}`);
   } catch (error) {
     console.error(
-      `Error linting files: ${path.relative(PACKAGE_ROOT_DIR, filePath)}`,
+      `Error linting files: ${path.relative(GENERATED_DIR, filePath)}`,
       error,
     );
     throw error; // Ensure we fail if linting fails
@@ -96,13 +93,10 @@ const checkAllTypes = () => {
   let hasDifferences = false;
 
   projects.forEach(
-    (project: { projectId: string; schema: string; outputPath: string }) => {
+    (project: { projectId: string; schema: string; fileName: string }) => {
       // Ensure the output path is absolute and within the fixed output directory
-      const existingOutputPath = path.resolve(
-        FIXED_OUTPUT_DIR,
-        project.outputPath,
-      );
-      const tempOutputPath = path.resolve(TEMP_DIR, project.outputPath);
+      const existingOutputPath = path.resolve(EXISTING_DIR, project.fileName);
+      const tempOutputPath = path.resolve(TEMP_DIR, project.fileName);
 
       // Generate types in the temporary directory
       generateTypesInTemp(project.projectId, project.schema, tempOutputPath);
@@ -114,12 +108,12 @@ const checkAllTypes = () => {
       // Compare the existing file with the temp file
       if (!compareFiles(existingOutputPath, tempOutputPath)) {
         console.warn(
-          `Warning: File ${path.relative(PACKAGE_ROOT_DIR, existingOutputPath)} differs from the generated types.`,
+          `Warning: File ${path.relative(GENERATED_DIR, existingOutputPath)} differs from the generated types.`,
         );
         hasDifferences = true;
       } else {
         console.log(
-          `File ${path.relative(PACKAGE_ROOT_DIR, existingOutputPath)} is up-to-date.`,
+          `File ${path.relative(GENERATED_DIR, existingOutputPath)} is up-to-date.`,
         );
       }
     },

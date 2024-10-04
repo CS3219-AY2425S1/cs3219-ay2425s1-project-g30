@@ -3,11 +3,11 @@
     {
       "projectId": "ncxgumrscmhhksignpks",
       "schema": "public",
-      "outputPath": "./types/questions.types.ts"
+      "fileName": "questions.types.ts"
     },
     {
       "projectId": "kamxbsekjfdzemvoevgz",
       "schema": "public",
-      "outputPath": "./types/auth.types.ts"
+      "fileName": "auth.types.ts"
     }
 ]
