@@ -114,11 +114,11 @@ const QuestionRepositoryContent = () => {
 
 const QuestionRepository = () => {
   return (
-    <Suspense fallback={<QuestionsSkeleton />}>
-      <QuestionsStateProvider>
+    <QuestionsStateProvider>
+      <Suspense fallback={<QuestionsSkeleton />}>
         <QuestionRepositoryContent />
-      </QuestionsStateProvider>
-    </Suspense>
+      </Suspense>
+    </QuestionsStateProvider>
   );
 };
 
