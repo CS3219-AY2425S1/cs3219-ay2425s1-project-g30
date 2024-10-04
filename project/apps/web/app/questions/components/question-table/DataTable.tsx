@@ -27,7 +27,7 @@ import {
 
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -83,7 +83,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className={clsx(header.id === "actions" ? "w-20" : "")}
+                      className={cn(header.id === "actions" ? "w-20" : "")}
                     >
                       {header.isPlaceholder
                         ? null
