@@ -1,13 +1,13 @@
-// columns.tsx
-import React from "react";
+"use client";
+
 import { ColumnDef, SortingFn } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import DifficultyBadge from "@/components/DifficultyBadge";
-import { COMPLEXITY } from "@/constants/question";
+
+import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { QuestionDto } from "@repo/dtos/questions";
+import DifficultyBadge from "@/components/DifficultyBadge";
+import { Badge } from "@/components/ui/badge";
+import { COMPLEXITY } from "@/constants/question";
+import Link from "next/link";
 
 // Complexity sorting order
 const complexityOrder: { [key in COMPLEXITY]: number } = {
@@ -30,98 +30,59 @@ const categorySortingFn: SortingFn<QuestionDto> = (rowA, rowB, columnId) => {
   return valueA.length - valueB.length;
 };
 
-
-// Filtering functions
-const complexityFilter = (row: any, columnId: string, filterValue: string[]) => {
-  return filterValue.length === 0 || filterValue.includes(row.getValue(columnId));
-};
-
-const categoryFilter = (row: any, columnId: string, filterValue: string[]) => {
-  const rowValues = row.getValue(columnId) as string[];
-  return (
-      filterValue.length === 0 || (rowValues.length === filterValue.length && 
-      rowValues.every((value) => filterValue.includes(value)))
-  );
-};
-
-const titleFilter = (row: any, columnId: string, filterValue: string) => {
-  return row.getValue(columnId).toLowerCase().includes(filterValue.toLowerCase());
-}
-
-// Column definitions
 export const columns: ColumnDef<QuestionDto>[] = [
   {
     accessorKey: "q_title",
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Title
-        {column.getIsSorted() === "asc" ? (
-          <ArrowUp className="ml-2 h-4 w-4" />
-        ) : column.getIsSorted() === "desc" ? (
-          <ArrowDown className="ml-2 h-4 w-4" />
-        ) : (
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        )}
-      </Button>
+      <DataTableColumnHeader column={column} title="Title" />
     ),
-    cell: ({ row }) => (
-      <Link href={`/question/${row.original.id}`} className="text-blue-500 hover:text-blue-700">
-        {row.original.q_title}
-      </Link>
-    ),
-    filterFn: titleFilter,
+    cell: ({ row }) => {
+      return (
+        <Link
+          href={`/question/${row.original.id}`}
+          className="text-blue-500 hover:text-blue-700"
+        >
+          {row.original.q_title}
+        </Link>
+      );
+    },
   },
   {
     accessorKey: "q_complexity",
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Difficulty
-        {column.getIsSorted() === "asc" ? (
-          <ArrowUp className="ml-2 h-4 w-4" />
-        ) : column.getIsSorted() === "desc" ? (
-          <ArrowDown className="ml-2 h-4 w-4" />
-        ) : (
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        )}
-      </Button>
+      <DataTableColumnHeader column={column} title="Complexity" />
     ),
-    cell: ({ row }) => <DifficultyBadge complexity={row.original.q_complexity} />,
-    filterFn: complexityFilter,
+    cell: ({ row }) => {
+      return <DifficultyBadge complexity={row.original.q_complexity} />;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
     sortingFn: complexitySortingFn,
   },
   {
     accessorKey: "q_category",
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Categories
-        {column.getIsSorted() === "asc" ? (
-          <ArrowUp className="ml-2 h-4 w-4" />
-        ) : column.getIsSorted() === "desc" ? (
-          <ArrowDown className="ml-2 h-4 w-4" />
-        ) : (
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        )}
-      </Button>
+      <DataTableColumnHeader column={column} title="Categories" />
     ),
-    cell: ({ row }) => (
-      <div className="flex flex-wrap gap-2 max-w-md">
-        {row.original.q_category.map((category) => (
-          <Badge key={category} variant="secondary" className="mr-2">
-            {category}
-          </Badge>
-        ))}
-      </div>
-    ),
-    filterFn: categoryFilter,
-    sortingFn: categorySortingFn
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-wrap gap-2 max-w-md">
+          {row.original.q_category.map((category) => (
+            <Badge key={category} variant="secondary" className="mr-2">
+              {category}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+    filterFn: (row, id, filterValues: string[]) => {
+      const rowValues = row.getValue(id) as string[];
+      return (
+        filterValues.length === 0 ||
+        filterValues.every((filterValue) => rowValues.includes(filterValue))
+      );
+    },
+    sortingFn: categorySortingFn,
   },
 ];
