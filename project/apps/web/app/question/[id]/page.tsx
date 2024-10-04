@@ -61,9 +61,9 @@ const QuestionPageContent = ({ id }: { id: string }) => {
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
       toast({
-        variant: "destructive",
+        variant: "error",
         title: "Error",
-        description: "Error updating question" + error.message,
+        description: error.message,
       });
     },
   });
@@ -86,9 +86,9 @@ const QuestionPageContent = ({ id }: { id: string }) => {
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
       toast({
-        variant: "destructive",
+        variant: "error",
         title: "Error",
-        description: "Error deleting question" + error.message,
+        description: error.message,
       });
     },
   });

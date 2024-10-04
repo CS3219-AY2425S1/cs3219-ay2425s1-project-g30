@@ -32,7 +32,8 @@ export function SignUpForm() {
     onError: (error) => {
       toast({
         description: error.message,
-        variant: "destructive",
+        variant: "error",
+        title: "Error",
       });
     },
   });
