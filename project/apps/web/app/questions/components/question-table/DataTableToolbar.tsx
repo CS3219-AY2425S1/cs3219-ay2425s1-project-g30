@@ -6,7 +6,10 @@ import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { COMPLEXITY, CATEGORY } from "@/constants/question";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from "@repo/dtos/generated/enums/questions.enums";
 import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 
 const COMPLEXITIES = Object.entries(COMPLEXITY).map(([value, label]) => ({

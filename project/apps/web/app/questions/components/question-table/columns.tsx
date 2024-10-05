@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { QuestionDto } from "@repo/dtos/questions";
 import DifficultyBadge from "@/components/DifficultyBadge";
 import { Badge } from "@/components/ui/badge";
-import { COMPLEXITY } from "@/constants/question";
+import { COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
 import Link from "next/link";
 import { DataTableRowActions } from "./DataTableRowActions";
 
