@@ -25,7 +25,10 @@ import { LoggerModule } from 'nestjs-pino';
         name: 'QUESTION_SERVICE',
         transport: Transport.TCP,
         options: {
-          host: process.env.QUESTION_SERVICE_HOST || 'localhost',
+          host:
+            process.env.NODE_ENV === 'development'
+              ? 'localhost'
+              : process.env.QUESTION_SERVICE_HOST || 'localhost',
           port: 3001,
         },
       },
