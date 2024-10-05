@@ -8,6 +8,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
+        host: process.env.QUESTION_SERVICE_HOST || 'question-service',
         port: 3001,
       },
     },

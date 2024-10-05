@@ -21,6 +21,9 @@ coverage
 # Vercel
 .vercel
 
+# Visual Studio Code
+**/.vscode/
+
 # Build Outputs
 .next/
 out/

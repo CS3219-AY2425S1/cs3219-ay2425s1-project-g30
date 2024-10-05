@@ -1,12 +1,14 @@
 import { z } from "zod";
 
-export const categorySchema = z.string().min(1);
-export const complexitySchema = z.string().min(1);
+import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
+
+const categoryEum = z.nativeEnum(CATEGORY);
+const complexityEnum = z.nativeEnum(COMPLEXITY);
 
 export const getQuestionsQuerySchema = z.object({
   title: z.string().optional(),
-  category: categorySchema.optional(),
-  complexity: complexitySchema.optional(),
+  category: categoryEum.optional(),
+  complexity: complexityEnum.optional(),
   includeDeleted: z.coerce.boolean().optional(),
 });
 
@@ -14,13 +16,13 @@ const commonQuestionFields = z.object({
   q_title: z.string().min(1, { message: "Title must not be empty" }),
   q_desc: z.string().min(1, { message: "Description must not be empty" }),
   q_category: z
-    .array(categorySchema)
+    .array(categoryEum)
     .min(1, { message: "At least one category is required" })
     // enforce uniqueness of categories
     .refine((categories) => new Set(categories).size === categories.length, {
       message: "Categories must be unique",
     }),
-  q_complexity: complexitySchema,
+  q_complexity: complexityEnum,
 });
 
 export const questionSchema = commonQuestionFields.extend({

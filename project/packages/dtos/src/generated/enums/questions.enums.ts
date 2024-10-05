@@ -1,9 +1,3 @@
-export enum COMPLEXITY {
-  Easy = "Easy",
-  Medium = "Medium",
-  Hard = "Hard",
-}
-
 export enum CATEGORY {
   Strings = "Strings",
   Algorithms = "Algorithms",
@@ -13,4 +7,10 @@ export enum CATEGORY {
   Databases = "Databases",
   BrainTeaser = "Brain Teaser",
   Arrays = "Arrays",
+}
+
+export enum COMPLEXITY {
+  Easy = "Easy",
+  Medium = "Medium",
+  Hard = "Hard",
 }

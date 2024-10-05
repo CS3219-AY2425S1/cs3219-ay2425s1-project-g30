@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    ports:
+      - 4000:4000
+    networks:
+      - backend
+    environment:
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      SUPABASE_URL: ${API_GATEWAY_SUPABASE_URL}
+      SUPABASE_KEY: ${API_GATEWAY_SUPABASE_KEY}
+  question-service:
+    build:
+      context: .
+      dockerfile: ./apps/question-service/Dockerfile
+    ports:
+      - 3001:3001
+    networks:
+      - backend
+    environment:
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      SUPABASE_URL: ${QUESTION_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${QUESTION_SERVICE_SUPABASE_KEY}
+
+networks:
+  backend:
+    driver: bridge

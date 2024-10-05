@@ -30,7 +30,7 @@ import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 // @UseGuards(AuthGuard) // comment out if we dw auth for now
 export class QuestionsController {
   constructor(
-    @Inject('QUESTIONS_SERVICE')
+    @Inject('QUESTION_SERVICE')
     private readonly questionsServiceClient: ClientProxy,
   ) {}
 

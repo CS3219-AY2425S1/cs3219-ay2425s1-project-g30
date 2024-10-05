@@ -29,8 +29,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY, COMPLEXITY } from "@/constants/question";
-
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from "@repo/dtos/generated/enums/questions.enums";
 interface CreateModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -53,6 +55,7 @@ export default function CreateModal({
   });
 
   const categories = Object.values(CATEGORY);
+  const complexities = Object.values(COMPLEXITY);
 
   const handleSubmit = (data: CreateQuestionDto) => {
     onCreate(data);
@@ -138,7 +141,7 @@ export default function CreateModal({
                         <SelectValue placeholder="Select complexity" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.values(COMPLEXITY).map((level) => (
+                        {complexities.map((level) => (
                           <SelectItem key={level} value={level}>
                             {level}
                           </SelectItem>

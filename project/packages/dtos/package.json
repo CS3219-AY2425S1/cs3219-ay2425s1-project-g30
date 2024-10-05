@@ -7,7 +7,11 @@
     "dev": "pnpm build --watch",
     "build": "tsc -b -v",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "check-db-types": "npx ts-node ./src/generated/check-types-script.ts",
+    "gen:types": "npx ts-node ./src/generated/generate-types-script.ts && pnpm lint src/generated/types",
+    "gen:enums": "npx ts-node ./src/generated/generate-enums-script.ts && pnpm lint src/generated/enums",
+    "gen:types-and-enums": "pnpm gen:types && pnpm gen:enums"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -41,6 +45,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.3.1",
+    "glob": "^11.0.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"

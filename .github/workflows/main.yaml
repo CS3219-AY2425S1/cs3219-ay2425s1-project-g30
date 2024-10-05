@@ -12,6 +12,8 @@ jobs:
   install:
     name: Install Dependencies
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
     defaults:
       run:
         working-directory: ./project
@@ -51,6 +53,14 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Check Database Types
+        run: pnpm --filter dtos check-db-types
 
   lint:
     name: Type Check & Lint

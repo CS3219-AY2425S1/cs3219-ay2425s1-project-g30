@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { COMPLEXITY } from "@/constants/question";
 import { cn } from "@/lib/utils";
+import { COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
 
 interface DifficultyBadgeProps {
   complexity: string;
