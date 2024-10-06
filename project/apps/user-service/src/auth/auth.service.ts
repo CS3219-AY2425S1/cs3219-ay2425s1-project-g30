@@ -108,8 +108,8 @@ export class AuthService {
         username,
         email,
       })
-      .returns<UserDetails>()
-      .single();
+      .select()
+      .single<UserDetails>();
 
     if (profileError) {
       // Delete the created user if profile creation fails
