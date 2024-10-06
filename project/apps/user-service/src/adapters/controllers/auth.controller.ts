@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
-import { AuthService } from './auth.service';
+import { AuthService } from '../../domain/ports/auth.service';
 
 @Controller()
 export class AuthController {
@@ -10,7 +10,6 @@ export class AuthController {
   @MessagePattern({ cmd: 'signup' })
   async signUp(@Payload() signUpDto: SignUpDto) {
     const { userData, session } = await this.authService.signUp(signUpDto);
-    console.log(userData, session);
     return { userData, session };
   }
 
@@ -22,8 +21,8 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'me' })
   async me(@Payload() token: string) {
-    const { userData } = await this.authService.me(token);
-    return { userData };
+    const userData = await this.authService.me(token);
+    return { userData }; // check: necessary to wrap in object?
   }
 
   @MessagePattern({ cmd: 'verify' })

@@ -27,6 +27,10 @@ export class AuthGuard implements CanActivate {
       this.userServiceClient.send({ cmd: 'verify' }, token),
     );
 
+    if (!data) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
     request.user = data;
     return true;
   }
