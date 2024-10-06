@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { QuestionDto } from "@repo/dtos/questions";
 import DifficultyBadge from "@/components/DifficultyBadge";
 import { Badge } from "@/components/ui/badge";
-import { COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
+import { CATEGORY, COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
 import Link from "next/link";
 import { DataTableRowActions } from "./DataTableRowActions";
 
@@ -81,7 +81,7 @@ export const columns: ColumnDef<QuestionDto>[] = [
       const rowValues = row.getValue(id) as string[];
       return (
         filterValues.length === 0 ||
-        filterValues.every((filterValue) => rowValues.includes(filterValue))
+        filterValues.every((filterValue) => rowValues.includes(CATEGORY[filterValue as keyof typeof CATEGORY]))
       );
     },
     sortingFn: categorySortingFn,
