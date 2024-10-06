@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './adapters/controllers/auth.controller';
-import { AuthService } from './domain/ports/auth.service';
 import { ConfigModule } from '@nestjs/config';
-import { UsersRepository } from './domain/ports/users.repository';
-import { SupabaseUsersRepository } from './adapters/db/users.supabase';
+
+import { AuthController } from 'src/adapters/controllers/auth.controller';
+import { SupabaseUsersRepository } from 'src/adapters/db/users.supabase';
+import { AuthService } from 'src/domain/ports/auth.service';
+import { UsersRepository } from 'src/domain/ports/users.repository';
 
 @Module({
   imports: [
