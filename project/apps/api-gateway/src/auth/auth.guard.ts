@@ -17,10 +17,19 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.cookies['token'];
+    const accessToken = request.cookies['access_token'];
+    const refreshToken = request.cookies['refresh_token'];
 
-    if (!token) {
-      throw new UnauthorizedException('No token found');
+    if (!accessToken) {
+      if (!refreshToken) {
+        throw new UnauthorizedException('No token found');
+      }
+      const { newAccessToken, newRefreshToken } = await this.authService.refreshToken(refreshToken);
+      if (!newAccessToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+      request.cookies['access_token'] = newAccessToken;
+      request.cookies['refresh_token'] = newRefreshToken;
     }
 
     const data = await firstValueFrom(

@@ -1,5 +1,6 @@
 import Topbar from "@/components/Topbar";
 import { ReactNode } from "react";
+import { EnforceLoginStatePageWrapper } from "@/components/auth-wrappers/EnforceLoginStatePageWrapper";
 
 interface QuestionsLayoutProps {
   children: ReactNode;
@@ -8,8 +9,10 @@ interface QuestionsLayoutProps {
 const QuestionsLayout = ({ children }: QuestionsLayoutProps) => {
   return (
     <>
-      <Topbar />
-      <main>{children}</main>
+      {/* <EnforceLoginStatePageWrapper> */}
+        <Topbar />
+        <main>{children}</main>
+      {/* /<EnforceLoginStatePageWrapper> */}
     </>
   );
 };
