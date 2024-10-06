@@ -2,12 +2,10 @@
 import {
   Injectable,
   BadRequestException,
-  UnauthorizedException,
   Logger,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { UserProfileDto, UpdateUserDto } from '@repo/dtos/user';
-import { UserDetails } from 'src/supabase/collection';
 import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
@@ -30,8 +28,8 @@ export class UserService {
     throw new RpcException(error);
   }
 
-  async allUsers(): Promise<{allUserData: UserDetails[]}> {
-    const { data: allUserData,  error} = await this.supabaseService
+  async allUsers() {
+    const { data,  error} = await this.supabaseService
       .getClient()
       .from(this.PROFILES_TABLE)
       .select(`id, email, username`)
@@ -43,7 +41,8 @@ export class UserService {
         new BadRequestException(error.message)
       );
     }
-    return { allUserData };
+
+    return { data };
   }
   
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UserProfileDto> {

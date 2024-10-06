@@ -49,14 +49,14 @@ export class AuthService {
       .getClient()
       .auth.refreshSession({ refresh_token: refreshToken });
 
-    if (error) {
+    if (error || !data || !data.session) {
       this.handleError(
         'refresh token',
         new BadRequestException('Unexpected refresh token response.')
       );
     }
     
-    return { newAccessToken: data.access_token, newRefreshToken: data.refresh_token };
+    return { newAccessToken: data.session.access_token, newRefreshToken: data.session.refresh_token };
   }
 
 
