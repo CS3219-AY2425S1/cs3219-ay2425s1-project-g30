@@ -2,7 +2,15 @@ import { create } from "zustand";
 import { apiCall } from "./apiClient";
 import { SignInDto, SignUpDto } from "@repo/dtos/auth";
 import { persist } from "zustand/middleware";
-import { UserDetails } from '../../../api-gateway/src/supabase/collection';
+
+// TODO: fix this interface by prob a DTO or sth
+export interface UserDetails {
+  created_at: string;
+  email: string;
+  id: string;
+  role: string;
+  username: string;
+}
 
 interface AuthState {
   user: UserDetails | null;
