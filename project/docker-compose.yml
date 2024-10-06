@@ -11,6 +11,7 @@ services:
       - backend
     environment:
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      NODE_ENV: production
   api-gateway:
     build:
       context: .
@@ -22,6 +23,7 @@ services:
     environment:
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      NODE_ENV: production
   question-service:
     build:
       context: .
@@ -34,6 +36,7 @@ services:
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       SUPABASE_URL: ${QUESTION_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${QUESTION_SERVICE_SUPABASE_KEY}
+      NODE_ENV: production
   user-service:
     build:
       context: .
@@ -46,6 +49,7 @@ services:
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY}
+      NODE_ENV: production
 
 networks:
   backend:
