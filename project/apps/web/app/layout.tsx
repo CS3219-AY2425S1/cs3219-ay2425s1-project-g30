@@ -6,7 +6,7 @@ import Suspense from "@/components/Suspense";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect } from "react";
-import { useAuthStore } from "@/app/store/AuthStore";
+import { useAuthStore } from "@/store/AuthStore";
 
 import "./globals.css";
 

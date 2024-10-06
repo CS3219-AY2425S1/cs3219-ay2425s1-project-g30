@@ -10,14 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/app/store/AuthStore";
+import { useAuthStore } from "@/store/AuthStore";
 import { Button } from "@/components/ui/button";
 
 const Topbar = () => {
   const user = useAuthStore.use.user();
   const logout = useAuthStore.use.signOut();
   const router = useRouter();
-  
   function handleLogout() {
     logout();
     router.push("/");
