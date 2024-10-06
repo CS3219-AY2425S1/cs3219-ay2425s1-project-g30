@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/api/auth";
+import { Button } from "@/components/ui/button";
 
 const Topbar = () => {
   const user = useAuthStore((state: any) => state.user);
@@ -28,27 +29,34 @@ const Topbar = () => {
         <Link href="/" passHref>
           <h1 className="text-lg font-medium cursor-pointer">PeerPrep</h1>
         </Link>
-        {/* //TODO: Replace with real user data */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="flex items-center space-x-2">
-              <Avatar>
-                <AvatarImage />
-                <AvatarFallback>{user ? user.username[0] : "JD"}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm font-medium">{user ? user.username : "John Doe"}</span>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem>
-              {/* // TODO: Replace with real link */}
-              <Link href="/" passHref>Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout}>
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        { user ?
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center space-x-2">
+                <Avatar>
+                  <AvatarImage />
+                  <AvatarFallback>{user.userData.username[0]}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium">{user.userData.username}</span>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem>
+                {/* // TODO: Replace with real link */}
+                <Link href="/" passHref>Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          :
+          <Button>
+            <Link href="/auth" passHref>
+              Login
+            </Link>
+          </Button>
+        }
       </div>
     </header>
   );
