@@ -103,14 +103,12 @@ export class AuthService {
     const { data: userData, error: profileError } = await this.supabaseService
       .getClient()
       .from(this.PROFILES_TABLE)
-      .insert([
-        {
-          id: user.id,
-          username,
-          email,
-        },
-      ])
-      .returns<UserDetails[]>()
+      .insert({
+        id: user.id,
+        username,
+        email,
+      })
+      .returns<UserDetails>()
       .single();
 
     if (profileError) {
