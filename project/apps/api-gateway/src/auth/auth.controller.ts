@@ -7,8 +7,9 @@ import {
   Req,
   Res,
   UsePipes,
+  Inject,
 } from '@nestjs/common';
-
+import { ClientProxy } from '@nestjs/microservices';
 import {
   SignInDto,
   signInSchema,
@@ -17,16 +18,20 @@ import {
 } from '@repo/dtos/auth';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-
+import { firstValueFrom } from 'rxjs';
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject('USER_SERVICE')
+    private readonly userServiceClient: ClientProxy,
+  ) {}
 
   @Post('signup')
   @UsePipes(new ZodValidationPipe(signUpSchema))
   async signUp(@Body() body: SignUpDto, @Res() res: Response) {
-    const { userData, session } = await this.authService.signUp(body);
+    const { userData, session } = await firstValueFrom(
+      this.userServiceClient.send({ cmd: 'signup' }, body),
+    );
     res.cookie('token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -40,7 +45,9 @@ export class AuthController {
   @Post('signin')
   @UsePipes(new ZodValidationPipe(signInSchema))
   async signIn(@Body() body: SignInDto, @Res() res: Response) {
-    const { userData, session } = await this.authService.signIn(body);
+    const { userData, session } = await firstValueFrom(
+      this.userServiceClient.send({ cmd: 'signin' }, body),
+    );
     res.cookie('token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -65,7 +72,9 @@ export class AuthController {
     if (!token) {
       return res.status(HttpStatus.UNAUTHORIZED).json({ user: null });
     }
-    const { userData } = await this.authService.me(token);
+    const { userData } = await firstValueFrom(
+      this.userServiceClient.send({ cmd: 'me' }, token),
+    );
     return res.status(HttpStatus.OK).json({ userData });
   }
 }
