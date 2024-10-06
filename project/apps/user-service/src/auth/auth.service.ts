@@ -30,10 +30,10 @@ export class AuthService {
     throw new RpcException(error);
   }
 
-  async verifyUser(token: string) {
+  async verifyUser(accessToken: string) {
     const { data, error } = await this.supabaseService
       .getClient()
-      .auth.getUser(token);
+      .auth.getUser(accessToken);
 
     if (error || !data) {
       this.handleError(
@@ -43,6 +43,22 @@ export class AuthService {
     }
     return data;
   }
+  
+  async refreshToken(refreshToken: string): Promise<{ newAccessToken: string; newRefreshToken: string }> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .auth.refreshSession({ refresh_token: refreshToken });
+
+    if (error) {
+      this.handleError(
+        'refresh token',
+        new BadRequestException('Unexpected refresh token response.')
+      );
+    }
+    
+    return { newAccessToken: data.access_token, newRefreshToken: data.refresh_token };
+  }
+
 
   async me(token: string) {
     const { data, error } = await this.supabaseService
@@ -157,22 +173,5 @@ export class AuthService {
     }
 
     return { userData, session };
-  }
-  
-  async refreshToken(refreshToken: string): Promise<{ newAccessToken: string; newRefreshToken: string }> {
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .auth.refreshSession({ refresh_token: refreshToken });
-
-    if (error) {
-      throw new BadRequestException(error.message);
-    }
-
-    const { session } = data;
-    if (!session) {
-      throw new BadRequestException('Unexpected refresh token response.');
-    }
-
-    return { newAccessToken: session.access_token, newRefreshToken: session.refresh_token };
   }
 }

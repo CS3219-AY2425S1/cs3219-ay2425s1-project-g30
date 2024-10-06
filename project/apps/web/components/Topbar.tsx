@@ -10,12 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/api/auth";
+import { useAuthStore } from "@/app/store/AuthStore";
 import { Button } from "@/components/ui/button";
 
 const Topbar = () => {
-  const user = useAuthStore((state: any) => state.user);
-  const logout = useAuthStore((state: any) => state.signOut);
+  const user = useAuthStore.use.user();
+  const logout = useAuthStore.use.signOut();
   const router = useRouter();
   
   function handleLogout() {
@@ -35,9 +35,9 @@ const Topbar = () => {
               <div className="flex items-center space-x-2">
                 <Avatar>
                   <AvatarImage />
-                  <AvatarFallback>{user.userData.username[0]}</AvatarFallback>
+                  <AvatarFallback>{user.username[0]}</AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium">{user.userData.username}</span>
+                <span className="text-sm font-medium">{user.username}</span>
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">

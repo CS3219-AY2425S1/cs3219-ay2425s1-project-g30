@@ -94,29 +94,4 @@ export class AuthController {
     );
     return res.status(HttpStatus.OK).json({ userData });
   }
-  
-  @Post('refresh-token')
-  async refreshToken(@Req() request: Request, @Res() res: Response) {
-    const refreshToken = request.cookies['refresh_token'];
-    if (!refreshToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'No refresh token provided.' });
-    }
-    const { newAccessToken, newRefreshToken } = await this.authService.refreshToken(refreshToken);
-    
-    res.cookie('access_token', newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 1000, // 1 hour
-    });
-
-    res.cookie('refresh_token', newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
-    });
-    
-    return res.status(HttpStatus.OK);
-  }
 }

@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/lib/api/auth";
 import { useZodForm } from "@/lib/form";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/app/store/AuthStore";
 import { useRouter } from "next/navigation";
 
 export function SignUpForm() {
   const form = useZodForm({ schema: signUpSchema });
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const signUp = useAuthStore((state: any) => state.signUp);
+  const signUp = useAuthStore.use.signUp();
   const router = useRouter();
   
   const mutation = useMutation({

@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
 import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "@/lib/api/auth";
+import { useAuthStore } from "../app/store/AuthStore";
 
 export const useMe = () => {
   const router = useRouter();
-  const user = useAuthStore((state: any) => state.user);
-  const fetchUser = useAuthStore((state) => state.fetchUser);
-  const signOut = useAuthStore((state) => state.signOut);
+  const user = useAuthStore.use.user();
+  const fetchUser = useAuthStore.use.fetchUser();
+  const signOut = useAuthStore.use.signOut();
 
   useEffect(() => {
     if (!user) {
