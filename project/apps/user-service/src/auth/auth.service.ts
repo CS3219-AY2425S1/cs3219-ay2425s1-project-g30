@@ -146,8 +146,7 @@ export class AuthService {
       .from(this.PROFILES_TABLE)
       .select(`id, email, username`)
       .eq('id', user.id)
-      .returns<UserDetails[]>()
-      .single();
+      .single<UserDetails>();
 
     if (profileError) {
       this.handleError(

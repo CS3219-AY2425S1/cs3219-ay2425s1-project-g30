@@ -87,6 +87,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
       .from(this.QUESTIONS_TABLE)
       .update(question)
       .eq('id', question.id)
+      .select()
       .single<QuestionDto>();
 
     if (error) {
