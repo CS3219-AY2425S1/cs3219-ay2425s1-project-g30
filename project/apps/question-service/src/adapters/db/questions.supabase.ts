@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { collectionMetadataDto } from '@repo/dtos/metatdata';
 import {
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
   QuestionDto,
   CreateQuestionDto,
   UpdateQuestionDto,
@@ -29,7 +29,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionCollectionDto> {
+  async findAll(filters: QuestionFiltersDto): Promise<QuestionCollectionDto> {
     const {
       title,
       categories,

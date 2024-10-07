@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import {
   CreateQuestionDto,
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
   QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
@@ -33,11 +33,11 @@ export class QuestionsService {
   /**
    * Retrieves all questions based on the provided filters.
    *
-   * @param {GetQuestionsQueryDto} filters - The filters to apply when fetching questions.
+   * @param {QuestionFiltersDto} filters - The filters to apply when fetching questions.
    * @returns {Promise<QuestionCollectionDto>} A promise that resolves to a collection of questions.
    * @throws Will throw an error if the questions cannot be fetched.
    */
-  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionCollectionDto> {
+  async findAll(filters: QuestionFiltersDto): Promise<QuestionCollectionDto> {
     try {
       const questionCollection =
         await this.questionsRepository.findAll(filters);
@@ -84,7 +84,7 @@ export class QuestionsService {
    */
   async create(question: CreateQuestionDto): Promise<QuestionDto> {
     try {
-      const filter: GetQuestionsQueryDto = {
+      const filter: QuestionFiltersDto = {
         title: question.q_title,
         includeDeleted: true,
       };
@@ -125,7 +125,7 @@ export class QuestionsService {
    */
   async update(question: UpdateQuestionDto): Promise<QuestionDto> {
     try {
-      const filter: GetQuestionsQueryDto = {
+      const filter: QuestionFiltersDto = {
         title: question.q_title,
         includeDeleted: true,
       };

@@ -3,7 +3,7 @@
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { fetchQuestions } from "@/lib/api/question";
 import {
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
   QuestionCollectionDto,
   SortQuestionsQueryDto,
 } from "@repo/dtos/questions";
@@ -76,7 +76,7 @@ export function QuestionTable() {
           }) as SortQuestionsQueryDto,
       );
 
-      const queryParams: GetQuestionsQueryDto = {
+      const queryParams: QuestionFiltersDto = {
         title,
         categories,
         complexities,

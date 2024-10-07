@@ -1,6 +1,6 @@
 import {
   CreateQuestionDto,
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
   QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
@@ -8,7 +8,7 @@ import {
 import { apiCall } from "@/lib/api/apiClient";
 
 export const fetchQuestions = async (
-  queryParams: GetQuestionsQueryDto,
+  queryParams: QuestionFiltersDto,
 ): Promise<QuestionCollectionDto> => {
   return await apiCall("get", "/questions", null, queryParams);
 };

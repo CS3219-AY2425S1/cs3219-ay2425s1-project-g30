@@ -11,7 +11,7 @@ export const sortQuestionsQuerySchema = z.object({
   order: z.enum(["asc", "desc"]),
 });
 
-export const getQuestionsQuerySchema = z.object({
+export const questionFiltersSchema = z.object({
   title: z.string().optional(),
   categories: z.array(categoryEum).optional(),
   complexities: z.array(complexityEnum).optional(),
@@ -54,7 +54,7 @@ export const updateQuestionSchema = commonQuestionFields.extend({
   id: z.string().uuid(),
 });
 
-export type GetQuestionsQueryDto = z.infer<typeof getQuestionsQuerySchema>;
+export type QuestionFiltersDto = z.infer<typeof questionFiltersSchema>;
 export type SortQuestionsQueryDto = z.infer<typeof sortQuestionsQuerySchema>;
 
 export type QuestionDto = z.infer<typeof questionSchema>;
