@@ -12,15 +12,17 @@ import {
   COMPLEXITY,
 } from "@repo/dtos/generated/enums/questions.enums";
 
-const COMPLEXITIES = Object.entries(COMPLEXITY).map(([value, label]) => ({
-  label,
+// filter value and label should both be the enum values
+// e.g. "Data Structures" as opposed to "DataStructures"
+const COMPLEXITIES = Object.values(COMPLEXITY).map((value) => ({
+  label: value,
+  value,
+}));
+const CATEGORIES = Object.values(CATEGORY).map((value) => ({
+  label: value,
   value,
 }));
 
-const CATEGORIES = Object.entries(CATEGORY).map(([value, label]) => ({
-  label,
-  value,
-}));
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
