@@ -23,12 +23,12 @@ import {
   SortingState,
   Updater,
 } from "@tanstack/react-table";
-import { startTransition, useState } from "react";
-import { useDebounce } from "@uidotdev/usehooks";
+import { startTransition, useCallback, useState } from "react";
 import {
   CATEGORY,
   COMPLEXITY,
 } from "@repo/dtos/generated/enums/questions.enums";
+import useDebounce from "@/hooks/useDebounce";
 
 export function QuestionTable() {
   const { confirmLoading } = useQuestionsState();

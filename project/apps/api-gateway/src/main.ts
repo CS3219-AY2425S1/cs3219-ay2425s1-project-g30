@@ -6,6 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
+  console.log(process.env.NODE_ENV);
   const app = await NestFactory.create(ApiGatewayModule, { bufferLogs: true });
   app.use(cookieParser());
   app.useLogger(app.get(Logger));
