@@ -23,7 +23,7 @@ import {
   SortingState,
   Updater,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import {
   CATEGORY,
   COMPLEXITY,
@@ -89,14 +89,24 @@ export function QuestionTable() {
     },
   });
 
+  const onPaginationChange = (updater: Updater<PaginationState>) => {
+    startTransition(() => {
+      setPagination(updater);
+    });
+  };
+
   const onSortingChange = (updater: Updater<SortingState>) => {
-    setSorting(updater);
-    resetPagination();
+    startTransition(() => {
+      setSorting(updater);
+      resetPagination();
+    });
   };
 
   const onColumnFiltersChange = (updater: Updater<ColumnFiltersState>) => {
-    setColumnFilters(updater);
-    resetPagination();
+    startTransition(() => {
+      setColumnFilters(updater);
+      resetPagination();
+    });
   };
 
   const metadata = data.metadata;
@@ -104,7 +114,7 @@ export function QuestionTable() {
 
   const controlledState: ControlledTableStateProps = {
     pagination,
-    onPaginationChange: setPagination,
+    onPaginationChange,
     rowCount: metadata.totalCount,
     sorting,
     onSortingChange,
