@@ -15,6 +15,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  PaginationState,
+  Updater,
+  TableState,
+  TableOptions,
 } from "@tanstack/react-table";
 
 import {
@@ -33,14 +37,21 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   confirmLoading: boolean;
-  TableToolbar: React.FC<{ table: ReactTable<TData> }>;
+  TableToolbar?: React.FC<{ table: ReactTable<TData> }>;
+  // determines if pagination is controlled by parent component
+  isPaginationControlled?: boolean;
+  pagination?: PaginationState;
+  onPaginationChange?: (updater: Updater<PaginationState>) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   confirmLoading,
-  TableToolbar: toolbar,
+  TableToolbar,
+  isPaginationControlled = false,
+  pagination,
+  onPaginationChange,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -50,15 +61,31 @@ export function DataTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const table = useReactTable({
+  let tableState: Partial<TableState> = {
+    sorting,
+    columnVisibility,
+    rowSelection,
+    columnFilters,
+  };
+
+  if (isPaginationControlled) {
+    // check if pagination and onPaginationChange is provided
+    if (!pagination || !onPaginationChange) {
+      throw new Error(
+        "If pagination is controlled, both pagination and onPaginationChange must be provided.",
+      );
+    }
+    // set pagination state
+    tableState = {
+      ...tableState,
+      pagination,
+    };
+  }
+
+  let tableOptions: TableOptions<TData> = {
     data,
     columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-    },
+    state: tableState,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -66,15 +93,29 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  });
+  };
+
+  if (isPaginationControlled) {
+    tableOptions = {
+      ...tableOptions,
+      manualPagination: true,
+      onPaginationChange,
+    };
+  } else {
+    tableOptions = {
+      ...tableOptions,
+      getPaginationRowModel: getPaginationRowModel(),
+    };
+  }
+
+  const table = useReactTable(tableOptions);
 
   return (
     <div className="space-y-4">
-      {toolbar({ table })}
+      {TableToolbar && <TableToolbar table={table} />}
       <div className="rounded-md border">
         <Table className="table-fixed">
           <TableHeader>

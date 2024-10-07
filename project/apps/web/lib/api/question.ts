@@ -5,7 +5,11 @@ import {
 } from "@repo/dtos/questions";
 import { apiCall } from "@/lib/api/apiClient";
 
-export const fetchQuestions = async (): Promise<QuestionDto[]> => {
+export const fetchQuestions = async (
+  pageIndex: number,
+  pageSize: number,
+): Promise<QuestionDto[]> => {
+  // update the api call to include pagination
   return await apiCall("get", "/questions");
 };
 
