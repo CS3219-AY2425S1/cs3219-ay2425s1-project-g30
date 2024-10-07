@@ -10,7 +10,10 @@ export const fetchQuestions = async (
   pageSize: number,
 ): Promise<QuestionDto[]> => {
   // update the api call to include pagination
-  return await apiCall("get", "/questions");
+  const limit = pageSize;
+  const offset = pageIndex * pageSize;
+  // add limit and offset as query params
+  return await apiCall("get", "/questions", null, { limit, offset });
 };
 
 export const fetchQuestionById = async (id: string): Promise<QuestionDto> => {

@@ -28,7 +28,8 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
   }
 
   async findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]> {
-    const { title, category, complexity, includeDeleted } = filters;
+    const { title, category, complexity, includeDeleted, offset, limit } =
+      filters;
 
     let query = this.supabase.from(this.QUESTIONS_TABLE).select();
 
@@ -43,6 +44,14 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     }
     if (!includeDeleted) {
       query = query.is('deleted_at', null);
+    }
+
+    if (limit) {
+      if (offset) {
+        query = query.range(offset, offset + limit);
+      } else {
+        query = query.limit(limit);
+      }
     }
 
     const { data, error } = await query;

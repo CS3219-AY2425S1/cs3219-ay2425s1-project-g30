@@ -10,6 +10,9 @@ export const getQuestionsQuerySchema = z.object({
   category: categoryEum.optional(),
   complexity: complexityEnum.optional(),
   includeDeleted: z.coerce.boolean().optional(),
+
+  offset: z.coerce.number().int().nonnegative().optional(),
+  limit: z.coerce.number().int().positive().optional(),
 });
 
 const commonQuestionFields = z.object({
