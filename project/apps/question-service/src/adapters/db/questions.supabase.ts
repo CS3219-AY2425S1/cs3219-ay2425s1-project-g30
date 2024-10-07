@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { collectionMetadataDto } from '@repo/dtos/metatdata';
 import {
   GetQuestionsQueryDto,
   QuestionDto,
   CreateQuestionDto,
   UpdateQuestionDto,
+  QuestionCollectionDto,
 } from '@repo/dtos/questions';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -27,40 +29,57 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]> {
+  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionCollectionDto> {
     const { title, category, complexity, includeDeleted, offset, limit } =
       filters;
 
-    let query = this.supabase.from(this.QUESTIONS_TABLE).select();
+    let queryBuilder = this.supabase
+      .from(this.QUESTIONS_TABLE)
+      .select('*', { count: 'exact' });
 
     if (title) {
-      query = query.ilike('q_title', `%${title}%`);
+      queryBuilder = queryBuilder.ilike('q_title', `%${title}%`);
     }
     if (category) {
-      query = query.contains('q_category', [category]);
+      queryBuilder = queryBuilder.contains('q_category', [category]);
     }
     if (complexity) {
-      query = query.eq('q_complexity', complexity);
+      queryBuilder = queryBuilder.eq('q_complexity', complexity);
     }
     if (!includeDeleted) {
-      query = query.is('deleted_at', null);
+      queryBuilder = queryBuilder.is('deleted_at', null);
     }
 
+    const totalCountQuery = queryBuilder;
+
+    let dataQuery = queryBuilder;
     if (limit) {
       if (offset) {
-        query = query.range(offset, offset + limit);
+        dataQuery = dataQuery.range(offset, offset + limit - 1); // Supabase range is inclusive
       } else {
-        query = query.limit(limit);
+        dataQuery = dataQuery.limit(limit);
       }
     }
 
-    const { data, error } = await query;
+    // Execute the data query
+    const { data: questions, error } = await dataQuery;
 
-    if (error) {
-      throw error;
+    // Execute the total count query
+    const { count: totalCount, error: totalCountError } = await totalCountQuery;
+
+    if (error || totalCountError) {
+      throw error || totalCountError;
     }
 
-    return data;
+    const metadata: collectionMetadataDto = {
+      count: questions ? questions.length : 0,
+      totalCount: totalCount ?? 0,
+    };
+
+    return {
+      metadata,
+      questions,
+    } as QuestionCollectionDto;
   }
 
   async findById(id: string): Promise<QuestionDto> {

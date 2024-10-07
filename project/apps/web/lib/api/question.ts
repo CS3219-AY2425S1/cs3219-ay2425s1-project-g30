@@ -1,5 +1,6 @@
 import {
   CreateQuestionDto,
+  QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
 } from "@repo/dtos/questions";
@@ -8,7 +9,7 @@ import { apiCall } from "@/lib/api/apiClient";
 export const fetchQuestions = async (
   pageIndex: number,
   pageSize: number,
-): Promise<QuestionDto[]> => {
+): Promise<QuestionCollectionDto> => {
   // update the api call to include pagination
   const limit = pageSize;
   const offset = pageIndex * pageSize;

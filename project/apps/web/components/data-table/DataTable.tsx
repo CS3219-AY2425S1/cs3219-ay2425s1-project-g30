@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   isPaginationControlled?: boolean;
   pagination?: PaginationState;
   onPaginationChange?: (updater: Updater<PaginationState>) => void;
+  rowCount?: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,6 +53,7 @@ export function DataTable<TData, TValue>({
   isPaginationControlled = false,
   pagination,
   onPaginationChange,
+  rowCount,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -69,10 +71,10 @@ export function DataTable<TData, TValue>({
   };
 
   if (isPaginationControlled) {
-    // check if pagination and onPaginationChange is provided
-    if (!pagination || !onPaginationChange) {
+    // check if necessary controlled pagination props are provided
+    if (!pagination || !onPaginationChange || !rowCount) {
       throw new Error(
-        "If pagination is controlled, both pagination and onPaginationChange must be provided.",
+        "When isPaginationControlled is true, pagination, onPaginationChange and rowCount must be provided",
       );
     }
     // set pagination state
@@ -103,6 +105,7 @@ export function DataTable<TData, TValue>({
       ...tableOptions,
       manualPagination: true,
       onPaginationChange,
+      rowCount,
     };
   } else {
     tableOptions = {

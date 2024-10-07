@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
+import { collectionMetadataSchema } from "./metatdata";
 
 const categoryEum = z.nativeEnum(CATEGORY);
 const complexityEnum = z.nativeEnum(COMPLEXITY);
@@ -35,6 +36,11 @@ export const questionSchema = commonQuestionFields.extend({
   deleted_at: z.date().nullable(),
 });
 
+export const questionCollectionSchema = z.object({
+  metadata: collectionMetadataSchema,
+  questions: z.array(questionSchema),
+});
+
 export const createQuestionSchema = commonQuestionFields;
 
 export const updateQuestionSchema = commonQuestionFields.extend({
@@ -44,5 +50,7 @@ export const updateQuestionSchema = commonQuestionFields.extend({
 export type GetQuestionsQueryDto = z.infer<typeof getQuestionsQuerySchema>;
 
 export type QuestionDto = z.infer<typeof questionSchema>;
+export type QuestionCollectionDto = z.infer<typeof questionCollectionSchema>;
+
 export type CreateQuestionDto = z.infer<typeof createQuestionSchema>;
 export type UpdateQuestionDto = z.infer<typeof updateQuestionSchema>;
