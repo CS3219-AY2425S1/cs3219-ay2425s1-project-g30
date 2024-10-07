@@ -10,7 +10,6 @@ import { apiCall } from "@/lib/api/apiClient";
 export const fetchQuestions = async (
   queryParams: QuestionFiltersDto,
 ): Promise<QuestionCollectionDto> => {
-  console.log("fetchQuestions", queryParams);
   return await apiCall("get", "/questions", null, queryParams);
 };
 

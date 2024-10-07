@@ -62,7 +62,6 @@ export function QuestionTable() {
       debouncedColumnFilters,
     ],
     queryFn: () => {
-      console.log("filters", debouncedColumnFilters);
       const title = debouncedColumnFilters.find((f) => f.id === "q_title")
         ?.value as string;
 
