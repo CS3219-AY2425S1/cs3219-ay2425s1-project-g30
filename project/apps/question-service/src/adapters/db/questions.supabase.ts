@@ -30,8 +30,15 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
   }
 
   async findAll(filters: GetQuestionsQueryDto): Promise<QuestionCollectionDto> {
-    const { title, category, complexity, includeDeleted, offset, limit } =
-      filters;
+    const {
+      title,
+      categories,
+      complexities,
+      includeDeleted,
+      offset,
+      limit,
+      sort,
+    } = filters;
 
     let queryBuilder = this.supabase
       .from(this.QUESTIONS_TABLE)
@@ -40,14 +47,23 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     if (title) {
       queryBuilder = queryBuilder.ilike('q_title', `%${title}%`);
     }
-    if (category) {
-      queryBuilder = queryBuilder.contains('q_category', [category]);
+    if (categories) {
+      // result must match ALL categories provided
+      queryBuilder = queryBuilder.contains('q_category', categories);
     }
-    if (complexity) {
-      queryBuilder = queryBuilder.eq('q_complexity', complexity);
+    if (complexities) {
+      // result must match ANY complexity provided
+      queryBuilder = queryBuilder.in('q_complexity', complexities);
     }
     if (!includeDeleted) {
       queryBuilder = queryBuilder.is('deleted_at', null);
+    }
+    if (sort) {
+      for (const s of sort) {
+        queryBuilder = queryBuilder.order(s.field, {
+          ascending: s.order === 'asc',
+        });
+      }
     }
 
     const totalCountQuery = queryBuilder;

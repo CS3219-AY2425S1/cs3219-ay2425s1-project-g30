@@ -2,16 +2,32 @@
 
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { fetchQuestions } from "@/lib/api/question";
-import { QuestionCollectionDto } from "@repo/dtos/questions";
+import {
+  GetQuestionsQueryDto,
+  QuestionCollectionDto,
+  SortQuestionsQueryDto,
+} from "@repo/dtos/questions";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { DataTable } from "@/components/data-table/DataTable";
+import {
+  ControlledTableStateProps,
+  DataTable,
+} from "@/components/data-table/DataTable";
 
 import EmptyPlaceholder from "../EmptyPlaceholder";
 import { columns } from "./columns";
 import { useQuestionsState } from "@/contexts/QuestionsStateContext";
 import { QuestionTableToolbar } from "./QuestionTableToolbar";
-import { PaginationState } from "@tanstack/react-table";
+import {
+  ColumnFiltersState,
+  PaginationState,
+  SortingState,
+  Updater,
+} from "@tanstack/react-table";
 import { useState } from "react";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from "@repo/dtos/generated/enums/questions.enums";
 
 export function QuestionTable() {
   const { confirmLoading } = useQuestionsState();
@@ -21,30 +37,90 @@ export function QuestionTable() {
     pageSize: 10,
   });
 
+  const resetPagination = () => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  };
+
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "q_title",
+      desc: false,
+    },
+  ]);
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
   const { data } = useSuspenseQuery<QuestionCollectionDto>({
-    queryKey: [QUERY_KEYS.Question, pagination],
-    queryFn: () => fetchQuestions(pagination.pageIndex, pagination.pageSize),
+    queryKey: [QUERY_KEYS.Question, pagination, sorting, columnFilters],
+    queryFn: () => {
+      const title = columnFilters.find((f) => f.id === "q_title")
+        ?.value as string;
+
+      const categories = columnFilters.find((f) => f.id === "q_category")
+        ?.value as CATEGORY[];
+
+      const complexities = columnFilters.find((f) => f.id === "q_complexity")
+        ?.value as COMPLEXITY[];
+
+      const offset = pagination.pageIndex * pagination.pageSize;
+      const limit = pagination.pageSize;
+
+      const sort = sorting.map(
+        (s) =>
+          ({
+            field: s.id,
+            order: s.desc ? "desc" : "asc",
+          }) as SortQuestionsQueryDto,
+      );
+
+      const queryParams: GetQuestionsQueryDto = {
+        title,
+        categories,
+        complexities,
+        offset,
+        limit,
+        sort,
+      };
+
+      return fetchQuestions(queryParams);
+    },
   });
+
+  const onSortingChange = (updater: Updater<SortingState>) => {
+    setSorting(updater);
+    resetPagination();
+  };
+
+  const onColumnFiltersChange = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFilters(updater);
+    resetPagination();
+  };
 
   const metadata = data.metadata;
   const questions = data.questions;
 
+  const controlledState: ControlledTableStateProps = {
+    pagination,
+    onPaginationChange: setPagination,
+    rowCount: metadata.totalCount,
+    sorting,
+    onSortingChange,
+    columnFilters,
+    onColumnFiltersChange,
+  };
+
   return (
     <>
-      {metadata.count === 0 ? (
-        <EmptyPlaceholder />
-      ) : (
-        <DataTable
-          data={questions}
-          columns={columns}
-          confirmLoading={confirmLoading}
-          TableToolbar={QuestionTableToolbar}
-          isPaginationControlled
-          pagination={pagination}
-          onPaginationChange={setPagination}
-          rowCount={metadata.totalCount}
-        />
-      )}
+      <DataTable
+        data={questions}
+        columns={columns}
+        confirmLoading={confirmLoading}
+        controlledState={controlledState}
+        TableToolbar={QuestionTableToolbar}
+      />
     </>
   );
 }

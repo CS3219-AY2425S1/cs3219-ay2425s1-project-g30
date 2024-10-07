@@ -6,7 +6,6 @@ import {
   ColumnFiltersState,
   SortingState,
   Table as ReactTable,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -33,54 +32,44 @@ import {
 import { cn } from "@/lib/utils";
 import { DataTablePagination } from "./DataTablePagination";
 
+export interface ControlledTableStateProps {
+  // pagination
+  pagination: PaginationState;
+  onPaginationChange: (updater: Updater<PaginationState>) => void;
+  rowCount: number;
+
+  // sorting
+  sorting: SortingState;
+  onSortingChange: (updater: Updater<SortingState>) => void;
+
+  // filtering
+  columnFilters: ColumnFiltersState;
+  onColumnFiltersChange: (updater: Updater<ColumnFiltersState>) => void;
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   confirmLoading: boolean;
+  controlledState?: ControlledTableStateProps;
   TableToolbar?: React.FC<{ table: ReactTable<TData> }>;
-  // determines if pagination is controlled by parent component
-  isPaginationControlled?: boolean;
-  pagination?: PaginationState;
-  onPaginationChange?: (updater: Updater<PaginationState>) => void;
-  rowCount?: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   confirmLoading,
+  controlledState,
   TableToolbar,
-  isPaginationControlled = false,
-  pagination,
-  onPaginationChange,
-  rowCount,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  let tableState: Partial<TableState> = {};
 
-  let tableState: Partial<TableState> = {
-    sorting,
-    columnVisibility,
-    rowSelection,
-    columnFilters,
-  };
-
-  if (isPaginationControlled) {
-    // check if necessary controlled pagination props are provided
-    if (!pagination || !onPaginationChange || !rowCount) {
-      throw new Error(
-        "When isPaginationControlled is true, pagination, onPaginationChange and rowCount must be provided",
-      );
-    }
-    // set pagination state
+  if (controlledState) {
     tableState = {
       ...tableState,
-      pagination,
+      pagination: controlledState.pagination,
+      sorting: controlledState.sorting,
+      columnFilters: controlledState.columnFilters,
     };
   }
 
@@ -88,29 +77,27 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     state: tableState,
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
   };
 
-  if (isPaginationControlled) {
+  if (controlledState) {
     tableOptions = {
       ...tableOptions,
+      // pagination
       manualPagination: true,
-      onPaginationChange,
-      rowCount,
-    };
-  } else {
-    tableOptions = {
-      ...tableOptions,
-      getPaginationRowModel: getPaginationRowModel(),
+      onPaginationChange: controlledState.onPaginationChange,
+      rowCount: controlledState.rowCount,
+      // sorting
+      manualSorting: true,
+      onSortingChange: controlledState.onSortingChange,
+      // filtering
+      manualFiltering: true,
+      onColumnFiltersChange: controlledState.onColumnFiltersChange,
     };
   }
 

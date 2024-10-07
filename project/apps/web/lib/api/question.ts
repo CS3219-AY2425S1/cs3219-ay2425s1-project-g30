@@ -1,5 +1,6 @@
 import {
   CreateQuestionDto,
+  GetQuestionsQueryDto,
   QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
@@ -7,14 +8,9 @@ import {
 import { apiCall } from "@/lib/api/apiClient";
 
 export const fetchQuestions = async (
-  pageIndex: number,
-  pageSize: number,
+  queryParams: GetQuestionsQueryDto,
 ): Promise<QuestionCollectionDto> => {
-  // update the api call to include pagination
-  const limit = pageSize;
-  const offset = pageIndex * pageSize;
-  // add limit and offset as query params
-  return await apiCall("get", "/questions", null, { limit, offset });
+  return await apiCall("get", "/questions", null, queryParams);
 };
 
 export const fetchQuestionById = async (id: string): Promise<QuestionDto> => {
