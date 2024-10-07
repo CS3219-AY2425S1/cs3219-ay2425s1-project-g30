@@ -2,13 +2,13 @@
 
 import { ColumnDef, SortingFn } from "@tanstack/react-table";
 
-import { DataTableColumnHeader } from "../../../../components/data-table/DataTableColumnHeader";
 import { QuestionDto } from "@repo/dtos/questions";
 import DifficultyBadge from "@/components/DifficultyBadge";
 import { Badge } from "@/components/ui/badge";
 import { COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
 import Link from "next/link";
-import { DataTableRowActions } from "../../../../components/data-table/DataTableRowActions";
+import { DataTableRowActions } from "./QuestionTableRowActions";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 
 // Complexity sorting order
 const complexityOrder: { [key in COMPLEXITY]: number } = {
