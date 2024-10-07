@@ -13,7 +13,6 @@ import {
   DataTable,
 } from "@/components/data-table/DataTable";
 
-import EmptyPlaceholder from "../EmptyPlaceholder";
 import { columns } from "./columns";
 import { useQuestionsState } from "@/contexts/QuestionsStateContext";
 import { QuestionTableToolbar } from "./QuestionTableToolbar";
@@ -23,7 +22,7 @@ import {
   SortingState,
   Updater,
 } from "@tanstack/react-table";
-import { startTransition, useCallback, useState } from "react";
+import { startTransition, useState } from "react";
 import {
   CATEGORY,
   COMPLEXITY,
