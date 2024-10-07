@@ -52,7 +52,7 @@ export function QuestionTable() {
   ]);
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const debouncedColumnFilters = useDebounce(columnFilters, 500);
+  const debouncedColumnFilters = useDebounce(columnFilters, 200);
 
   const { data } = useSuspenseQuery<QuestionCollectionDto>({
     queryKey: [

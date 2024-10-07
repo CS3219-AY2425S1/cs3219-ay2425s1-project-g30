@@ -18,6 +18,7 @@ const COMPLEXITIES = Object.values(COMPLEXITY).map((value) => ({
   label: value,
   value,
 }));
+
 const CATEGORIES = Object.values(CATEGORY).map((value) => ({
   label: value,
   value,
@@ -48,6 +49,7 @@ export function QuestionTableToolbar<TData>({
             column={table.getColumn("q_complexity")}
             title="Complexity"
             options={COMPLEXITIES}
+            includeFacets={false}
           />
         )}
         {table.getColumn("q_category") && (
@@ -55,6 +57,7 @@ export function QuestionTableToolbar<TData>({
             column={table.getColumn("q_category")}
             title="Category"
             options={CATEGORIES}
+            includeFacets={false}
           />
         )}
         {isFiltered && (
