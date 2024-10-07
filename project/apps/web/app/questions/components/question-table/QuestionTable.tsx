@@ -24,6 +24,7 @@ import {
   Updater,
 } from "@tanstack/react-table";
 import { startTransition, useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
 import {
   CATEGORY,
   COMPLEXITY,
@@ -52,18 +53,27 @@ export function QuestionTable() {
   ]);
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const debouncedColumnFilters = useDebounce(columnFilters, 500);
 
   const { data } = useSuspenseQuery<QuestionCollectionDto>({
-    queryKey: [QUERY_KEYS.Question, pagination, sorting, columnFilters],
+    queryKey: [
+      QUERY_KEYS.Question,
+      pagination,
+      sorting,
+      debouncedColumnFilters,
+    ],
     queryFn: () => {
-      const title = columnFilters.find((f) => f.id === "q_title")
+      console.log("filters", debouncedColumnFilters);
+      const title = debouncedColumnFilters.find((f) => f.id === "q_title")
         ?.value as string;
 
-      const categories = columnFilters.find((f) => f.id === "q_category")
-        ?.value as CATEGORY[];
+      const categories = debouncedColumnFilters.find(
+        (f) => f.id === "q_category",
+      )?.value as CATEGORY[];
 
-      const complexities = columnFilters.find((f) => f.id === "q_complexity")
-        ?.value as COMPLEXITY[];
+      const complexities = debouncedColumnFilters.find(
+        (f) => f.id === "q_complexity",
+      )?.value as COMPLEXITY[];
 
       const offset = pagination.pageIndex * pagination.pageSize;
       const limit = pagination.pageSize;
