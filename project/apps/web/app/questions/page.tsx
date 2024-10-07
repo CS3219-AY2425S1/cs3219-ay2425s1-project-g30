@@ -15,7 +15,7 @@ import { Suspense, useState } from "react";
 import CreateModal from "./components/CreateModal";
 import EmptyPlaceholder from "./components/EmptyPlaceholder";
 import { columns } from "./components/question-table/columns";
-import { DataTable } from "./components/question-table/DataTable";
+import { DataTable } from "../../components/data-table/DataTable";
 import QuestionsSkeleton from "./components/QuestionsSkeleton";
 import {
   QuestionsStateProvider,
