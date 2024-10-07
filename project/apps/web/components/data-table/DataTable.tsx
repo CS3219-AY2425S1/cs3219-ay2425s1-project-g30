@@ -5,6 +5,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
+  Table as ReactTable,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -25,7 +26,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { DataTableToolbar } from "./DataTableToolbar";
 import { cn } from "@/lib/utils";
 import { DataTablePagination } from "./DataTablePagination";
 
@@ -33,12 +33,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   confirmLoading: boolean;
+  TableToolbar: React.FC<{ table: ReactTable<TData> }>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   confirmLoading,
+  TableToolbar: toolbar,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -72,7 +74,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      {toolbar({ table })}
       <div className="rounded-md border">
         <Table className="table-fixed">
           <TableHeader>

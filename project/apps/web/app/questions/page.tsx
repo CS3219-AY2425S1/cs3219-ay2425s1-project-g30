@@ -22,6 +22,7 @@ import {
   useQuestionsState,
 } from "@/contexts/QuestionsStateContext";
 import { ActionModals } from "@/components/question/ActionModals";
+import { QuestionTable } from "./components/question-table/QuestionTable";
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
@@ -36,10 +37,11 @@ const QuestionRepositoryContent = () => {
     setDeleteModalOpen,
   } = useQuestionsState();
   const { toast } = useToast();
-  const { data } = useSuspenseQuery<QuestionDto[]>({
-    queryKey: [QUERY_KEYS.Question],
-    queryFn: fetchQuestions,
-  });
+
+  // const { data } = useSuspenseQuery<QuestionDto[]>({
+  //   queryKey: [QUERY_KEYS.Question],
+  //   queryFn: fetchQuestions,
+  // });
 
   const createMutation = useMutation({
     mutationFn: (newQuestion: CreateQuestionDto) => createQuestion(newQuestion),
@@ -82,7 +84,8 @@ const QuestionRepositoryContent = () => {
       </div>
 
       {/* Table */}
-      {data?.length === 0 ? (
+      <QuestionTable />
+      {/* {data?.length === 0 ? (
         <EmptyPlaceholder />
       ) : (
         <DataTable
@@ -90,7 +93,7 @@ const QuestionRepositoryContent = () => {
           columns={columns}
           confirmLoading={confirmLoading}
         />
-      )}
+      )} */}
 
       <CreateModal
         open={isCreateModalOpen}

@@ -3,6 +3,7 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 
+import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -10,8 +11,6 @@ import {
   CATEGORY,
   COMPLEXITY,
 } from "@repo/dtos/generated/enums/questions.enums";
-
-import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 
 const COMPLEXITIES = Object.entries(COMPLEXITY).map(([value, label]) => ({
   label,
@@ -26,7 +25,7 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTableToolbar<TData>({
+export function QuestionTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
