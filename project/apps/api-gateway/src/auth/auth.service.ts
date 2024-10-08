@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
-import { RpcException } from '@nestjs/microservices';
 
 import {
   UserDataDto,
