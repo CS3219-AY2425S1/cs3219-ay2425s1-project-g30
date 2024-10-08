@@ -7,9 +7,7 @@ import {
   Req,
   Res,
   UsePipes,
-  Inject,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import {
   SignInDto,
   signInSchema,
@@ -18,20 +16,17 @@ import {
 } from '@repo/dtos/auth';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import { Request, Response } from 'express';
-import { firstValueFrom } from 'rxjs';
+
+import { AuthService } from './auth.service';
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject('USER_SERVICE')
-    private readonly userServiceClient: ClientProxy,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   @UsePipes(new ZodValidationPipe(signUpSchema))
-  async signUp(@Body() body: SignUpDto, @Res() res: Response) {
-    const { userData, session } = await firstValueFrom(
-      this.userServiceClient.send({ cmd: 'signup' }, body),
-    );
+  async signUp(@Body() signUpDto: SignUpDto, @Res() res: Response) {
+    const { userData, session } = await this.authService.signUp(signUpDto);
+
     res.cookie('token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -44,10 +39,9 @@ export class AuthController {
 
   @Post('signin')
   @UsePipes(new ZodValidationPipe(signInSchema))
-  async signIn(@Body() body: SignInDto, @Res() res: Response) {
-    const { userData, session } = await firstValueFrom(
-      this.userServiceClient.send({ cmd: 'signin' }, body),
-    );
+  async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
+    const { userData, session } = await this.authService.signIn(signInDto);
+
     res.cookie('token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -72,9 +66,7 @@ export class AuthController {
     if (!token) {
       return res.status(HttpStatus.UNAUTHORIZED).json({ user: null });
     }
-    const { userData } = await firstValueFrom(
-      this.userServiceClient.send({ cmd: 'me' }, token),
-    );
+    const userData = await this.authService.me(token);
     return res.status(HttpStatus.OK).json({ userData });
   }
 }

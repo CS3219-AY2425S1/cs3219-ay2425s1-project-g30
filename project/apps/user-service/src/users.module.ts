@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { AuthController } from 'src/adapters/controllers/users.controller';
+import { UsersController } from 'src/adapters/controllers/users.controller';
 import { SupabaseUsersRepository } from 'src/adapters/db/users.supabase';
 import { UsersService } from 'src/domain/ports/users.service';
 import { UsersRepository } from 'src/domain/ports/users.repository';
@@ -12,7 +12,7 @@ import { UsersRepository } from 'src/domain/ports/users.repository';
       isGlobal: true,
     }),
   ],
-  controllers: [AuthController],
+  controllers: [UsersController],
   providers: [
     UsersService,
     {
@@ -21,4 +21,4 @@ import { UsersRepository } from 'src/domain/ports/users.repository';
     },
   ],
 })
-export class UserModule {}
+export class UsersModule {}

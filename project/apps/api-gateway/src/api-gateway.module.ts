@@ -4,6 +4,10 @@ import { QuestionsController } from './questions/questions.controller';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller';
 import { LoggerModule } from 'nestjs-pino';
+import { UsersController } from './users/users.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthRepository } from './auth/auth.repository';
+import { SupabaseAuthRepository } from './auth/auth.supabase';
 
 @Module({
   imports: [
@@ -17,7 +21,6 @@ import { LoggerModule } from 'nestjs-pino';
         },
       },
     }),
-    // Client for Questions Service
     ClientsModule.register([
       {
         name: 'QUESTION_SERVICE',
@@ -43,6 +46,13 @@ import { LoggerModule } from 'nestjs-pino';
       },
     ]),
   ],
-  controllers: [QuestionsController, AuthController],
+  controllers: [AuthController, QuestionsController, UsersController],
+  providers: [
+    AuthService,
+    {
+      provide: AuthRepository,
+      useClass: SupabaseAuthRepository,
+    },
+  ],
 })
 export class ApiGatewayModule {}

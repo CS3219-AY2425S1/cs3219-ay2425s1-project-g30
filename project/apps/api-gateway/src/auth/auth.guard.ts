@@ -1,31 +1,25 @@
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    @Inject('USER_SERVICE')
-    private readonly userServiceClient: ClientProxy,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.cookies['token'];
+    const token = request.cookies['token']; // to fix: token here is always undefined
 
     if (!token) {
       throw new UnauthorizedException('No token found');
     }
 
-    const data = await firstValueFrom(
-      this.userServiceClient.send({ cmd: 'verify' }, token),
-    );
+    const data = await this.authService.verifyUser(token);
 
     if (!data) {
       throw new UnauthorizedException('Invalid token');
