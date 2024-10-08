@@ -9,8 +9,8 @@ import {
 } from '@repo/dtos/users';
 
 @Injectable()
-export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
 
   constructor(private readonly usersRepository: UsersRepository) {}
 
