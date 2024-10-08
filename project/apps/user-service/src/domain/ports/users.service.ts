@@ -1,13 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 import { RpcException } from '@nestjs/microservices';
 import { UsersRepository } from 'src/domain/ports/users.repository';
-import {
-  UserDataDto,
-  UserSessionDto,
-  UserAuthRecordDto,
-} from '@repo/dtos/users';
-
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
