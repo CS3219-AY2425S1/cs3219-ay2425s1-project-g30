@@ -24,6 +24,7 @@
     "@repo/dtos": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-table": "^8.20.5",
+    "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

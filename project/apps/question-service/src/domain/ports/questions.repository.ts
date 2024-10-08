@@ -1,6 +1,7 @@
 import {
   CreateQuestionDto,
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
+  QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
@@ -13,9 +14,9 @@ export abstract class QuestionsRepository {
   /**
    * Retrieves all questions that match the given filters.
    * @param filters - The criteria used to filter the questions.
-   * @returns A promise that resolves to an array of QuestionDto objects.
+   * @returns A promise that resolves to a QuestionCollectionDto object.
    */
-  abstract findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]>;
+  abstract findAll(filters: QuestionFiltersDto): Promise<QuestionCollectionDto>;
 
   /**
    * Retrieves a question by its unique identifier.

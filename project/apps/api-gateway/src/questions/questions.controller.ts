@@ -19,8 +19,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import {
   CreateQuestionDto,
   createQuestionSchema,
-  GetQuestionsQueryDto,
-  getQuestionsQuerySchema,
+  QuestionFiltersDto,
+  questionFiltersSchema,
   UpdateQuestionDto,
   updateQuestionSchema,
 } from '@repo/dtos/questions';
@@ -35,8 +35,8 @@ export class QuestionsController {
   ) {}
 
   @Get()
-  @UsePipes(new ZodValidationPipe(getQuestionsQuerySchema))
-  async getQuestions(@Query() filters: GetQuestionsQueryDto) {
+  @UsePipes(new ZodValidationPipe(questionFiltersSchema))
+  async getQuestions(@Query() filters: QuestionFiltersDto) {
     return this.questionsServiceClient.send({ cmd: 'get_questions' }, filters);
   }
 

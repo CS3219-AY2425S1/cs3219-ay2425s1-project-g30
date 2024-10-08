@@ -5,7 +5,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
-  VisibilityState,
+  Table as ReactTable,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -14,6 +14,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  PaginationState,
+  Updater,
+  TableState,
+  TableOptions,
 } from "@tanstack/react-table";
 
 import {
@@ -25,55 +29,91 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { DataTablePagination } from "./DataTablePagination";
-import { DataTableToolbar } from "./DataTableToolbar";
 import { cn } from "@/lib/utils";
+
+import { DataTablePagination } from "./DataTablePagination";
+import { LoadingSpinner } from "../ui/spinner";
+
+export interface ControlledTableStateProps {
+  // pagination
+  pagination: PaginationState;
+  onPaginationChange: (updater: Updater<PaginationState>) => void;
+  rowCount: number;
+
+  // sorting
+  sorting: SortingState;
+  onSortingChange: (updater: Updater<SortingState>) => void;
+
+  // filtering
+  columnFilters: ColumnFiltersState;
+  onColumnFiltersChange: (updater: Updater<ColumnFiltersState>) => void;
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   confirmLoading: boolean;
+  controlledState?: ControlledTableStateProps;
+  TableToolbar?: React.FC<{ table: ReactTable<TData> }>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   confirmLoading,
+  controlledState,
+  TableToolbar,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  let tableState: Partial<TableState> = {};
 
-  const table = useReactTable({
+  if (controlledState) {
+    tableState = {
+      ...tableState,
+      pagination: controlledState.pagination,
+      sorting: controlledState.sorting,
+      columnFilters: controlledState.columnFilters,
+    };
+  }
+
+  let tableOptions: TableOptions<TData> = {
     data,
     columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-    },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
+    state: tableState,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  });
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+  };
+
+  if (controlledState) {
+    tableOptions = {
+      ...tableOptions,
+      // pagination
+      manualPagination: true,
+      onPaginationChange: controlledState.onPaginationChange,
+      rowCount: controlledState.rowCount,
+      // sorting
+      manualSorting: true,
+      onSortingChange: controlledState.onSortingChange,
+      // filtering
+      manualFiltering: true,
+      onColumnFiltersChange: controlledState.onColumnFiltersChange,
+    };
+  }
+
+  const table = useReactTable(tableOptions);
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
-      <div className="rounded-md border">
+      {TableToolbar && <TableToolbar table={table} />}
+      <div className="relative rounded-md border">
+        {confirmLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+            <LoadingSpinner className="text-gray-500 w-8 h-8" />
+          </div>
+        )}
         <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

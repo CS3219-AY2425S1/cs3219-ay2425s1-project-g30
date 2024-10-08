@@ -2,7 +2,8 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import {
   CreateQuestionDto,
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
+  QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
@@ -30,21 +31,22 @@ export class QuestionsService {
   }
 
   /**
-   * Retrieves all questions that match the provided filters.
+   * Retrieves all questions based on the provided filters.
    *
-   * @param {GetQuestionsQueryDto} filters - The filters to apply when fetching questions.
-   * @returns {Promise<QuestionDto[]>} A promise that resolves to an array of QuestionDto objects.
-   * @throws Will throw an error if the fetch operation fails.
+   * @param {QuestionFiltersDto} filters - The filters to apply when fetching questions.
+   * @returns {Promise<QuestionCollectionDto>} A promise that resolves to a collection of questions.
+   * @throws Will throw an error if the questions cannot be fetched.
    */
-  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]> {
+  async findAll(filters: QuestionFiltersDto): Promise<QuestionCollectionDto> {
     try {
-      const questions = await this.questionsRepository.findAll(filters);
+      const questionCollection =
+        await this.questionsRepository.findAll(filters);
 
       this.logger.log(
-        `fetched ${questions.length} questions with filters: ${JSON.stringify(filters)}`,
+        `fetched ${questionCollection.metadata.count} questions with filters: ${JSON.stringify(filters)}`,
       );
 
-      return questions;
+      return questionCollection;
     } catch (error) {
       this.handleError('fetch questions', error);
     }
@@ -82,15 +84,16 @@ export class QuestionsService {
    */
   async create(question: CreateQuestionDto): Promise<QuestionDto> {
     try {
-      const filter: GetQuestionsQueryDto = {
+      const filter: QuestionFiltersDto = {
         title: question.q_title,
         includeDeleted: true,
       };
 
-      const existingQuestions = await this.questionsRepository.findAll(filter);
+      const existingQuestionCollection =
+        await this.questionsRepository.findAll(filter);
 
       // check if question with the same title already exists
-      if (existingQuestions.length) {
+      if (existingQuestionCollection.metadata.count) {
         this.handleError(
           'create question',
           new BadRequestException(
@@ -122,15 +125,19 @@ export class QuestionsService {
    */
   async update(question: UpdateQuestionDto): Promise<QuestionDto> {
     try {
-      const filter: GetQuestionsQueryDto = {
+      const filter: QuestionFiltersDto = {
         title: question.q_title,
         includeDeleted: true,
       };
 
-      const existingQuestions = await this.questionsRepository.findAll(filter);
+      const existingQuestionCollection =
+        await this.questionsRepository.findAll(filter);
 
       // check if another question with the same title already exists
-      if (existingQuestions.length && existingQuestions[0].id !== question.id) {
+      if (
+        existingQuestionCollection.metadata.count &&
+        existingQuestionCollection.questions[0].id !== question.id
+      ) {
         this.handleError(
           'update question',
           new BadRequestException(
