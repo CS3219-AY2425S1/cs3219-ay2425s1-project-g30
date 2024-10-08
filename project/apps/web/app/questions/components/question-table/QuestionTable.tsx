@@ -30,7 +30,7 @@ import {
 import useDebounce from "@/hooks/useDebounce";
 
 export function QuestionTable() {
-  const { confirmLoading } = useQuestionsState();
+  const { confirmLoading, setConfirmLoading } = useQuestionsState();
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -52,7 +52,12 @@ export function QuestionTable() {
   ]);
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const debouncedColumnFilters = useDebounce(columnFilters, 200);
+  const debouncedColumnFilters = useDebounce(
+    columnFilters,
+    200,
+    () => setConfirmLoading(true),
+    () => setConfirmLoading(false),
+  );
 
   const { data } = useSuspenseQuery<QuestionCollectionDto>({
     queryKey: [
@@ -62,38 +67,42 @@ export function QuestionTable() {
       debouncedColumnFilters,
     ],
     queryFn: () => {
-      const title = debouncedColumnFilters.find((f) => f.id === "q_title")
-        ?.value as string;
+      setConfirmLoading(true);
+      try {
+        const title = debouncedColumnFilters.find((f) => f.id === "q_title")
+          ?.value as string;
 
-      const categories = debouncedColumnFilters.find(
-        (f) => f.id === "q_category",
-      )?.value as CATEGORY[];
+        const categories = debouncedColumnFilters.find(
+          (f) => f.id === "q_category",
+        )?.value as CATEGORY[];
 
-      const complexities = debouncedColumnFilters.find(
-        (f) => f.id === "q_complexity",
-      )?.value as COMPLEXITY[];
+        const complexities = debouncedColumnFilters.find(
+          (f) => f.id === "q_complexity",
+        )?.value as COMPLEXITY[];
 
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const limit = pagination.pageSize;
+        const offset = pagination.pageIndex * pagination.pageSize;
+        const limit = pagination.pageSize;
 
-      const sort = sorting.map(
-        (s) =>
-          ({
-            field: s.id,
-            order: s.desc ? "desc" : "asc",
-          }) as SortQuestionsQueryDto,
-      );
+        const sort = sorting.map(
+          (s) =>
+            ({
+              field: s.id,
+              order: s.desc ? "desc" : "asc",
+            }) as SortQuestionsQueryDto,
+        );
 
-      const queryParams: QuestionFiltersDto = {
-        title,
-        categories,
-        complexities,
-        offset,
-        limit,
-        sort,
-      };
-
-      return fetchQuestions(queryParams);
+        const queryParams: QuestionFiltersDto = {
+          title,
+          categories,
+          complexities,
+          offset,
+          limit,
+          sort,
+        };
+        return fetchQuestions(queryParams);
+      } finally {
+        setConfirmLoading(false);
+      }
     },
   });
 

@@ -3,19 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useToast } from "@/hooks/use-toast";
-import { createQuestion, fetchQuestions } from "@/lib/api/question";
-import { CreateQuestionDto, QuestionDto } from "@repo/dtos/questions";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { createQuestion } from "@/lib/api/question";
+import { CreateQuestionDto } from "@repo/dtos/questions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { Suspense, useState } from "react";
 import CreateModal from "./components/CreateModal";
-import EmptyPlaceholder from "./components/EmptyPlaceholder";
-import { columns } from "./components/question-table/columns";
-import { DataTable } from "../../components/data-table/DataTable";
 import QuestionsSkeleton from "./components/QuestionsSkeleton";
 import {
   QuestionsStateProvider,
@@ -37,11 +30,6 @@ const QuestionRepositoryContent = () => {
     setDeleteModalOpen,
   } = useQuestionsState();
   const { toast } = useToast();
-
-  // const { data } = useSuspenseQuery<QuestionDto[]>({
-  //   queryKey: [QUERY_KEYS.Question],
-  //   queryFn: fetchQuestions,
-  // });
 
   const createMutation = useMutation({
     mutationFn: (newQuestion: CreateQuestionDto) => createQuestion(newQuestion),
@@ -85,15 +73,6 @@ const QuestionRepositoryContent = () => {
 
       {/* Table */}
       <QuestionTable />
-      {/* {data?.length === 0 ? (
-        <EmptyPlaceholder />
-      ) : (
-        <DataTable
-          data={data}
-          columns={columns}
-          confirmLoading={confirmLoading}
-        />
-      )} */}
 
       <CreateModal
         open={isCreateModalOpen}

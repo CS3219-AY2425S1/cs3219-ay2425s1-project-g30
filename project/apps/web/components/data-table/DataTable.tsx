@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
+
 import { DataTablePagination } from "./DataTablePagination";
 
 export interface ControlledTableStateProps {
