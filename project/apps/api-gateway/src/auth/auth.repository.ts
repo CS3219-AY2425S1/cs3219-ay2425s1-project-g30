@@ -6,7 +6,7 @@ import {
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 
 /**
- * Abstract class representing the UsersRepository.
+ * Abstract class representing the AuthRepository.
  * This class defines the methods for interacting with user data and authentication records.
  */
 export abstract class AuthRepository {
