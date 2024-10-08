@@ -54,7 +54,7 @@ export function QuestionTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const debouncedColumnFilters = useDebounce(
     columnFilters,
-    200,
+    100,
     () => setConfirmLoading(true),
     () => setConfirmLoading(false),
   );
@@ -66,7 +66,7 @@ export function QuestionTable() {
       sorting,
       debouncedColumnFilters,
     ],
-    queryFn: () => {
+    queryFn: async () => {
       setConfirmLoading(true);
       try {
         const title = debouncedColumnFilters.find((f) => f.id === "q_title")
@@ -99,7 +99,8 @@ export function QuestionTable() {
           limit,
           sort,
         };
-        return fetchQuestions(queryParams);
+
+        return await fetchQuestions(queryParams);
       } finally {
         setConfirmLoading(false);
       }

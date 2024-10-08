@@ -32,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { DataTablePagination } from "./DataTablePagination";
+import { LoadingSpinner } from "../ui/spinner";
 
 export interface ControlledTableStateProps {
   // pagination
@@ -107,7 +108,12 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {TableToolbar && <TableToolbar table={table} />}
-      <div className="rounded-md border">
+      <div className="relative rounded-md border">
+        {confirmLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+            <LoadingSpinner className="text-gray-500 w-8 h-8" />
+          </div>
+        )}
         <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
