@@ -8,7 +8,6 @@ export type UserSessionDto = { userData: UserDataDto; session: Session };
 
 export type UserAuthRecordDto = {
   id: string;
-  email?: string;
   last_sign_in_at?: string;
   role?: string;
 };
