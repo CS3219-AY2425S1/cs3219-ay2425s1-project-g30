@@ -21,6 +21,7 @@ services:
     environment:
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
       NODE_ENV: production
   question-service:
     build:
@@ -47,6 +48,17 @@ services:
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY}
+      NODE_ENV: production
+  matching-service:
+    build:
+      context: .
+      dockerfile: ./apps/matching-service/Dockerfile
+    ports:
+      - 3002:3002
+    networks:
+      - backend
+    environment:
+      MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
       NODE_ENV: production
   rabbitmq:
     build:
