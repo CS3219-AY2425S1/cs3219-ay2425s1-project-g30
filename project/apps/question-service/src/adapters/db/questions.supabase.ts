@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { collectionMetadataDto } from '@repo/dtos/metatdata';
 import {
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
   QuestionDto,
   CreateQuestionDto,
   UpdateQuestionDto,
+  QuestionCollectionDto,
 } from '@repo/dtos/questions';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -27,31 +29,73 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  async findAll(filters: GetQuestionsQueryDto): Promise<QuestionDto[]> {
-    const { title, category, complexity, includeDeleted } = filters;
+  async findAll(filters: QuestionFiltersDto): Promise<QuestionCollectionDto> {
+    const {
+      title,
+      categories,
+      complexities,
+      includeDeleted,
+      offset,
+      limit,
+      sort,
+    } = filters;
 
-    let query = this.supabase.from(this.QUESTIONS_TABLE).select();
+    let queryBuilder = this.supabase
+      .from(this.QUESTIONS_TABLE)
+      .select('*', { count: 'exact' });
 
     if (title) {
-      query = query.ilike('q_title', `%${title}%`);
+      queryBuilder = queryBuilder.ilike('q_title', `%${title}%`);
     }
-    if (category) {
-      query = query.contains('q_category', [category]);
+    if (categories) {
+      // result must match ALL categories provided
+      queryBuilder = queryBuilder.contains('q_category', categories);
     }
-    if (complexity) {
-      query = query.eq('q_complexity', complexity);
+    if (complexities) {
+      // result must match ANY complexity provided
+      queryBuilder = queryBuilder.in('q_complexity', complexities);
     }
     if (!includeDeleted) {
-      query = query.is('deleted_at', null);
+      queryBuilder = queryBuilder.is('deleted_at', null);
+    }
+    if (sort) {
+      for (const s of sort) {
+        queryBuilder = queryBuilder.order(s.field, {
+          ascending: s.order === 'asc',
+        });
+      }
     }
 
-    const { data, error } = await query;
+    const totalCountQuery = queryBuilder;
 
-    if (error) {
-      throw error;
+    let dataQuery = queryBuilder;
+    if (limit) {
+      if (offset) {
+        dataQuery = dataQuery.range(offset, offset + limit - 1); // Supabase range is inclusive
+      } else {
+        dataQuery = dataQuery.limit(limit);
+      }
     }
 
-    return data;
+    // Execute the data query
+    const { data: questions, error } = await dataQuery;
+
+    // Execute the total count query
+    const { count: totalCount, error: totalCountError } = await totalCountQuery;
+
+    if (error || totalCountError) {
+      throw error || totalCountError;
+    }
+
+    const metadata: collectionMetadataDto = {
+      count: questions ? questions.length : 0,
+      totalCount: totalCount ?? 0,
+    };
+
+    return {
+      metadata,
+      questions,
+    } as QuestionCollectionDto;
   }
 
   async findById(id: string): Promise<QuestionDto> {

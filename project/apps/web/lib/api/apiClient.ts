@@ -1,9 +1,9 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 
 export class ApiError extends Error {
   constructor(
     public message: string,
-    public statusCode: number
+    public statusCode: number,
   ) {
     super(message);
     this.name = "ApiError";
@@ -18,16 +18,26 @@ const apiClient: AxiosInstance = axios.create({
 export const apiCall = async <T>(
   method: "get" | "post" | "put" | "delete",
   url: string,
-  data?: any
+  data?: any,
+  params?: Record<string, any>,
 ): Promise<T> => {
   try {
-    const response = await apiClient[method]<T>(url, data);
+    const config: AxiosRequestConfig = {
+      params,
+    };
+
+    const response = await apiClient.request<T>({
+      url,
+      method,
+      data,
+      ...config,
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new ApiError(
         error.response?.data?.message || error.message,
-        error.response?.status || 500
+        error.response?.status || 500,
       );
     }
     throw new ApiError("An unexpected error occurred", 500);

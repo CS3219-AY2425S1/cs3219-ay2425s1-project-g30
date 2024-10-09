@@ -1,12 +1,16 @@
 import {
   CreateQuestionDto,
+  QuestionFiltersDto,
+  QuestionCollectionDto,
   QuestionDto,
   UpdateQuestionDto,
 } from "@repo/dtos/questions";
 import { apiCall } from "@/lib/api/apiClient";
 
-export const fetchQuestions = async (): Promise<QuestionDto[]> => {
-  return await apiCall("get", "/questions");
+export const fetchQuestions = async (
+  queryParams: QuestionFiltersDto,
+): Promise<QuestionCollectionDto> => {
+  return await apiCall("get", "/questions", null, queryParams);
 };
 
 export const fetchQuestionById = async (id: string): Promise<QuestionDto> => {

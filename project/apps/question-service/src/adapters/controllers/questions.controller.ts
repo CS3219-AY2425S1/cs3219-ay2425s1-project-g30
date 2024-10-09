@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   CreateQuestionDto,
-  GetQuestionsQueryDto,
+  QuestionFiltersDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
 
@@ -12,7 +12,7 @@ export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @MessagePattern({ cmd: 'get_questions' })
-  async getQuestions(@Payload() filters: GetQuestionsQueryDto) {
+  async getQuestions(@Payload() filters: QuestionFiltersDto) {
     return await this.questionsService.findAll(filters);
   }
 

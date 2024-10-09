@@ -3,6 +3,7 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 
+import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -10,22 +11,24 @@ import {
   CATEGORY,
   COMPLEXITY,
 } from "@repo/dtos/generated/enums/questions.enums";
-import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 
-const COMPLEXITIES = Object.entries(COMPLEXITY).map(([value, label]) => ({
-  label,
+// filter value and label should both be the enum values
+// e.g. "Data Structures" as opposed to "DataStructures"
+const COMPLEXITIES = Object.values(COMPLEXITY).map((value) => ({
+  label: value,
   value,
 }));
 
-const CATEGORIES = Object.entries(CATEGORY).map(([value, label]) => ({
-  label,
+const CATEGORIES = Object.values(CATEGORY).map((value) => ({
+  label: value,
   value,
 }));
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
-export function DataTableToolbar<TData>({
+export function QuestionTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
@@ -46,6 +49,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("q_complexity")}
             title="Complexity"
             options={COMPLEXITIES}
+            includeFacets={false}
           />
         )}
         {table.getColumn("q_category") && (
@@ -53,6 +57,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("q_category")}
             title="Category"
             options={CATEGORIES}
+            includeFacets={false}
           />
         )}
         {isFiltered && (
