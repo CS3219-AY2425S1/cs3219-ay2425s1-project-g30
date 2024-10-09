@@ -38,7 +38,7 @@ export class SupabaseAuthRepository implements AuthRepository {
     const { data, error } = await this.supabase.auth.getUser(token);
 
     if (error || !data || !data.user) {
-      throw new UnauthorizedException('Invalid token');
+      throw new Error('Invalid token');
     }
 
     return data.user as UserAuthRecordDto;
@@ -52,7 +52,7 @@ export class SupabaseAuthRepository implements AuthRepository {
       .single<UserDataDto>();
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw error;
     }
 
     return data;
@@ -74,13 +74,13 @@ export class SupabaseAuthRepository implements AuthRepository {
       });
 
     if (authError) {
-      throw new BadRequestException(authError.message);
+      throw authError;
     }
 
     const { user, session } = authData;
 
     if (!user || !session) {
-      throw new BadRequestException('Unexpected sign-up response');
+      throw new Error('Unexpected sign-up response');
     }
 
     // Next, create user profile in Supabase Profiles table
@@ -97,7 +97,7 @@ export class SupabaseAuthRepository implements AuthRepository {
     if (profileError) {
       // Rollback user creation in Auth
       await this.supabase.auth.admin.deleteUser(user.id);
-      throw new BadRequestException(profileError.message);
+      throw profileError;
     }
 
     return { userData: profileData, session } as UserSessionDto;
@@ -111,12 +111,12 @@ export class SupabaseAuthRepository implements AuthRepository {
       await this.supabase.auth.signInWithPassword(credentials);
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw error;
     }
 
     const { user, session } = data;
     if (!user || !session) {
-      throw new BadRequestException('Unexpected sign-in response');
+      throw new Error('Unexpected sign-in response');
     }
 
     const userData = await this.getUserDataById(user.id);

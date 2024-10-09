@@ -21,6 +21,7 @@ services:
     environment:
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       NODE_ENV: production
   question-service:
     build:

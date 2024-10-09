@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 
 import {
@@ -7,6 +12,7 @@ import {
   UserAuthRecordDto,
 } from '@repo/dtos/users';
 import { AuthRepository } from './auth.repository';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -15,17 +21,17 @@ export class AuthService {
   constructor(private readonly authRepository: AuthRepository) {}
 
   /**
-   * Logs an error message and throws the original error.
+   * Handles errors by logging the error message and throwing an RpcException.
    *
    * @private
    * @param {string} operation - The name of the operation where the error occurred.
    * @param {any} error - The error object that was caught. This can be any type of error, including a NestJS HttpException.
-   * @throws {never} - Throws the original error.
+   * @throws {RpcException} - Throws an RpcException wrapping the original error.
    */
   private handleError(operation: string, error: any): never {
     this.logger.error(`Error at ${operation}: ${error.message}`);
 
-    throw error;
+    throw new RpcException(error);
   }
 
   /**
@@ -46,7 +52,7 @@ export class AuthService {
 
       return userAuthRecord;
     } catch (error) {
-      this.handleError('verify user', error);
+      this.handleError('verify user', new UnauthorizedException(error.message));
     }
   }
 
@@ -59,7 +65,6 @@ export class AuthService {
    */
   async me(token: string): Promise<UserDataDto> {
     try {
-      this.logger.log('debug');
       const userAuthRecord =
         await this.authRepository.getUserAuthRecordByToken(token);
 
@@ -71,7 +76,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
-      this.handleError('fetch me', error);
+      this.handleError('fetch me', new BadRequestException(error.message));
     }
   }
 
@@ -92,7 +97,7 @@ export class AuthService {
 
       return userSession;
     } catch (error) {
-      this.handleError('sign up', error);
+      this.handleError('sign up', new BadRequestException(error.message));
     }
   }
 
@@ -113,7 +118,7 @@ export class AuthService {
 
       return userSession;
     } catch (error) {
-      this.handleError('sign in', error);
+      this.handleError('sign in', new BadRequestException(error.message));
     }
   }
 }
