@@ -22,7 +22,7 @@ export class MatchExpiryConsumer implements OnModuleInit {
         await channel.consume(MATCH_EXPIRY_QUEUE, async (message) => {
           if (message) {
             const content = JSON.parse(message.content.toString());
-            this.logger.log('Received message:', content);
+            this.logger.log('Received expiry message:', content);
             channel.ack(message);
           }
         });
