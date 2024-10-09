@@ -3,16 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
-import { MatchExpiryProducer } from './match-expiry.producer';
 
 @Injectable()
-export class MatchProducer {
-  private readonly logger = new Logger(MatchProducer.name);
+export class MatchRequestService {
+  private readonly logger = new Logger(MatchRequestService.name);
   private channelWrapper: ChannelWrapper;
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly matchExpiryProducer: MatchExpiryProducer,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     const connection_url =
       configService.get<string>('RABBITMQ_URL') || 'amqp://localhost:5672';
     const connection = amqp.connect([connection_url]);
@@ -33,7 +29,6 @@ export class MatchProducer {
       MATCH_QUEUE,
       Buffer.from(JSON.stringify(matchData)),
     );
-    this.matchExpiryProducer.enqueueMatchExpiryRequest(matchData, 1000);
     return { success: true };
   }
 }
