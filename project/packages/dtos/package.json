@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@supabase/auth-js": "^2.65.0",
+    "supabase": "^1.203.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
