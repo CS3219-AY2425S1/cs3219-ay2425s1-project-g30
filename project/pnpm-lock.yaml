@@ -560,7 +560,7 @@ importers:
         specifier: ^2.65.0
         version: 2.65.0
       supabase:
-        specifier: 1.203.0
+        specifier: ^1.203.0
         version: 1.203.0
       zod:
         specifier: ^3.23.8
