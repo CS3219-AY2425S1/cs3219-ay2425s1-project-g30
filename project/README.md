@@ -78,8 +78,7 @@ pnpm dev:infra
 To run the Infra Required for certain backend services, run the following command:
 
 ```
-docker compose -f docker-compose-infra.yml build
-docker compose -f docker-compose-infra.yml up -d
+pnpm infra
 ```
 
 To develop all apps and packages, run the following command:
