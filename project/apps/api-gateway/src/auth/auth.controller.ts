@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Inject,
   Post,
   Req,
   Res,
@@ -17,15 +18,21 @@ import {
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import { Request, Response } from 'express';
 
-import { AuthService } from './auth.service';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject('AUTH_SERVICE')
+    private readonly authServiceClient: ClientProxy,
+  ) {}
 
   @Post('signup')
   @UsePipes(new ZodValidationPipe(signUpSchema))
-  async signUp(@Body() signUpDto: SignUpDto, @Res() res: Response) {
-    const { userData, session } = await this.authService.signUp(signUpDto);
+  async signUp(@Body() body: SignUpDto, @Res() res: Response) {
+    const { userData, session } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'signup' }, body),
+    );
 
     res.cookie('token', session.access_token, {
       httpOnly: true,
@@ -39,9 +46,10 @@ export class AuthController {
 
   @Post('signin')
   @UsePipes(new ZodValidationPipe(signInSchema))
-  async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
-    const { userData, session } = await this.authService.signIn(signInDto);
-
+  async signIn(@Body() body: SignInDto, @Res() res: Response) {
+    const { userData, session } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'signin' }, body),
+    );
     res.cookie('token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -66,7 +74,9 @@ export class AuthController {
     if (!token) {
       return res.status(HttpStatus.UNAUTHORIZED).json({ user: null });
     }
-    const userData = await this.authService.me(token);
+    const userData = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, token),
+    );
     return res.status(HttpStatus.OK).json({ userData });
   }
 }

@@ -15,7 +15,7 @@ import {
   SignInWithPasswordCredentials,
   SupabaseClient,
 } from '@supabase/supabase-js';
-import { AuthRepository } from './auth.repository';
+import { AuthRepository } from '../../domain/ports/auth.repository';
 
 @Injectable()
 export class SupabaseAuthRepository implements AuthRepository {

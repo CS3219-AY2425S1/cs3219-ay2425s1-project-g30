@@ -5,9 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller';
 import { LoggerModule } from 'nestjs-pino';
 import { UsersController } from './users/users.controller';
-import { AuthService } from './auth/auth.service';
-import { AuthRepository } from './auth/auth.repository';
-import { SupabaseAuthRepository } from './auth/auth.supabase';
 
 @Module({
   imports: [
@@ -44,15 +41,19 @@ import { SupabaseAuthRepository } from './auth/auth.supabase';
           port: 3002,
         },
       },
+      {
+        name: 'AUTH_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host:
+            process.env.NODE_ENV === 'development'
+              ? 'localhost'
+              : process.env.AUTH_SERVICE_HOST || 'localhost',
+          port: 3003,
+        },
+      },
     ]),
   ],
-  controllers: [AuthController, QuestionsController, UsersController],
-  providers: [
-    AuthService,
-    {
-      provide: AuthRepository,
-      useClass: SupabaseAuthRepository,
-    },
-  ],
+  controllers: [QuestionsController, UsersController, AuthController],
 })
 export class ApiGatewayModule {}

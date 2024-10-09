@@ -48,6 +48,19 @@ services:
       SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY}
       NODE_ENV: production
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    ports:
+      - 3003:3003
+    networks:
+      - backend
+    environment:
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL} # Use the same Supabase URL as the user service
+      SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY} # Use the same Supabase key as the user service
+      NODE_ENV: production
 
 networks:
   backend:
