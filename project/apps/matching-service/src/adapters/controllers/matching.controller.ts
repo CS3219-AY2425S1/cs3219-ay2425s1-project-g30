@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { MatchProducer } from 'src/domain/ports/match.producer';
+import { MatchProducer } from 'src/domain/ports/producers/match.producer';
 
 @Controller()
 export class MatchingController {

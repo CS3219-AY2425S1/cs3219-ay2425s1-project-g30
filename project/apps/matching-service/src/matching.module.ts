@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MatchingController } from './adapters/controllers/matching.controller';
-import { MatchProducer } from './domain/ports/match.producer';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MatchConsumer } from './domain/consumer/match.consumer';
+import { MatchExpiryConsumer } from './domain/ports/consumers/match-expiry.consumer';
+import { MatchConsumer } from './domain/ports/consumers/match.consumer';
+import { MatchExpiryProducer } from './domain/ports/producers/match-expiry.producer';
+import { MatchProducer } from './domain/ports/producers/match.producer';
 
 @Module({
   imports: [
@@ -12,6 +13,11 @@ import { MatchConsumer } from './domain/consumer/match.consumer';
     }),
   ],
   controllers: [MatchingController],
-  providers: [MatchProducer, MatchConsumer],
+  providers: [
+    MatchProducer,
+    MatchConsumer,
+    MatchExpiryProducer,
+    MatchExpiryConsumer,
+  ],
 })
 export class MatchingModule {}

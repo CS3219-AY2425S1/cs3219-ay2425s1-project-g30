@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel } from 'amqplib';
+import { MATCH_QUEUE } from 'src/constants/queue';
 
 @Injectable()
 export class MatchConsumer implements OnModuleInit {
@@ -17,8 +18,8 @@ export class MatchConsumer implements OnModuleInit {
   public async onModuleInit() {
     try {
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
-        await channel.assertQueue('matchQueue', { durable: true });
-        await channel.consume('matchQueue', async (message) => {
+        await channel.assertQueue(MATCH_QUEUE, { durable: true });
+        await channel.consume(MATCH_QUEUE, async (message) => {
           if (message) {
             const content = JSON.parse(message.content.toString());
             this.logger.log('Received message:', content);
