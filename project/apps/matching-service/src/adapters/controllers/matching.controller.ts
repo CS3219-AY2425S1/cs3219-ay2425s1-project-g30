@@ -1,13 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { MatchingService } from 'src/domain/ports/matching.service';
+import { MatchProducer } from 'src/domain/ports/match.producer';
 
 @Controller()
 export class MatchingController {
-  constructor(private readonly matchingService: MatchingService) {}
+  constructor(private readonly matchProducer: MatchProducer) {}
 
   @MessagePattern({ cmd: 'find_match' })
   async findMatch(@Payload() matchData: any) {
-    return await this.matchingService.findMatch(matchData);
+    return await this.matchProducer.enqueueMatchRequest(matchData);
   }
 }
