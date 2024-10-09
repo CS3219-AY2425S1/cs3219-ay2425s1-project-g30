@@ -59,12 +59,15 @@ export class AuthService {
    */
   async me(token: string): Promise<UserDataDto> {
     try {
+      this.logger.log('debug');
       const userAuthRecord =
         await this.authRepository.getUserAuthRecordByToken(token);
 
       const userData = await this.authRepository.getUserDataById(
         userAuthRecord.id,
       );
+
+      this.logger.log(`user with id ${userData.id} fetched successfully`);
 
       return userData;
     } catch (error) {

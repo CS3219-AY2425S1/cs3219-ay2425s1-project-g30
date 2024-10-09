@@ -16,5 +16,6 @@ async function bootstrap() {
   app.useGlobalFilters(new RpcExceptionFilter());
   app.useGlobalInterceptors(new RpcExceptionInterceptor());
   await app.listen(4000);
+  console.log('Api Gateway is listening on port 4000');
 }
 bootstrap();
