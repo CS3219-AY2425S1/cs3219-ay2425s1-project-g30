@@ -4,6 +4,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:infra": "pnpm infra && turbo dev",
+    "infra": "docker compose -f docker-compose-infra.yml build && docker compose -f docker-compose-infra.yml up -d",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""

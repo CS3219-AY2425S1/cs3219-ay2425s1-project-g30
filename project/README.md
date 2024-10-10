@@ -68,6 +68,19 @@ Then, replace the variables accordingly.
 
 ### Develop
 
+To run both Infra and develop all apps, run the following command:
+
+```
+pnpm install
+pnpm dev:infra
+```
+
+To run the Infra Required for certain backend services, run the following command:
+
+```
+pnpm infra
+```
+
 To develop all apps and packages, run the following command:
 
 ```
