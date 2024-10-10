@@ -256,6 +256,9 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@supabase/supabase-js':
+        specifier: ^2.45.4
+        version: 2.45.4
       amqp-connection-manager:
         specifier: ^4.1.14
         version: 4.1.14(amqplib@0.10.4)
