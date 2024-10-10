@@ -50,7 +50,7 @@ import { MatchingController } from './matching/matching.controller';
             process.env.NODE_ENV === 'development'
               ? 'localhost'
               : process.env.MATCHING_SERVICE_HOST || 'localhost',
-          port: 3003,
+          port: 3004,
         },
       },
     ]),

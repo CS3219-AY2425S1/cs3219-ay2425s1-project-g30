@@ -64,7 +64,7 @@ WORKDIR /app/apps/matching-service
 USER nodejs
 
 # Expose the service's port
-EXPOSE 3003
+EXPOSE 3004
 
 # Start the NestJS matching-service
 CMD ["pnpm", "start"]
