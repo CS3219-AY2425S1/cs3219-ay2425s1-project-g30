@@ -1,0 +1,12 @@
+services:
+  rabbitmq:
+    build:
+      context: ./infra/rabbitmq
+      dockerfile: Dockerfile
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672" # RabbitMQ message broker port
+      - "15672:15672" # RabbitMQ management plugin port
