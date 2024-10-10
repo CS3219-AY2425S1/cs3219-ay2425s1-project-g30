@@ -1,8 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class MatchSupabase {
-  constructor() {}
+  private supabase: SupabaseClient;
 
-  // Contains methods to get and post values to supabase
+  private readonly MATCHES_TABLE = 'matches';
+
+  constructor(private configService: ConfigService) {
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+    const supabaseKey = this.configService.get<string>('SUPABASE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase URL and key must be provided');
+    }
+
+    this.supabase = createClient(supabaseUrl, supabaseKey);
+  }
 }

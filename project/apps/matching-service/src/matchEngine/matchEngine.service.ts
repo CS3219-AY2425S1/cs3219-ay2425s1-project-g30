@@ -11,7 +11,7 @@ export class MatchEngineService {
     private readonly matchSupabase: MatchSupabase,
   ) {}
 
-  generateMatch(matchRequest: any) {
+  async generateMatch(matchRequest: any) {
     // Performs some sort of redis checking
     // Add to supabase if match found
     // If no match found produce match expiry

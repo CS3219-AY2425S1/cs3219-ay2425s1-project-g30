@@ -73,6 +73,11 @@ services:
       - backend
     environment:
       MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      SUPABASE_URL: ${MATCHING_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${MATCHING_SERVICE_SUPABASE_KEY}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
       NODE_ENV: production
   rabbitmq:
     build:
@@ -85,9 +90,25 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5672:5672" # RabbitMQ message broker port
-      - "15672:15672" # RabbitMQ management plugin port
-
+      - 5672:5672 # RabbitMQ message broker port
+      - 15672:15672 # RabbitMQ management plugin port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+  redis:
+    build:
+      context: ./infra/redis
+      dockerfile: Dockerfile
+    container_name: redis
+    networks:
+      - backend
+    ports:
+      - 6739:6739
+    volumes:
+      - redis_data:/data
 networks:
   backend:
     driver: bridge
+
+volumes:
+  rabbitmq_data:
+  redis_data:
