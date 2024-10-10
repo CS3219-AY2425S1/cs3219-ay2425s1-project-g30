@@ -10,12 +10,15 @@ export interface UserDetails {
   username: string;
 }
 
-export const signUp = (signUpDto: SignUpDto) =>
-  apiCall("post", "/auth/signup", signUpDto);
+export const signUp = async (signUpDto: SignUpDto): Promise<UserDetails> =>
+  await apiCall("post", "/auth/signup", signUpDto);
 
-export const signIn = (signInDto: SignInDto) =>
-  apiCall("post", "/auth/signin", signInDto);
+export const signIn = async (signInDto: SignInDto): Promise<UserDetails> =>
+  await apiCall("post", "/auth/signin", signInDto);
 
-export const signOut = () => apiCall<void>("post", "/auth/signout");
+export const signOut = async () => await apiCall<void>("post", "/auth/signout");
 
-export const me = (): Promise<UserDetails> => apiCall("get", "/auth/me");
+export const me = async (): Promise<UserDetails> => await apiCall("get", "/auth/me");
+
+export const refreshAccessToken = async () => 
+  await apiCall<void>("post", "/auth/refresh-token");

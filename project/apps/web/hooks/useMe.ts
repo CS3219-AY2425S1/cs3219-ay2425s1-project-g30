@@ -1,38 +1,40 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
-import { useLoginState } from "@/contexts/LoginStateContext";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { me, signOut } from "@/lib/api/auth";
-import { QUERY_KEYS } from "@/constants/queryKeys";
+import { useMutation } from "@tanstack/react-query";
+import { useAuthStore } from "../store/AuthStore";
 
 export const useMe = () => {
   const router = useRouter();
-  const { data, error } = useSuspenseQuery({
-    queryKey: [QUERY_KEYS.Me],
-    queryFn: me,
+  const user = useAuthStore.use.user();
+  const fetchUser = useAuthStore.use.fetchUser();
+  const signOut = useAuthStore.use.signOut();
+
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+  }, [fetchUser, user]);
+
+  const logoutMutation = useMutation({ 
+    mutationFn: signOut,
+    onSuccess: async () => await router.push("/auth")
   });
-  const { removeLoginStateFlag } = useLoginState();
-  if (error) {
-    removeLoginStateFlag();
-  }
-  const logoutMutation = useMutation({ mutationFn: signOut });
 
   const logout = useCallback(
     (redirectToSignIn = true) => {
       return logoutMutation.mutate(undefined, {
         onSuccess: async () => {
-          removeLoginStateFlag();
           if (redirectToSignIn) {
             await router.push("/auth");
           }
         },
       });
     },
-    [logoutMutation, removeLoginStateFlag],
+    [logoutMutation, user],
   );
 
-  return { userData: data, logout };
+  return { userData: user, logout };
 };
