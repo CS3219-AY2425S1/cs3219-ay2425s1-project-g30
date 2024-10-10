@@ -54,7 +54,7 @@ services:
       context: .
       dockerfile: ./apps/matching-service/Dockerfile
     ports:
-      - 3002:3002
+      - 3004:3004
     networks:
       - backend
     environment:
