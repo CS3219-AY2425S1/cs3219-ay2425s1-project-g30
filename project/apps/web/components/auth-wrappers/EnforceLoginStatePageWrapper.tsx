@@ -38,7 +38,7 @@ export const EnforceLoginStatePageWrapper = ({
   redirectTo = SIGN_IN,
   children,
 }: PropsWithChildren<EnforceLoginStatePageWrapperProps>): React.ReactElement => {
-  const user = useAuthStore((state: any) => state.user);
+  const user = useAuthStore.use.user();
   
   if (user) {
     return <>{children}</>;

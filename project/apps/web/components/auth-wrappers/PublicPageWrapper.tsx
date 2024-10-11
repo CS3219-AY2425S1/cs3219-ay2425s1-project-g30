@@ -32,7 +32,7 @@ export const PublicPageWrapper = ({
   children,
 }: PropsWithChildren<PublicPageWrapperProps>): JSX.Element => {
   const router = useRouter();
-  const user = useAuthStore((state: any) => state.user);
+  const user = useAuthStore.use.user();
   const searchParams = useSearchParams();
 
   if (user && redirect.strict) {

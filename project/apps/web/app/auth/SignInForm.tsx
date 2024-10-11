@@ -22,7 +22,7 @@ export function SignInForm() {
   const form = useZodForm({ schema: signInSchema });
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const signIn = useAuthStore((state: any) => state.signIn);
+  const signIn = useAuthStore.use.signIn();
   const router = useRouter();
 
   const mutation = useMutation({

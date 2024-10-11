@@ -18,21 +18,39 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
-    let accessToken = request.cookies['access_token'];
+    const accessToken = request.cookies['access_token'];
     const refreshToken = request.cookies['refresh_token'];
-
-    if (!accessToken) {
-      if (!refreshToken) {
-        throw new UnauthorizedException('No token found');
+    
+    if (accessToken) {
+      const { data, error } = await firstValueFrom(
+        this.authServiceClient.send({ cmd: 'verify' }, accessToken),
+      );
+      
+      if (error) {
+        throw new UnauthorizedException('Invalid token');
       }
       
-      const { newAccessToken, newRefreshToken } = await firstValueFrom(
-        this.userServiceClient.send({ cmd: 'refreshToken' }, refreshToken),
-      )
+      request.user = data;
+      return true;
+    }
+    
+    // Check if refresh token exists
+    if (!refreshToken) {
+      throw new UnauthorizedException('No token found');
+    }
+    
+    try {
+      const { access_token: newAccessToken, refresh_token: newRefreshToken } = await firstValueFrom(
+        this.authServiceClient.send({ cmd: 'refresh' }, refreshToken),
+      );
       
-      if (!newAccessToken) {
-        throw new UnauthorizedException('Invalid refresh token');
-      }
+      // Update new tokens in request and response cookies
+      request.cookie('access_token', newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 1000, // 1 hour
+      });
       
       response.cookie('access_token', newAccessToken, {
         httpOnly: true,
@@ -48,14 +66,16 @@ export class AuthGuard implements CanActivate {
         maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
       });
       
-      accessToken = newAccessToken;
+      // Get user data with new access token
+      const data = await firstValueFrom(
+        this.authServiceClient.send({ cmd: 'verify' }, newAccessToken),
+      );
+      
+      request.user = data;
+      return true;
+      
+    } catch (error) { // If refresh token is invalid
+      throw new UnauthorizedException('Invalid token');
     }
-    
-    const data = await firstValueFrom(
-      this.authServiceClient.send({ cmd: 'verify' }, token),
-    );
-
-    request.user = data;
-    return true;
   }
 }

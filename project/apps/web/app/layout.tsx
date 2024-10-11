@@ -26,8 +26,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const fetchUser = useAuthStore((state) => state.fetchUser);
-
+  const fetchUser = useAuthStore.use.fetchUser();
+  
   // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
     const initializeUser = async () => {
