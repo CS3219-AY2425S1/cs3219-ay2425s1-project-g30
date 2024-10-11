@@ -1,8 +1,7 @@
 import { Session } from "@supabase/auth-js";
 import { z } from "zod";
 import { Tables } from "./generated/types/auth.types";
-import { collectionMetadataSchema } from "./metatdata";
-import exp from "constants";
+import { collectionMetadataSchema } from "./metadata";
 
 export type UserDataDto = Tables<"profiles">;
 
