@@ -16,7 +16,7 @@ export class AuthController {
   async signIn(@Payload() signInDto: SignInDto) {
     return await this.authService.signIn(signInDto);
   }
-  
+
   @MessagePattern({ cmd: 'signout' })
   async signOut() {
     return await this.authService.signOut();
@@ -31,7 +31,7 @@ export class AuthController {
   async me(@Payload() accessToken: string) {
     return await this.authService.me(accessToken);
   }
-   
+
   @MessagePattern({ cmd: 'refresh' })
   async refresh(@Payload() refreshToken: string) {
     return await this.authService.refreshUserSession(refreshToken);

@@ -56,18 +56,20 @@ export class AuthService {
       this.handleError('verify user', new UnauthorizedException(error.message));
     }
   }
-  
+
   async refreshUserSession(refresh_token: string): Promise<Session> {
     try {
-      const userSession = await this.authRepository.refreshUserSession(refresh_token);
+      const userSession =
+        await this.authRepository.refreshUserSession(refresh_token);
 
-      this.logger.log(
-        `user refreshed successfully`,
-      );
+      this.logger.log(`user refreshed successfully`);
 
       return userSession;
     } catch (error) {
-      this.handleError('refresh user session', new UnauthorizedException(error.message));
+      this.handleError(
+        'refresh user session',
+        new UnauthorizedException(error.message),
+      );
     }
   }
 
@@ -82,8 +84,10 @@ export class AuthService {
     try {
       const userAuthRecord =
         await this.authRepository.getUserAuthRecordByToken(accessToken);
-      
-      const userData = await this.authRepository.getUserDataById(userAuthRecord.id);
+
+      const userData = await this.authRepository.getUserDataById(
+        userAuthRecord.id,
+      );
 
       this.logger.log(`user with id ${userData.id} fetched successfully`);
 
@@ -134,7 +138,7 @@ export class AuthService {
       this.handleError('sign in', new BadRequestException(error.message));
     }
   }
-  
+
   /**
    * Signs out the user.
    *

@@ -65,7 +65,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
         });
       }
     }
-    
+
     const totalCountQuery = queryBuilder;
 
     let dataQuery = queryBuilder;
@@ -76,7 +76,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
         dataQuery = dataQuery.limit(limit);
       }
     }
-    
+
     // Execute the data query
     const { data: questions, error } = await dataQuery;
 

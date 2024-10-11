@@ -40,12 +40,12 @@ export class SupabaseAuthRepository implements AuthRepository {
 
     return data.user as UserAuthRecordDto;
   }
-  
+
   async refreshUserSession(refreshToken: string): Promise<Session> {
     const { data, error } = await this.supabase.auth.refreshSession({
-      refresh_token: refreshToken
+      refresh_token: refreshToken,
     });
-    
+
     if (error || !data.session) {
       throw new Error('Invalid token');
     }
@@ -132,7 +132,7 @@ export class SupabaseAuthRepository implements AuthRepository {
 
     return { userData, session } as UserSessionDto;
   }
-  
+
   async signOut(): Promise<void> {
     const { error } = await this.supabase.auth.signOut();
     if (error) {

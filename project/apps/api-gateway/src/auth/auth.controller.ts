@@ -44,7 +44,7 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
-    
+
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -52,7 +52,9 @@ export class AuthController {
       maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
     });
 
-    return res.status(HttpStatus.OK).json({ userData, session } as UserSessionDto);
+    return res
+      .status(HttpStatus.OK)
+      .json({ userData, session } as UserSessionDto);
   }
 
   @Post('signin')
@@ -61,14 +63,14 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signin' }, body),
     );
-    
+
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
-    
+
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -76,17 +78,18 @@ export class AuthController {
       maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
     });
 
-    return res.status(HttpStatus.OK).json({ userData, session } as UserSessionDto);
+    return res
+      .status(HttpStatus.OK)
+      .json({ userData, session } as UserSessionDto);
   }
 
   @Post('signout')
   @UseGuards(AuthGuard)
   async signOut(@Res() res: Response) {
-    await this.authServiceClient.send({ cmd: 'signout' }, {}),
-    
+    this.authServiceClient.send({ cmd: 'signout' }, {});
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
-    
+
     return res
       .status(HttpStatus.OK)
       .json({ message: 'Signed out successfully' });
@@ -96,8 +99,10 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async me(@Req() req: Request, @Res() res: Response) {
     const accessToken = req.cookies['access_token'];
-    const userData = await firstValueFrom(this.authServiceClient.send({ cmd: 'me' }, accessToken));
-    
-    return res.status(HttpStatus.OK).json( userData );
+    const userData = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
+    );
+
+    return res.status(HttpStatus.OK).json(userData);
   }
 }

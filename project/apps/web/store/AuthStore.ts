@@ -1,7 +1,6 @@
 import { create, StoreApi, UseBoundStore } from "zustand";
 import { SignInDto, SignUpDto } from "@repo/dtos/auth";
 import { UserDataDto } from '@repo/dtos/users';
-import { persist } from "zustand/middleware";
 import {
   signUp,
   signIn,

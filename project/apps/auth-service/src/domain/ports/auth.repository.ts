@@ -17,8 +17,10 @@ export abstract class AuthRepository {
    * @param accessToken - The token associated with the user authentication record.
    * @returns A promise that resolves to the UserAuthRecord.
    */
-  abstract getUserAuthRecordByToken(accessToken: string): Promise<UserAuthRecordDto>;
-  
+  abstract getUserAuthRecordByToken(
+    accessToken: string,
+  ): Promise<UserAuthRecordDto>;
+
   /**
    * Refreshes the user session.
    *
@@ -50,7 +52,7 @@ export abstract class AuthRepository {
    * @returns A promise that resolves to the UserSessionDto.
    */
   abstract signIn(signInDto: SignInDto): Promise<UserSessionDto>;
-  
+
   /**
    * Signs out the user.
    *

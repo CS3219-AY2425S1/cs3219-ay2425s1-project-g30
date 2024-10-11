@@ -31,43 +31,43 @@ export class UsersController {
   constructor(
     @Inject('USER_SERVICE')
     private readonly usersServiceClient: ClientProxy,
-    
+
     @Inject('AUTH_SERVICE')
     private readonly authServiceClient: ClientProxy,
   ) {}
-  
+
   @Get()
   @UsePipes(new ZodValidationPipe(userFiltersSchema))
   async getUsers(@Req() req: Request, @Query() filters: UserFiltersDto) {
     const accessToken = req.cookies['access_token'];
-    
-    // // Check if user is admin, else forbid access
-    // const { userData } = await firstValueFrom(
-    //   this.authServiceClient.send({ cmd: 'me' }, accessToken)
-    // );
-    // if (userData.role != 'Admin') {
-    //   throw new ForbiddenException('Access denied.');
-    // }
-    
+
+    // Check if user is admin, else forbid access [DELETE once role guard is implemented]
+    const { userData } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
+    );
+    if (userData.role != 'Admin') {
+      throw new ForbiddenException('Access denied.');
+    }
+
     return this.usersServiceClient.send({ cmd: 'get_users' }, filters);
   }
-  
+
   @Get(':id')
   async getUserById(@Req() req: Request, @Param('id') id: string) {
     const accessToken = req.cookies['access_token'];
-    
-    // // Check if admin or user is viewing their own account
-    // const { userData } = await firstValueFrom(
-    //   this.authServiceClient.send({ cmd: 'me' }, accessToken)
-    // );
-    
-    // if (userData.role != 'Admin' && userData.id != id) {
-    //   throw new ForbiddenException('Access denied.');
-    // }
-    
+
+    // Check if admin or user is viewing their own account [DELETE once role guard is implemented]
+    const { userData } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
+    );
+
+    if (userData.role != 'Admin' && userData.id != id) {
+      throw new ForbiddenException('Access denied.');
+    }
+
     return this.usersServiceClient.send({ cmd: 'get_user' }, id);
   }
-  
+
   @Put(':id')
   async updateUser(
     @Req() req: Request,
@@ -77,20 +77,17 @@ export class UsersController {
   ) {
     const accessToken = req.cookies['access_token'];
 
-    // // Check if admin or user is updating their own account
-    // const { userData } = await firstValueFrom(
-    //   this.authServiceClient.send({ cmd: 'me' }, accessToken)
-    // );
-    // if (userData.role != 'Admin' && userData.id != id) {
-    //   throw new ForbiddenException('Access denied.');
-    // }
-
-    return this.usersServiceClient.send(
-      { cmd: 'update_user' },
-      updateUserDto,
+    // Check if admin or user is updating their own account [DELETE once role guard is implemented]
+    const { userData } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
+    if (userData.role != 'Admin' && userData.id != id) {
+      throw new ForbiddenException('Access denied.');
+    }
+
+    return this.usersServiceClient.send({ cmd: 'update_user' }, updateUserDto);
   }
-  
+
   @Patch(':id')
   async updateUserPrivilegeById(
     @Req() req: Request,
@@ -98,47 +95,47 @@ export class UsersController {
     @Param('id') id: string,
   ) {
     const accessToken = req.cookies['access_token'];
-    
-    // // Check if user is admin
-    // const { userData } = await firstValueFrom(
-    //   this.authServiceClient.send({ cmd: 'me' }, accessToken)
-    // );
-    // if (userData.role != 'Admin') {
-    //   throw new ForbiddenException('Access denied.');
-    // }
+
+    // Check if user is admin [DELETE once role guard is implemented]
+    const { userData } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
+    );
+    if (userData.role != 'Admin') {
+      throw new ForbiddenException('Access denied.');
+    }
 
     return this.usersServiceClient.send({ cmd: 'update_privilege' }, id);
   }
-  
+
   @Delete(':id')
   async deleteUserById(
     @Req() req: Request,
     @Res() res: Response,
-    @Param('id') id: string
+    @Param('id') id: string,
   ) {
     const accessToken = req.cookies['access_token'];
-    
-    // Check if admin or user is deleting their own account
-    const { userData } = await firstValueFrom(
-      this.authServiceClient.send({ cmd: 'me' }, accessToken)
-    );
-    // if (userData.role != 'Admin' && userData.id != id) {
-    //   throw new ForbiddenException('Access denied.');
-    // }
 
-    try { 
+    // Check if admin or user is deleting their own account [DELETE once role guard is implemented]
+    const { userData } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
+    );
+    if (userData.role != 'Admin' && userData.id != id) {
+      throw new ForbiddenException('Access denied.');
+    }
+
+    try {
       const user = await firstValueFrom(
-        this.usersServiceClient.send({ cmd: 'delete_user' }, id)
+        this.usersServiceClient.send({ cmd: 'delete_user' }, id),
       );
-      
+
       // Clear cookies if user is deleting their own account
       if (userData.id === id) {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
       }
-      
+
       return user;
-    } catch (error) {
+    } catch {
       throw new NotFoundException('User not found');
     }
   }

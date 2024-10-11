@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { 
+import {
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
-  UserFiltersDto
+  UserFiltersDto,
 } from '@repo/dtos/users';
 
 import { UsersRepository } from 'src/domain/ports/users.repository';
@@ -38,9 +38,8 @@ export class UsersService {
    */
   async findAll(filters: UserFiltersDto): Promise<UserCollectionDto> {
     try {
-      const userCollection =
-        await this.usersRepository.findAll(filters);
-      
+      const userCollection = await this.usersRepository.findAll(filters);
+
       this.logger.log(
         `fetched ${userCollection.metadata.count} users with filters: ${JSON.stringify(filters)}`,
       );
@@ -50,7 +49,7 @@ export class UsersService {
       this.handleError('fetch users', error);
     }
   }
-  
+
   /**
    * Fetches a user by their unique identifier.
    *
@@ -58,7 +57,7 @@ export class UsersService {
    * @returns {Promise<UserDataDto>} A promise that resolves to the user data transfer object.
    * @throws Will throw an error if the user cannot be fetched.
    */
-   async findById(id: string): Promise<UserDataDto> {
+  async findById(id: string): Promise<UserDataDto> {
     try {
       const user = await this.usersRepository.findById(id);
 
@@ -69,7 +68,7 @@ export class UsersService {
       this.handleError('fetch user by id', error);
     }
   }
-  
+
   /**
    * Updates a user's details with the provided data.
    *
@@ -81,16 +80,15 @@ export class UsersService {
    * @returns {Promise<UserDataDto>} A promise that resolves to the updated user data transfer object.
    * @throws {BadRequestException} - If another user with the same email or username already exists.
    */
-   async updateById(userDetails: UpdateUserDto): Promise<UserDataDto> {
+  async updateById(userDetails: UpdateUserDto): Promise<UserDataDto> {
     try {
       const filter: UserFiltersDto = {
         email: userDetails.email,
         username: userDetails.username,
       };
-      
-      const existingUserCollection =
-        await this.usersRepository.findAll(filter);
-        
+
+      const existingUserCollection = await this.usersRepository.findAll(filter);
+
       if (
         existingUserCollection.metadata.count &&
         existingUserCollection.users[0].id !== userDetails.id
@@ -102,7 +100,7 @@ export class UsersService {
           ),
         );
       }
-      
+
       const user = await this.usersRepository.updateById(userDetails);
 
       this.logger.log(`updated user with id ${user.id}`);
@@ -111,8 +109,8 @@ export class UsersService {
     } catch (error) {
       this.handleError('update user', error);
     }
-   }
-   
+  }
+
   /**
    * Updates a user's privilege by their unique identifier.
    *
@@ -123,15 +121,15 @@ export class UsersService {
   async updatePrivilegeById(id: string): Promise<UserDataDto> {
     try {
       const user = await this.usersRepository.updatePrivilegeById(id);
-      
+
       this.logger.log(`updated user privilege for user with id ${user.id}`);
-      
+
       return user;
     } catch (error) {
       this.handleError('update user privilege by id', error);
     }
   }
-  
+
   /**
    * Deletes a user by their unique identifier.
    *
@@ -142,9 +140,9 @@ export class UsersService {
   async deleteById(id: string): Promise<UserDataDto> {
     try {
       const user = await this.usersRepository.deleteById(id);
-      
+
       this.logger.log(`deleted user with id ${id}`);
-      
+
       return user;
     } catch (error) {
       this.handleError('delete user by id', error);

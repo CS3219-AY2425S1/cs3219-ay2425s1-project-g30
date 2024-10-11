@@ -18,7 +18,7 @@ export const userSchema = z.custom<UserDataDto>();
 export const userCollectionSchema = z.object({
   metadata: collectionMetadataSchema,
   users: z.array(userSchema),
-})
+});
 
 export const userFiltersSchema = z.object({
   email: z.string().optional(),
