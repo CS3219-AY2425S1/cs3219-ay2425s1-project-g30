@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { collectionMetadataDto } from '@repo/dtos/metatdata';
+import { collectionMetadataDto } from '@repo/dtos/metadata';
 import {
   QuestionFiltersDto,
   QuestionDto,
