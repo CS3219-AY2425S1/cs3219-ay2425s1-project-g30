@@ -13,8 +13,10 @@ import {
   Query,
   UsePipes,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
 // import { AuthGuard } from 'src/auth/auth.guard';
 import {
   CreateQuestionDto,
@@ -25,9 +27,12 @@ import {
   updateQuestionSchema,
 } from '@repo/dtos/questions';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { RolesGuard } from 'src/roles/roles.guard';
 
 @Controller('questions')
-// @UseGuards(AuthGuard) // comment out if we dw auth for now
+@UseGuards(AuthGuard, RolesGuard) // comment out if we dw auth for now
 export class QuestionsController {
   constructor(
     @Inject('QUESTION_SERVICE')
@@ -35,6 +40,7 @@ export class QuestionsController {
   ) {}
 
   @Get()
+  @Roles(ROLE.User)
   @UsePipes(new ZodValidationPipe(questionFiltersSchema))
   async getQuestions(@Query() filters: QuestionFiltersDto) {
     return this.questionsServiceClient.send({ cmd: 'get_questions' }, filters);

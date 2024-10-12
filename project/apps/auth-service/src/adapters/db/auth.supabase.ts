@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 import {
@@ -34,9 +38,21 @@ export class SupabaseAuthRepository implements AuthRepository {
     const { data, error } = await this.supabase.auth.getUser(token);
 
     if (error || !data || !data.user) {
-      throw new Error('Invalid token');
+      throw new UnauthorizedException('Invalid token');
     }
 
+    // Access user's role
+    const { data: userData, error: userError } = await this.supabase
+      .from(this.PROFILES_TABLE)
+      .select('role')
+      .eq('id', data.user.id)
+      .single();
+
+    if (userError || !userData) {
+      throw new BadRequestException("Trouble accessing user's data");
+    }
+
+    data.user.role = userData.role;
     return data.user as UserAuthRecordDto;
   }
 
@@ -76,7 +92,7 @@ export class SupabaseAuthRepository implements AuthRepository {
     const { user, session } = authData;
 
     if (!user || !session) {
-      throw new Error('Unexpected sign-up response');
+      throw new BadRequestException('Unexpected sign-up response');
     }
 
     // Next, create user profile in Supabase Profiles table
@@ -112,7 +128,7 @@ export class SupabaseAuthRepository implements AuthRepository {
 
     const { user, session } = data;
     if (!user || !session) {
-      throw new Error('Unexpected sign-in response');
+      throw new BadRequestException('Unexpected sign-in response');
     }
 
     const userData = await this.getUserDataById(user.id);
