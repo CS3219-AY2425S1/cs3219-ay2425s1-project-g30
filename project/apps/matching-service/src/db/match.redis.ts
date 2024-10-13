@@ -11,7 +11,7 @@ import {
 export class MatchRedis {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  async setMatchRequest(matchId: string, matchData: any) {
+  async addMatchRequest(matchId: string, matchData: any) {
     const key = `${MATCH_WAITING_KEY}-${matchId}`;
     await this.cacheManager.set(key, matchData);
   }
@@ -48,5 +48,14 @@ export class MatchRedis {
   async getSocketByUserId(userId: string) {
     const userSocketKey = `${USER_SOCKET_KEY}-${userId}`;
     return await this.cacheManager.get<string>(userSocketKey);
+  }
+  async removeMatchRequest(matchId: string) {
+    const key = `${MATCH_WAITING_KEY}-${matchId}`;
+    await this.cacheManager.del(key);
+  }
+
+  async findPotentialMatch(criteria: any) {
+    // TODO: Implement logic to find potential match
+    return { userId: '123' };
   }
 }
