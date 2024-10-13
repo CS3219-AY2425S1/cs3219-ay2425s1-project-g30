@@ -38,12 +38,14 @@ export class SupabaseUsersRepository implements UsersRepository {
     if (email || username) {
       const orFilter = [];
       if (email) {
-        orFilter.push({ email });
+        orFilter.push(`email.eq.${email}`);
       }
       if (username) {
-        orFilter.push({ username });
+        orFilter.push(`username.eq.${username}`);
       }
-      queryBuilder = queryBuilder.or(orFilter.join(','));
+      if (orFilter.length > 0) {
+        queryBuilder = queryBuilder.or(orFilter.join(','));
+      }
     }
 
     const totalCountQuery = queryBuilder;
@@ -100,19 +102,25 @@ export class SupabaseUsersRepository implements UsersRepository {
       password: newPassword,
     } = userDetails;
 
-    // Update user details in auth table
-    const { error: authError } = await this.supabase.auth.admin.updateUserById(
-      id,
-      {
-        email: newEmail,
-        password: newPassword,
-      },
-    );
+    // Update user email and/or password in auth table
+    const { error: authError } = await this.supabase.auth.updateUser({
+      email: newEmail,
+      password: newPassword,
+    });
+
     if (authError) {
       throw authError;
     }
 
     // Update user details in profiles table
+    const updateData: any = {};
+    if (newEmail) {
+      updateData.email = newEmail;
+    }
+    if (newUsername) {
+      updateData.username = newUsername;
+    }
+
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .update({
@@ -129,7 +137,7 @@ export class SupabaseUsersRepository implements UsersRepository {
     return data;
   }
 
-  async updatePrivilegeById(id: string): Promise<UserDataDto> {
+  async updatePrivilegeById(id: string): Promise<any> {
     const user = await this.findById(id);
     const newRole = user.role == 'Admin' ? 'User' : 'Admin';
 
@@ -150,11 +158,14 @@ export class SupabaseUsersRepository implements UsersRepository {
       .from(this.PROFILES_TABLE)
       .update({ role: newRole })
       .eq('id', id)
+      .select()
       .single<UserDataDto>();
 
     if (error) {
       throw error;
     }
+
+    console.error(data);
 
     return data;
   }
