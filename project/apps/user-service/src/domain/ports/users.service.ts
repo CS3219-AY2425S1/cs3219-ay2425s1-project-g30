@@ -93,12 +93,8 @@ export class UsersService {
         existingUserCollection.metadata.count &&
         existingUserCollection.users[0].id !== userDetails.id
       ) {
-        this.handleError(
-          'update user',
-          new BadRequestException(
-            `The email or username is already in use by another user`,
-          ),
-        );
+        throw new BadRequestException(
+          `The email or username is already in use by another user`);
       }
 
       const user = await this.usersRepository.updateById(userDetails);
