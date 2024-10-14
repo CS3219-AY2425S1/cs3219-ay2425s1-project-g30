@@ -17,10 +17,13 @@ export class MatchEngineService {
     // Performs some sort of redis checking
     // Add to supabase if match found
     // If no match found produce match expiry
+
+    // TODO: Replace with userId of user
     this.matchGateway.sendMessageToClient({
       userId: '3821549f-001f-4fb9-beb8-8fb293747519',
       message: 'success',
     });
+
     this.matchEngineProduceExpiry.enqueueMatchExpiryRequest(
       matchRequest,
       30000,

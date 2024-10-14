@@ -49,7 +49,7 @@ export class AuthService {
       this.logger.log(
         `user with id ${userAuthRecord.id} verified successfully`,
       );
-      this.logger.log(userAuthRecord);
+
       return userAuthRecord;
     } catch (error) {
       this.handleError('verify user', new UnauthorizedException(error.message));

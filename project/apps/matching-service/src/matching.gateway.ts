@@ -11,6 +11,11 @@ import { firstValueFrom } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { MatchRedis } from './db/match.redis';
 
+enum MatchEvent {
+  'MATCH_FOUND' = 'match_found',
+  'MATCH_REQUEST_EXPIRED' = 'match_request_expired',
+}
+
 @WebSocketGateway(8080, {
   cors: {
     origin: 'http://localhost:3000',
@@ -78,6 +83,18 @@ export class MatchingGateway
   }
 
   async sendMessageToClient({
+    socketId,
+    message,
+    event,
+  }: {
+    socketId: string;
+    message: any;
+    event: MatchEvent;
+  }) {
+    this.server.to(socketId).emit(event, message);
+  }
+
+  async sendMatchFound({
     userId,
     message,
   }: {
@@ -85,10 +102,13 @@ export class MatchingGateway
     message: string;
   }) {
     const socketId = await this.matchRedis.getSocketByUserId(userId);
-    this.logger.log(socketId);
     // TODO: Implement a retry mechanism here if there is either no socket id or the sending failed
     if (socketId) {
-      this.server.to(socketId).emit('match_request_update', message);
+      this.sendMessageToClient({
+        socketId,
+        message,
+        event: MatchEvent.MATCH_FOUND,
+      });
     }
   }
 }
