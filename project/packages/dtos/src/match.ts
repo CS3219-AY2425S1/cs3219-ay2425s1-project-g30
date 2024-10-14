@@ -21,4 +21,24 @@ export const matchDataSchema = z.object({
     //   deleted_at: z.date().nullable().optional(),
 });
 
+export const criteriaSchema = z.object({
+  complexity: complexityEnum,
+  category: z
+    .array(categoryEnum)
+    .min(1, { message: "At least one category is required" })
+    // Enforce uniqueness of categories
+    .refine((categories) => new Set(categories).size === categories.length, {
+      message: "Categories must be unique",
+    }),
+});
+
+
+
+export const matchRequestSchema = z.object({
+  userId: z.string().uuid(),
+  criteria: criteriaSchema
+});
+
+export type CriteriaDto = z.infer<typeof criteriaSchema>;
 export type MatchDataDto = z.infer<typeof matchDataSchema>;
+export type MatchRequestDto = z.infer<typeof matchRequestSchema>;

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { MatchRequestDto } from '@repo/dtos/match';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
@@ -23,7 +24,7 @@ export class MatchRequestService {
    * Enqueues a match request to the matching queue.
    * @param matchData Data related to the match request.
    */
-  async enqueueMatchRequest(matchData: any) {
+  async enqueueMatchRequest(matchData: MatchRequestDto) {
     this.logger.log(`Enqueuing match request: ${JSON.stringify(matchData)}`);
     this.channelWrapper.sendToQueue(
       MATCH_QUEUE,

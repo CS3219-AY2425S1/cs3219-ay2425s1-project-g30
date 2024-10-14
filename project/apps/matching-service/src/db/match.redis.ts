@@ -1,5 +1,6 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { CriteriaDto } from '@repo/dtos/match';
 import { Cache } from 'cache-manager';
 import {
   MATCH_WAITING_KEY,
@@ -54,8 +55,13 @@ export class MatchRedis {
     await this.cacheManager.del(key);
   }
 
-  async findPotentialMatch(criteria: any) {
-    // TODO: Implement logic to find potential match
+  async findPotentialMatch(criteria: CriteriaDto) {
+    
     return { userId: '123' };
+  }
+
+  async userMatchRequestExists(userId: string) {
+    const key = `${MATCH_WAITING_KEY}-${userId}`;
+    return await this.cacheManager.get(key);
   }
 }
