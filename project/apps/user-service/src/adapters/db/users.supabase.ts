@@ -7,7 +7,7 @@ import {
   UserDataDto,
   UserFiltersDto,
 } from '@repo/dtos/users';
-
+import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { UsersRepository } from 'src/domain/ports/users.repository';
 
@@ -106,6 +106,7 @@ export class SupabaseUsersRepository implements UsersRepository {
     const { error: authError } = await this.supabase.auth.updateUser({
       email: newEmail,
       password: newPassword,
+      data: { username: newUsername }
     });
 
     if (authError) {
@@ -139,7 +140,7 @@ export class SupabaseUsersRepository implements UsersRepository {
 
   async updatePrivilegeById(id: string): Promise<any> {
     const user = await this.findById(id);
-    const newRole = user.role == 'Admin' ? 'User' : 'Admin';
+    const newRole = user.role == ROLE.Admin ? ROLE.User : ROLE.Admin;
 
     // Update user role in auth table
     const { error: authError } = await this.supabase.auth.admin.updateUserById(

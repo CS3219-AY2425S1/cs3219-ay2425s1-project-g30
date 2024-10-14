@@ -133,10 +133,16 @@ export class SupabaseAuthRepository implements AuthRepository {
     return { userData, session } as UserSessionDto;
   }
 
-  async signOut(): Promise<void> {
-    const { error } = await this.supabase.auth.signOut();
-    if (error) {
-      throw error;
+  async signOut(): Promise<Session> {
+    const { data, error } = await this.supabase.auth.getSession();
+    if (!data.session || error) {
+      throw new Error('No active session') || error;
     }
+    
+    const { error: authError } = await this.supabase.auth.signOut();
+    if (authError) {
+      throw authError;
+    }
+    return data.session;
   }
 }

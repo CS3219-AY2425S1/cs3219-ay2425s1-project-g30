@@ -22,15 +22,9 @@ export class AuthGuard implements CanActivate {
     const refreshToken = request.cookies['refresh_token'];
 
     if (accessToken) {
-      const { data, error } = await firstValueFrom(
+      request.user = await firstValueFrom(
         this.authServiceClient.send({ cmd: 'verify' }, accessToken),
       );
-
-      if (error) {
-        throw new UnauthorizedException('Invalid token');
-      }
-
-      request.user = data;
       return true;
     }
 
@@ -68,11 +62,9 @@ export class AuthGuard implements CanActivate {
       });
 
       // Get user data with new access token
-      const data = await firstValueFrom(
+      request.user = await firstValueFrom(
         this.authServiceClient.send({ cmd: 'verify' }, newAccessToken),
       );
-
-      request.user = data;
       return true;
     } catch {
       // If refresh token is invalid

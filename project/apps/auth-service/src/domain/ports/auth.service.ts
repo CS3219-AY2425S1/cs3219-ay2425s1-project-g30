@@ -62,7 +62,7 @@ export class AuthService {
       const userSession =
         await this.authRepository.refreshUserSession(refresh_token);
 
-      this.logger.log(`user refreshed successfully`);
+      this.logger.log(`user with id ${userSession.user.id} refreshed successfully`);
 
       return userSession;
     } catch (error) {
@@ -147,9 +147,9 @@ export class AuthService {
    */
   async signOut(): Promise<void> {
     try {
-      await this.authRepository.signOut();
+      const session = await this.authRepository.signOut();
 
-      this.logger.log('user signed out successfully');
+      this.logger.log(`user with id ${session.user.id} signed out successfully`);
     } catch (error) {
       this.handleError('sign out', new BadRequestException(error.message));
     }

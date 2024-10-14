@@ -58,5 +58,5 @@ export abstract class AuthRepository {
    *
    * @returns A promise that resolves to void.
    */
-  abstract signOut(): Promise<void>;
+  abstract signOut(): Promise<Session>;
 }

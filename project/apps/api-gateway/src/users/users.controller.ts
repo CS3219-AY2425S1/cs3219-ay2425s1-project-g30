@@ -54,17 +54,6 @@ export class UsersController {
 
   @Get(':id')
   async getUserById(@Req() req: Request, @Param('id') id: string) {
-    const accessToken = req.cookies['access_token'];
-
-    // Check if admin or user is viewing their own account [DELETE once role guard is implemented]
-    const userData = await firstValueFrom(
-      this.authServiceClient.send({ cmd: 'me' }, accessToken),
-    );
-
-    if (userData.role != 'Admin' && userData.id != id) {
-      throw new ForbiddenException('Access denied.');
-    }
-
     return this.usersServiceClient.send({ cmd: 'get_user' }, id);
   }
 
