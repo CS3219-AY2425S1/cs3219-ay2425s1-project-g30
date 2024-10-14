@@ -1,4 +1,4 @@
-import { Inject, Logger, UnauthorizedException } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   OnGatewayConnection,
