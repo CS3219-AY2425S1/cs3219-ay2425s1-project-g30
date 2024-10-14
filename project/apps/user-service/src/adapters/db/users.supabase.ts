@@ -106,7 +106,7 @@ export class SupabaseUsersRepository implements UsersRepository {
     const { error: authError } = await this.supabase.auth.updateUser({
       email: newEmail,
       password: newPassword,
-      data: { username: newUsername }
+      data: { username: newUsername },
     });
 
     if (authError) {
