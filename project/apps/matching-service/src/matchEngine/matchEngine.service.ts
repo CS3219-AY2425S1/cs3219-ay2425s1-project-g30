@@ -2,11 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { MatchExpiryProducer } from './matchEngine.produceExpiry';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
-<<<<<<< HEAD
 import { MatchingGateway } from 'src/matching.gateway';
-=======
-import { MatchDataDto } from '@repo/dtos/match';
->>>>>>> 33516f2 (feat: add skeleton functions and basic generate match logic)
+import { MatchDataDto, MatchRequestDto } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchEngineService {
@@ -19,7 +16,7 @@ export class MatchEngineService {
 
   async generateMatch(matchRequest: MatchRequestDto) {
     const {userId, criteria} = matchRequest;
-    
+
     const potentialMatch = await this.matchRedis.findPotentialMatch(criteria);
 
     if (potentialMatch) {
