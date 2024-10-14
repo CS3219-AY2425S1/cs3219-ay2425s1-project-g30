@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
 import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "../store/AuthStore";
+import { useAuthStore } from "../stores/AuthStore";
 
 export const useMe = () => {
   const router = useRouter();
@@ -18,9 +18,9 @@ export const useMe = () => {
     }
   }, [fetchUser, user]);
 
-  const logoutMutation = useMutation({ 
+  const logoutMutation = useMutation({
     mutationFn: signOut,
-    onSuccess: async () => await router.push("/auth")
+    onSuccess: async () => await router.push("/auth"),
   });
 
   const logout = useCallback(

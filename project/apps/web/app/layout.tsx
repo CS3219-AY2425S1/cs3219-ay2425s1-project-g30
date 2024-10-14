@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Inter, Roboto } from "next/font/google";
 import ReactQueryProvider from "@/components/ReactQueryProvider";
@@ -6,7 +6,7 @@ import Suspense from "@/components/Suspense";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect } from "react";
-import { useAuthStore } from "@/store/AuthStore";
+import { useAuthStore } from "@/stores/AuthStore";
 
 import "./globals.css";
 
@@ -27,19 +27,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const fetchUser = useAuthStore.use.fetchUser();
-  
+
   // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
     const initializeUser = async () => {
       try {
         await fetchUser();
       } catch (error) {
-        console.error('Failed to fetch user data:', error);
+        console.error("Failed to fetch user data:", error);
       }
     };
     initializeUser();
   }, [fetchUser]);
-  
+
   return (
     <html lang="en" className={inter.className}>
       <body className={roboto.className}>
