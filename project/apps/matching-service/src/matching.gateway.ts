@@ -46,15 +46,15 @@ export class MatchingGateway
     }
 
     const cookies = parse(cookie);
-    const token = cookies['token'];
+    const accessToken = cookies['access_token'];
     // Disconnect client if no token provided
-    if (!token) {
+    if (! accessToken) {
       client.disconnect();
       return;
     }
     try {
       const data = await firstValueFrom(
-        this.authServiceClient.send({ cmd: 'verify' }, token),
+        this.authServiceClient.send({ cmd: 'verify' }, accessToken),
       );
 
       if (!data) {
