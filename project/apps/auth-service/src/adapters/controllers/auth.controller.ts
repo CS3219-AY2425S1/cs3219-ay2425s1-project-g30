@@ -17,13 +17,23 @@ export class AuthController {
     return await this.authService.signIn(signInDto);
   }
 
+  @MessagePattern({ cmd: 'signout' })
+  async signOut() {
+    return await this.authService.signOut();
+  }
+
   @MessagePattern({ cmd: 'verify' })
-  async verify(token: string) {
-    return await this.authService.verifyUser(token);
+  async verify(@Payload() accessToken: string) {
+    return await this.authService.verifyUser(accessToken);
   }
 
   @MessagePattern({ cmd: 'me' })
-  async me(token: string) {
-    return await this.authService.me(token);
+  async me(@Payload() accessToken: string) {
+    return await this.authService.me(accessToken);
+  }
+
+  @MessagePattern({ cmd: 'refresh' })
+  async refresh(@Payload() refreshToken: string) {
+    return await this.authService.refreshUserSession(refreshToken);
   }
 }

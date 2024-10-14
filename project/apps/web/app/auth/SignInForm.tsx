@@ -12,23 +12,24 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { signIn } from "@/lib/api/auth";
+import { useAuthStore } from "@/store/AuthStore";
 import { useZodForm } from "@/lib/form";
-import { useLoginState } from "@/contexts/LoginStateContext";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS } from "@/constants/queryKeys";
+import { useRouter } from "next/navigation";
 
 export function SignInForm() {
   const form = useZodForm({ schema: signInSchema });
-  const { setHasLoginStateFlag } = useLoginState();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const signIn = useAuthStore.use.signIn();
+  const router = useRouter();
 
   const mutation = useMutation({
-    mutationFn: signIn,
+    mutationFn: (values: SignInDto) => signIn(values),
     onSuccess: async () => {
-      setHasLoginStateFlag();
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
+      await router.push("/questions");
     },
     onError(error) {
       toast({

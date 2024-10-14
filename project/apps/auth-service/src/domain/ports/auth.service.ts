@@ -13,6 +13,7 @@ import {
 } from '@repo/dtos/users';
 import { AuthRepository } from './auth.repository';
 import { RpcException } from '@nestjs/microservices';
+import { Session } from '@supabase/supabase-js';
 
 @Injectable()
 export class AuthService {
@@ -37,14 +38,14 @@ export class AuthService {
   /**
    * Verifies a user based on the provided token.
    *
-   * @param token - The token used to verify the user.
+   * @param accessToken - The token used to verify the user.
    * @returns A promise that resolves to a UserAuthRecord if the verification is successful.
    * @throws Will handle and log errors if the verification process fails.
    */
-  async verifyUser(token: string): Promise<UserAuthRecordDto> {
+  async verifyUser(accessToken: string): Promise<UserAuthRecordDto> {
     try {
       const userAuthRecord =
-        await this.authRepository.getUserAuthRecordByToken(token);
+        await this.authRepository.getUserAuthRecordByToken(accessToken);
 
       this.logger.log(
         `user with id ${userAuthRecord.id} verified successfully`,
@@ -56,17 +57,35 @@ export class AuthService {
     }
   }
 
+  async refreshUserSession(refresh_token: string): Promise<Session> {
+    try {
+      const userSession =
+        await this.authRepository.refreshUserSession(refresh_token);
+
+      this.logger.log(
+        `user with id ${userSession.user.id} refreshed successfully`,
+      );
+
+      return userSession;
+    } catch (error) {
+      this.handleError(
+        'refresh user session',
+        new UnauthorizedException(error.message),
+      );
+    }
+  }
+
   /**
    * Retrieves the user data associated with the provided authentication token.
    *
-   * @param token - The authentication token used to identify the user.
+   * @param accessToken - The authentication token used to identify the user.
    * @returns A promise that resolves to the user's data.
    * @throws Will handle and log any errors that occur during the process.
    */
-  async me(token: string): Promise<UserDataDto> {
+  async me(accessToken: string): Promise<UserDataDto> {
     try {
       const userAuthRecord =
-        await this.authRepository.getUserAuthRecordByToken(token);
+        await this.authRepository.getUserAuthRecordByToken(accessToken);
 
       const userData = await this.authRepository.getUserDataById(
         userAuthRecord.id,
@@ -119,6 +138,24 @@ export class AuthService {
       return userSession;
     } catch (error) {
       this.handleError('sign in', new BadRequestException(error.message));
+    }
+  }
+
+  /**
+   * Signs out the user.
+   *
+   * @returns A promise that resolves to void.
+   * @throws Will throw an error if the sign-out process fails.
+   */
+  async signOut(): Promise<void> {
+    try {
+      const session = await this.authRepository.signOut();
+
+      this.logger.log(
+        `user with id ${session.user.id} signed out successfully`,
+      );
+    } catch (error) {
+      this.handleError('sign out', new BadRequestException(error.message));
     }
   }
 }

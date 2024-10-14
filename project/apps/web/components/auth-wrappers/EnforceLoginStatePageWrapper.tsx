@@ -5,8 +5,8 @@ import { type PropsWithChildren, useEffect, useMemo } from "react";
 
 import { SIGN_IN } from "@/lib/routes";
 
-import { useLoginState } from "@/contexts/LoginStateContext";
 import useSocketStore from "@/stores/useSocketStore";
+import { useAuthStore } from "@/stores/AuthStore";
 
 interface EnforceLoginStatePageWrapperProps {
   /**
@@ -39,19 +39,20 @@ export const EnforceLoginStatePageWrapper = ({
   redirectTo = SIGN_IN,
   children,
 }: PropsWithChildren<EnforceLoginStatePageWrapperProps>): React.ReactElement => {
-  const { hasLoginStateFlag } = useLoginState();
+  const user = useAuthStore.use.user();
+
   const { connect, disconnect } = useSocketStore();
 
   useEffect(() => {
-    if (hasLoginStateFlag) {
+    if (user) {
       connect();
     }
     return () => {
       disconnect();
     };
-  }, [connect, disconnect, hasLoginStateFlag]);
+  }, [connect, disconnect, user]);
 
-  if (hasLoginStateFlag) {
+  if (user) {
     return <>{children}</>;
   }
 

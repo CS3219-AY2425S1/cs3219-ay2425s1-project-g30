@@ -7,6 +7,7 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,9 @@ import { Request, Response } from 'express';
 
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { UserSessionDto } from '@repo/dtos/users';
+import { AuthGuard } from './auth.guard';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -34,14 +38,23 @@ export class AuthController {
       this.authServiceClient.send({ cmd: 'signup' }, body),
     );
 
-    res.cookie('token', session.access_token, {
+    res.cookie('access_token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7 * 1000,
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    return res.status(HttpStatus.OK).json({ userData });
+    res.cookie('refresh_token', session.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json({ userData, session } as UserSessionDto);
   }
 
   @Post('signin')
@@ -50,33 +63,46 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signin' }, body),
     );
-    res.cookie('token', session.access_token, {
+
+    res.cookie('access_token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7 * 1000,
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    return res.status(HttpStatus.OK).json({ userData });
+    res.cookie('refresh_token', session.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json({ userData, session } as UserSessionDto);
   }
 
   @Post('signout')
+  @UseGuards(AuthGuard)
   async signOut(@Res() res: Response) {
-    res.clearCookie('token');
+    this.authServiceClient.send({ cmd: 'signout' }, {});
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
     return res
       .status(HttpStatus.OK)
       .json({ message: 'Signed out successfully' });
   }
 
   @Get('me')
-  async me(@Req() request: Request, @Res() res: Response) {
-    const token = request.cookies['token'];
-    if (!token) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({ user: null });
-    }
+  @UseGuards(AuthGuard)
+  async me(@Req() req: Request, @Res() res: Response) {
+    const accessToken = req.cookies['access_token'];
     const userData = await firstValueFrom(
-      this.authServiceClient.send({ cmd: 'me' }, token),
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
-    return res.status(HttpStatus.OK).json({ userData });
+
+    return res.status(HttpStatus.OK).json(userData);
   }
 }
