@@ -19,7 +19,7 @@ export class MatchEngineService {
     // If no match found produce match expiry
 
     // TODO: Replace with userId of user
-    this.matchGateway.sendMessageToClient({
+    this.matchGateway.sendMatchFound({
       userId: '3821549f-001f-4fb9-beb8-8fb293747519',
       message: 'success',
     });
