@@ -1,6 +1,7 @@
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
+import { COMPLEXITY } from '@repo/dtos/generated/enums/questions.enums';
+
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface DifficultyBadgeProps {
   complexity: string;
@@ -10,13 +11,13 @@ interface DifficultyBadgeProps {
 const getBadgeColor = (complexity: string) => {
   switch (complexity) {
     case COMPLEXITY.Easy:
-      return "bg-green-400 text-white hover:bg-green-400";
+      return 'bg-green-400 text-white hover:bg-green-400';
     case COMPLEXITY.Medium:
-      return "bg-yellow-400 text-white hover:bg-yellow-400";
+      return 'bg-yellow-400 text-white hover:bg-yellow-400';
     case COMPLEXITY.Hard:
-      return "bg-red-400 text-white hover:bg-red-400";
+      return 'bg-red-400 text-white hover:bg-red-400';
     default:
-      return "bg-secondary text-white";
+      return 'bg-secondary text-white';
   }
 };
 
@@ -24,7 +25,7 @@ const DifficultyBadge = ({ complexity, className }: DifficultyBadgeProps) => {
   const colorClass = getBadgeColor(complexity);
 
   return (
-    <Badge style={{ userSelect: "none" }} className={cn(className, colorClass)}>
+    <Badge style={{ userSelect: 'none' }} className={cn(className, colorClass)}>
       {complexity}
     </Badge>
   );

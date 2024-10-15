@@ -1,8 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useZodForm } from "@/lib/form";
-import { Button } from "@/components/ui/button";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
+import { UpdateQuestionDto, updateQuestionSchema } from '@repo/dtos/questions';
+import { useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -10,29 +23,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { UpdateQuestionDto, updateQuestionSchema } from "@repo/dtos/questions";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import {
-  CATEGORY,
-  COMPLEXITY,
-} from "@repo/dtos/generated/enums/questions.enums";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useZodForm } from '@/lib/form';
 
 interface EditModalProps {
   open: boolean;
@@ -176,7 +177,7 @@ export default function EditModal({
                               : field.onChange([...field.value, cat])
                           }
                           variant={
-                            field.value?.includes(cat) ? "default" : "secondary"
+                            field.value?.includes(cat) ? 'default' : 'secondary'
                           }
                           className="cursor-pointer"
                         >

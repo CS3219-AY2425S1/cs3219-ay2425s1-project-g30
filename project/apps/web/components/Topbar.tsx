@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React from 'react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dropdown-menu';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const Topbar = () => {
   const user = useAuthStore.use.user();
@@ -19,7 +20,7 @@ const Topbar = () => {
   const router = useRouter();
   function handleLogout() {
     logout();
-    router.push("/");
+    router.push('/');
   }
 
   return (

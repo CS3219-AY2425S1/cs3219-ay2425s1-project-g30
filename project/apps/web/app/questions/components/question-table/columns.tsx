@@ -1,14 +1,18 @@
-"use client";
+'use client';
 
-import { ColumnDef, SortingFn } from "@tanstack/react-table";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
+import { QuestionDto } from '@repo/dtos/questions';
+import { ColumnDef, SortingFn } from '@tanstack/react-table';
+import Link from 'next/link';
 
-import { QuestionDto } from "@repo/dtos/questions";
-import DifficultyBadge from "@/components/DifficultyBadge";
-import { Badge } from "@/components/ui/badge";
-import { CATEGORY, COMPLEXITY } from "@repo/dtos/generated/enums/questions.enums";
-import Link from "next/link";
-import { DataTableRowActions } from "./QuestionTableRowActions";
-import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
+import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
+import DifficultyBadge from '@/components/DifficultyBadge';
+import { Badge } from '@/components/ui/badge';
+
+import { DataTableRowActions } from './QuestionTableRowActions';
 
 // Complexity sorting order
 const complexityOrder: { [key in COMPLEXITY]: number } = {
@@ -33,7 +37,7 @@ const categorySortingFn: SortingFn<QuestionDto> = (rowA, rowB, columnId) => {
 
 export const columns: ColumnDef<QuestionDto>[] = [
   {
-    accessorKey: "q_title",
+    accessorKey: 'q_title',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
@@ -49,7 +53,7 @@ export const columns: ColumnDef<QuestionDto>[] = [
     },
   },
   {
-    accessorKey: "q_complexity",
+    accessorKey: 'q_complexity',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Complexity" />
     ),
@@ -62,7 +66,7 @@ export const columns: ColumnDef<QuestionDto>[] = [
     sortingFn: complexitySortingFn,
   },
   {
-    accessorKey: "q_category",
+    accessorKey: 'q_category',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Categories" />
     ),
@@ -81,13 +85,15 @@ export const columns: ColumnDef<QuestionDto>[] = [
       const rowValues = row.getValue(id) as string[];
       return (
         filterValues.length === 0 ||
-        filterValues.every((filterValue) => rowValues.includes(CATEGORY[filterValue as keyof typeof CATEGORY]))
+        filterValues.every((filterValue) =>
+          rowValues.includes(CATEGORY[filterValue as keyof typeof CATEGORY]),
+        )
       );
     },
     sortingFn: categorySortingFn,
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];

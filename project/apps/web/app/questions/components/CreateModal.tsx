@@ -1,8 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useZodForm } from "@/lib/form";
-import { Button } from "@/components/ui/button";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
+import { CreateQuestionDto, createQuestionSchema } from '@repo/dtos/questions';
+import { useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -10,29 +23,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { CreateQuestionDto, createQuestionSchema } from "@repo/dtos/questions";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import {
-  CATEGORY,
-  COMPLEXITY,
-} from "@repo/dtos/generated/enums/questions.enums";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useZodForm } from '@/lib/form';
+
 interface CreateModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -47,8 +49,8 @@ export default function CreateModal({
   const form = useZodForm({
     schema: createQuestionSchema,
     defaultValues: {
-      q_title: "",
-      q_desc: "",
+      q_title: '',
+      q_desc: '',
       q_complexity: undefined,
       q_category: [],
     },
@@ -94,7 +96,7 @@ export default function CreateModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-black">
-                    {renderLabelWithAsterisk("Title")}
+                    {renderLabelWithAsterisk('Title')}
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter title" {...field} />
@@ -111,7 +113,7 @@ export default function CreateModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-black">
-                    {renderLabelWithAsterisk("Description")}
+                    {renderLabelWithAsterisk('Description')}
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -133,7 +135,7 @@ export default function CreateModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-black">
-                    {renderLabelWithAsterisk("Complexity")}
+                    {renderLabelWithAsterisk('Complexity')}
                   </FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
@@ -161,7 +163,7 @@ export default function CreateModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-black">
-                    {renderLabelWithAsterisk("Categories")}
+                    {renderLabelWithAsterisk('Categories')}
                   </FormLabel>
                   <FormControl>
                     <div className="flex flex-wrap gap-2">
@@ -176,7 +178,7 @@ export default function CreateModal({
                               : field.onChange([...field.value, cat])
                           }
                           variant={
-                            field.value?.includes(cat) ? "default" : "secondary"
+                            field.value?.includes(cat) ? 'default' : 'secondary'
                           }
                           className="cursor-pointer"
                         >

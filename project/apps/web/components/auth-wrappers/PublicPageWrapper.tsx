@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from 'next/navigation';
+import { type PropsWithChildren } from 'react';
 
-import { type PropsWithChildren } from "react";
-
-import { useAuthStore } from "@/stores/useAuthStore";
-import { LANDING } from "@/lib/routes";
+import { LANDING } from '@/lib/routes';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface PublicPageWrapperProps {
   redirect: Redirect;
@@ -37,7 +36,7 @@ export const PublicPageWrapper = ({
 
   if (user && redirect.strict) {
     const callbackUrl =
-      searchParams?.get("callbackUrl") ?? redirect.defaultUrl ?? LANDING;
+      searchParams?.get('callbackUrl') ?? redirect.defaultUrl ?? LANDING;
     router.replace(callbackUrl);
     return <div>Loading...</div>;
   }

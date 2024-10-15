@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { EnforceLoginStatePageWrapper } from "@/components/auth-wrappers/EnforceLoginStatePageWrapper";
+import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
 
 export default function MatchPage() {
   return (

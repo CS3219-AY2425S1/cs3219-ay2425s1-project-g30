@@ -1,12 +1,11 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { type PropsWithChildren, useEffect, useMemo } from "react";
+import { useRouter } from 'next/navigation';
+import { type PropsWithChildren, useEffect, useMemo } from 'react';
 
-import { SIGN_IN } from "@/lib/routes";
-
-import useSocketStore from "@/stores/useSocketStore";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { SIGN_IN } from '@/lib/routes';
+import { useAuthStore } from '@/stores/useAuthStore';
+import useSocketStore from '@/stores/useSocketStore';
 
 interface EnforceLoginStatePageWrapperProps {
   /**
@@ -19,7 +18,7 @@ interface EnforceLoginStatePageWrapperProps {
 const Redirect = ({ redirectTo }: EnforceLoginStatePageWrapperProps) => {
   const router = useRouter();
   const redirectUrl = useMemo(() => {
-    if (typeof window === "undefined") return encodeURIComponent("/");
+    if (typeof window === 'undefined') return encodeURIComponent('/');
     const { pathname, search, hash } = window.location;
     return encodeURIComponent(`${pathname}${search}${hash}`);
   }, []);

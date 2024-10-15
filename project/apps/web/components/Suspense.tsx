@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
 import {
   type ComponentProps,
   Suspense as ReactSuspense,
   useEffect,
   useState,
-} from "react";
+} from 'react';
 
 export default function SuspenseWrapper(
-  props: ComponentProps<typeof ReactSuspense>
+  props: ComponentProps<typeof ReactSuspense>,
 ) {
   const [isMounted, setIsMounted] = useState(false);
 

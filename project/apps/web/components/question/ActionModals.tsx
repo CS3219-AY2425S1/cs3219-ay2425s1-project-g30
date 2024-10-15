@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import DeleteModal from "@/components/question/DeleteModal";
-import EditModal from "@/components/question/EditModal";
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useToast } from "@/hooks/use-toast";
-import { deleteQuestion, updateQuestion } from "@/lib/api/question";
-import { QuestionDto, UpdateQuestionDto } from "@repo/dtos/questions";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { QuestionDto, UpdateQuestionDto } from '@repo/dtos/questions';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
+import DeleteModal from '@/components/question/DeleteModal';
+import EditModal from '@/components/question/EditModal';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { useToast } from '@/hooks/use-toast';
+import { deleteQuestion, updateQuestion } from '@/lib/api/question';
 
 interface ActionModalsProps {
   id: string;
@@ -43,16 +44,16 @@ export const ActionModals = ({
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Question] });
       setEditModalOpen(false);
       toast({
-        variant: "success",
-        title: "Success",
-        description: "Question updated successfully",
+        variant: 'success',
+        title: 'Success',
+        description: 'Question updated successfully',
       });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
       toast({
-        variant: "error",
-        title: "Error",
+        variant: 'error',
+        title: 'Error',
         description: error.message,
       });
     },
@@ -67,18 +68,18 @@ export const ActionModals = ({
       });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Question] });
       setDeleteModalOpen(false);
-      router.push("/questions");
+      router.push('/questions');
       toast({
-        variant: "success",
-        title: "Success",
-        description: "Question deleted successfully",
+        variant: 'success',
+        title: 'Success',
+        description: 'Question deleted successfully',
       });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
       toast({
-        variant: "error",
-        title: "Error",
+        variant: 'error',
+        title: 'Error',
         description: error.message,
       });
     },

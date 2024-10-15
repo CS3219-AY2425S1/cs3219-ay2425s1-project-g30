@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { Table } from "@tanstack/react-table";
-
-import { DataTableFacetedFilter } from "@/components/data-table/DataTableFacetedFilter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
+import { Cross2Icon } from '@radix-ui/react-icons';
 import {
   CATEGORY,
   COMPLEXITY,
-} from "@repo/dtos/generated/enums/questions.enums";
+} from '@repo/dtos/generated/enums/questions.enums';
+import { Table } from '@tanstack/react-table';
+
+import { DataTableFacetedFilter } from '@/components/data-table/DataTableFacetedFilter';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 // filter value and label should both be the enum values
 // e.g. "Data Structures" as opposed to "DataStructures"
@@ -38,23 +37,23 @@ export function QuestionTableToolbar<TData>({
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder="Filter questions..."
-          value={(table.getColumn("q_title")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn('q_title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
-            table.getColumn("q_title")?.setFilterValue(event.target.value)
+            table.getColumn('q_title')?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("q_complexity") && (
+        {table.getColumn('q_complexity') && (
           <DataTableFacetedFilter
-            column={table.getColumn("q_complexity")}
+            column={table.getColumn('q_complexity')}
             title="Complexity"
             options={COMPLEXITIES}
             includeFacets={false}
           />
         )}
-        {table.getColumn("q_category") && (
+        {table.getColumn('q_category') && (
           <DataTableFacetedFilter
-            column={table.getColumn("q_category")}
+            column={table.getColumn('q_category')}
             title="Category"
             options={CATEGORIES}
             includeFacets={false}

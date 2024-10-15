@@ -1,7 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+
+import { PublicPageWrapper } from '@/components/auth-wrappers/PublicPageWrapper';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,11 +11,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { SignInForm } from "./SignInForm";
-import { SignUpForm } from "./SignUpForm";
-import { PublicPageWrapper } from "@/components/auth-wrappers/PublicPageWrapper";
-import { LANDING } from "@/lib/routes";
+} from '@/components/ui/card';
+import { LANDING } from '@/lib/routes';
+
+import { SignInForm } from './SignInForm';
+import { SignUpForm } from './SignUpForm';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -24,16 +26,16 @@ export default function AuthPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>
-              {isSignUp ? "Create an account" : "Sign in to your account"}
+              {isSignUp ? 'Create an account' : 'Sign in to your account'}
             </CardTitle>
             <CardDescription>
               {isSignUp
-                ? "Enter your details to create a new account"
-                : "Enter your credentials to access your account"}
+                ? 'Enter your details to create a new account'
+                : 'Enter your credentials to access your account'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isSignUp ? <SignUpForm /> : <SignInForm />}{" "}
+            {isSignUp ? <SignUpForm /> : <SignInForm />}{' '}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -47,7 +49,7 @@ export default function AuthPage() {
               onClick={() => setIsSignUp(!isSignUp)}
             >
               {isSignUp
-                ? "Already have an account? Sign In"
+                ? 'Already have an account? Sign In'
                 : "Don't have an account? Sign Up"}
             </Button>
           </CardFooter>

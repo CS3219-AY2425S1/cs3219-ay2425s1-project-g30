@@ -1,6 +1,7 @@
-import { apiCall } from './apiClient';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 import { UserSessionDto, UserDataDto } from '@repo/dtos/users';
+
+import { apiCall } from './apiClient';
 
 export const signUp = async (signUpDto: SignUpDto): Promise<UserSessionDto> =>
   await apiCall('post', '/auth/signup', signUpDto);

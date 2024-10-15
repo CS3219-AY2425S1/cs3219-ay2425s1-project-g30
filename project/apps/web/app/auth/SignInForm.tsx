@@ -1,7 +1,10 @@
-"use client";
+'use client';
 
-import { signInSchema, SignInDto } from "@repo/dtos/auth";
-import { Button } from "@/components/ui/button";
+import { signInSchema, SignInDto } from '@repo/dtos/auth';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -9,14 +12,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useZodForm } from "@/lib/form";
-import { useToast } from "@/hooks/use-toast";
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useRouter } from "next/navigation";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { useToast } from '@/hooks/use-toast';
+import { useZodForm } from '@/lib/form';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export function SignInForm() {
   const form = useZodForm({ schema: signInSchema });
@@ -29,13 +30,13 @@ export function SignInForm() {
     mutationFn: (values: SignInDto) => signIn(values),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
-      await router.push("/questions");
+      await router.push('/questions');
     },
     onError(error) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: error.message,
-        variant: "error",
+        variant: 'error',
       });
     },
   });

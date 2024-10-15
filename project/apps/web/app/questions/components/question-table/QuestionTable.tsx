@@ -1,33 +1,34 @@
-"use client";
+'use client';
 
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import { fetchQuestions } from "@/lib/api/question";
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
 import {
   QuestionFiltersDto,
   QuestionCollectionDto,
   SortQuestionsQueryDto,
-} from "@repo/dtos/questions";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  ControlledTableStateProps,
-  DataTable,
-} from "@/components/data-table/DataTable";
-
-import { columns } from "./columns";
-import { useQuestionsState } from "@/contexts/QuestionsStateContext";
-import { QuestionTableToolbar } from "./QuestionTableToolbar";
+} from '@repo/dtos/questions';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   PaginationState,
   SortingState,
   Updater,
-} from "@tanstack/react-table";
-import { startTransition, useState } from "react";
+} from '@tanstack/react-table';
+import { startTransition, useState } from 'react';
+
 import {
-  CATEGORY,
-  COMPLEXITY,
-} from "@repo/dtos/generated/enums/questions.enums";
-import useDebounce from "@/hooks/useDebounce";
+  ControlledTableStateProps,
+  DataTable,
+} from '@/components/data-table/DataTable';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { useQuestionsState } from '@/contexts/QuestionsStateContext';
+import useDebounce from '@/hooks/useDebounce';
+import { fetchQuestions } from '@/lib/api/question';
+
+import { columns } from './columns';
+import { QuestionTableToolbar } from './QuestionTableToolbar';
 
 export function QuestionTable() {
   const { confirmLoading, setConfirmLoading } = useQuestionsState();
@@ -46,7 +47,7 @@ export function QuestionTable() {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "q_title",
+      id: 'q_title',
       desc: false,
     },
   ]);
@@ -69,15 +70,15 @@ export function QuestionTable() {
     queryFn: async () => {
       setConfirmLoading(true);
       try {
-        const title = debouncedColumnFilters.find((f) => f.id === "q_title")
+        const title = debouncedColumnFilters.find((f) => f.id === 'q_title')
           ?.value as string;
 
         const categories = debouncedColumnFilters.find(
-          (f) => f.id === "q_category",
+          (f) => f.id === 'q_category',
         )?.value as CATEGORY[];
 
         const complexities = debouncedColumnFilters.find(
-          (f) => f.id === "q_complexity",
+          (f) => f.id === 'q_complexity',
         )?.value as COMPLEXITY[];
 
         const offset = pagination.pageIndex * pagination.pageSize;
@@ -87,7 +88,7 @@ export function QuestionTable() {
           (s) =>
             ({
               field: s.id,
-              order: s.desc ? "desc" : "asc",
+              order: s.desc ? 'desc' : 'asc',
             }) as SortQuestionsQueryDto,
         );
 

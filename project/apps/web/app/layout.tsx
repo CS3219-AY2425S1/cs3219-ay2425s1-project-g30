@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Inter, Roboto } from 'next/font/google';
 import { usePathname } from 'next/navigation';
@@ -41,7 +41,7 @@ export default function RootLayout({
       try {
         await fetchUser();
       } catch (error) {
-        console.error("Failed to fetch user data:", error);
+        console.error('Failed to fetch user data:', error);
       }
     };
     initializeUser();

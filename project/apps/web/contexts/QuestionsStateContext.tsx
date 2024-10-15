@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { QuestionDto } from "@repo/dtos/questions";
+import { QuestionDto } from '@repo/dtos/questions';
 import {
   createContext,
   type PropsWithChildren,
   useContext,
   useState,
-} from "react";
+} from 'react';
 
 type QuestionsStateContextReturn = {
   selectedQuestion: QuestionDto | null;

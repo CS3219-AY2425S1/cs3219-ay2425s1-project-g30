@@ -1,6 +1,5 @@
-"use client";
+'use client';
 
-import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -18,7 +17,8 @@ import {
   Updater,
   TableState,
   TableOptions,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
+import * as React from 'react';
 
 import {
   Table,
@@ -27,12 +27,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
-import { cn } from "@/lib/utils";
+import { LoadingSpinner } from '../ui/spinner';
 
-import { DataTablePagination } from "./DataTablePagination";
-import { LoadingSpinner } from "../ui/spinner";
+import { DataTablePagination } from './DataTablePagination';
 
 export interface ControlledTableStateProps {
   // pagination
@@ -123,7 +123,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className={cn(header.id === "actions" ? "w-20" : "")}
+                      className={cn(header.id === 'actions' ? 'w-20' : '')}
                     >
                       {header.isPlaceholder
                         ? null
@@ -138,13 +138,13 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody
-            className={`${confirmLoading ? "opacity-50" : "opacity-100"}`}
+            className={`${confirmLoading ? 'opacity-50' : 'opacity-100'}`}
           >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
