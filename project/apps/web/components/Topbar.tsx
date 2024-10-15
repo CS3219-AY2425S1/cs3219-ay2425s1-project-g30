@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { Button } from "@/components/ui/button";
 
 const Topbar = () => {
@@ -28,7 +28,7 @@ const Topbar = () => {
         <Link href="/" passHref>
           <h1 className="text-lg font-medium cursor-pointer">PeerPrep</h1>
         </Link>
-        { user ?
+        {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center space-x-2">
@@ -42,20 +42,20 @@ const Topbar = () => {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem>
                 {/* // TODO: Replace with real link */}
-                <Link href="/" passHref>Profile</Link>
+                <Link href="/" passHref>
+                  Profile
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout}>
-                Logout
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          :
+        ) : (
           <Button>
             <Link href="/auth" passHref>
               Login
             </Link>
           </Button>
-        }
+        )}
       </div>
     </header>
   );

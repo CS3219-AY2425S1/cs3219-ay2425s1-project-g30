@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useZodForm } from "@/lib/form";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/store/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 
 export function SignUpForm() {
@@ -24,7 +24,7 @@ export function SignUpForm() {
   const { toast } = useToast();
   const signUp = useAuthStore.use.signUp();
   const router = useRouter();
-  
+
   const mutation = useMutation({
     mutationFn: (values: SignUpDto) => signUp(values),
     onSuccess: async () => {

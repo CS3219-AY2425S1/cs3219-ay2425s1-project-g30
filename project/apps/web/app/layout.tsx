@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Inter, Roboto } from 'next/font/google';
 import { usePathname } from 'next/navigation';
@@ -10,7 +10,7 @@ import Suspense from '@/components/Suspense';
 import Topbar from '@/components/Topbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toaster } from '@/components/ui/toaster';
-import { useAuthStore } from '@/store/AuthStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 import './globals.css';
 
@@ -41,7 +41,7 @@ export default function RootLayout({
       try {
         await fetchUser();
       } catch (error) {
-        console.error('Failed to fetch user data:', error);
+        console.error("Failed to fetch user data:", error);
       }
     };
     initializeUser();

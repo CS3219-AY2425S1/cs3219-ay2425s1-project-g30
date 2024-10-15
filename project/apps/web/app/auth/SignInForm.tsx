@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/store/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useZodForm } from "@/lib/form";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS } from "@/constants/queryKeys";

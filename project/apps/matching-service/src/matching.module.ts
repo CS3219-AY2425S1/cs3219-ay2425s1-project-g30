@@ -13,6 +13,7 @@ import { MatchRequestService } from './matchRequest/matchRequest.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './constants/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MatchingGateway } from './matching.gateway';
 
 @Module({
   imports: [
@@ -32,6 +33,17 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           port: 3001,
         },
       },
+      {
+        name: 'AUTH_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host:
+            process.env.NODE_ENV === 'development'
+              ? 'localhost'
+              : process.env.AUTH_SERVICE_HOST || 'localhost',
+          port: 3003,
+        },
+      },
     ]),
   ],
   controllers: [MatchingController],
@@ -45,6 +57,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     MatchExpiryConsumer,
     MatchExpiryService,
     MatchRequestService,
+    MatchingGateway,
   ],
 })
 export class MatchingModule {}

@@ -16,6 +16,7 @@ async function bootstrap() {
       },
     },
   );
+
   await app.listen();
   console.log('Matching Service is listening...');
 }

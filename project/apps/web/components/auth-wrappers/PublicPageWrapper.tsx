@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { type PropsWithChildren } from "react";
 
-import { useAuthStore } from "@/store/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { LANDING } from "@/lib/routes";
 
 interface PublicPageWrapperProps {

@@ -27,6 +27,8 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/microservices": "^10.4.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.4.4",
+    "@nestjs/websockets": "^10.4.4",
     "@repo/dtos": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@supabase/supabase-js": "^2.45.4",
@@ -34,8 +36,10 @@
     "amqplib": "^0.10.4",
     "cache-manager": "^5.7.6",
     "cache-manager-redis-store": "^3.0.1",
+    "cookie": "^1.0.1",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "socket.io": "^4.8.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
