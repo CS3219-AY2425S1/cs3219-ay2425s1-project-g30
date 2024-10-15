@@ -94,11 +94,8 @@ export class QuestionsService {
 
       // check if question with the same title already exists
       if (existingQuestionCollection.metadata.count) {
-        this.handleError(
-          'create question',
-          new BadRequestException(
-            `Question with title ${question.q_title} already exists`,
-          ),
+        throw new BadRequestException(
+          `Question with title ${question.q_title} already exists`,
         );
       }
 
@@ -138,11 +135,8 @@ export class QuestionsService {
         existingQuestionCollection.metadata.count &&
         existingQuestionCollection.questions[0].id !== question.id
       ) {
-        this.handleError(
-          'update question',
-          new BadRequestException(
-            `Question with title ${question.q_title} already exists`,
-          ),
+        throw new BadRequestException(
+          `Question with title ${question.q_title} already exists`,
         );
       }
       const updatedQuestion = await this.questionsRepository.update(question);
@@ -171,11 +165,8 @@ export class QuestionsService {
       const existingQuestion = await this.questionsRepository.findById(id);
 
       if (existingQuestion.deleted_at) {
-        this.handleError(
-          'delete question',
-          new BadRequestException(
-            `Question with id ${id} has already been deleted`,
-          ),
+        throw new BadRequestException(
+          `Question with id ${id} has already been deleted`,
         );
       }
 
