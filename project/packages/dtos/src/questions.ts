@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
-import { collectionMetadataSchema } from "./metatdata";
+import { collectionMetadataSchema } from "./metadata";
 
 const categoryEum = z.nativeEnum(CATEGORY);
 const complexityEnum = z.nativeEnum(COMPLEXITY);

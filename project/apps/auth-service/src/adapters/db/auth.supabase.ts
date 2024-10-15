@@ -12,6 +12,7 @@ import {
 } from '@repo/dtos/users';
 import {
   createClient,
+  Session,
   SignInWithPasswordCredentials,
   SupabaseClient,
 } from '@supabase/supabase-js';
@@ -56,10 +57,22 @@ export class SupabaseAuthRepository implements AuthRepository {
     return data.user as UserAuthRecordDto;
   }
 
+  async refreshUserSession(refreshToken: string): Promise<Session> {
+    const { data, error } = await this.supabase.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+
+    if (error || !data.session) {
+      throw new Error('Invalid token');
+    }
+
+    return data.session;
+  }
+
   async getUserDataById(id: string): Promise<UserDataDto> {
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
-      .select(`id, email, username`)
+      .select()
       .eq('id', id)
       .single<UserDataDto>();
 
@@ -134,5 +147,18 @@ export class SupabaseAuthRepository implements AuthRepository {
     const userData = await this.getUserDataById(user.id);
 
     return { userData, session } as UserSessionDto;
+  }
+
+  async signOut(): Promise<Session> {
+    const { data, error } = await this.supabase.auth.getSession();
+    if (!data.session || error) {
+      throw new Error('No active session') || error;
+    }
+
+    const { error: authError } = await this.supabase.auth.signOut();
+    if (authError) {
+      throw authError;
+    }
+    return data.session;
   }
 }

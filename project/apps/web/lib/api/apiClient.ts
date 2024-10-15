@@ -16,7 +16,7 @@ const apiClient: AxiosInstance = axios.create({
 });
 
 export const apiCall = async <T>(
-  method: "get" | "post" | "put" | "delete",
+  method: "get" | "post" | "put" | "delete" | "patch",
   url: string,
   data?: any,
   params?: Record<string, any>,

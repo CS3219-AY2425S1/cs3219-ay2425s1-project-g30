@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { type PropsWithChildren } from "react";
 
-import { useLoginState } from "@/contexts/LoginStateContext";
+import { useAuthStore } from "@/store/AuthStore";
 import { LANDING } from "@/lib/routes";
 
 interface PublicPageWrapperProps {
@@ -32,10 +32,10 @@ export const PublicPageWrapper = ({
   children,
 }: PropsWithChildren<PublicPageWrapperProps>): JSX.Element => {
   const router = useRouter();
-  const { hasLoginStateFlag } = useLoginState();
+  const user = useAuthStore.use.user();
   const searchParams = useSearchParams();
 
-  if (hasLoginStateFlag && redirect.strict) {
+  if (user && redirect.strict) {
     const callbackUrl =
       searchParams?.get("callbackUrl") ?? redirect.defaultUrl ?? LANDING;
     router.replace(callbackUrl);

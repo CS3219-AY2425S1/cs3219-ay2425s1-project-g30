@@ -4,6 +4,7 @@ import {
   UserSessionDto,
 } from '@repo/dtos/users';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
+import { Session } from '@supabase/supabase-js';
 
 /**
  * Abstract class representing the AuthRepository.
@@ -13,10 +14,20 @@ export abstract class AuthRepository {
   /**
    * Retrieves a user authentication record by token.
    *
-   * @param token - The token associated with the user authentication record.
+   * @param accessToken - The token associated with the user authentication record.
    * @returns A promise that resolves to the UserAuthRecord.
    */
-  abstract getUserAuthRecordByToken(token: string): Promise<UserAuthRecordDto>;
+  abstract getUserAuthRecordByToken(
+    accessToken: string,
+  ): Promise<UserAuthRecordDto>;
+
+  /**
+   * Refreshes the user session.
+   *
+   * @param refreshToken - The refresh token used to refresh the user session.
+   * @returns A promise that resolves to a Session.
+   */
+  abstract refreshUserSession(refreshToken: string): Promise<Session>;
 
   /**
    * Retrieves user data by user ID.
@@ -41,4 +52,11 @@ export abstract class AuthRepository {
    * @returns A promise that resolves to the UserSessionDto.
    */
   abstract signIn(signInDto: SignInDto): Promise<UserSessionDto>;
+
+  /**
+   * Signs out the user.
+   *
+   * @returns A promise that resolves to void.
+   */
+  abstract signOut(): Promise<Session>;
 }

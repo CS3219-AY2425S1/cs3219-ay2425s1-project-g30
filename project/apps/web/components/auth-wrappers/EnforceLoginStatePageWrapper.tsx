@@ -5,7 +5,7 @@ import { type PropsWithChildren, useMemo } from "react";
 
 import { SIGN_IN } from "@/lib/routes";
 
-import { useLoginState } from "@/contexts/LoginStateContext";
+import { useAuthStore  } from "@/store/AuthStore";
 
 interface EnforceLoginStatePageWrapperProps {
   /**
@@ -38,9 +38,9 @@ export const EnforceLoginStatePageWrapper = ({
   redirectTo = SIGN_IN,
   children,
 }: PropsWithChildren<EnforceLoginStatePageWrapperProps>): React.ReactElement => {
-  const { hasLoginStateFlag } = useLoginState();
-
-  if (hasLoginStateFlag) {
+  const user = useAuthStore.use.user();
+  
+  if (user) {
     return <>{children}</>;
   }
 
