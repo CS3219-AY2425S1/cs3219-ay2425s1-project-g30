@@ -1,11 +1,13 @@
 import { io, Socket } from "socket.io-client";
 import { create } from "zustand";
 
-const SOCKET_SERVER_URL = "http://localhost:8080";
+const SOCKET_SERVER_URL =
+  process.env.NEXT_PUBLIC_MATCH_SOCKET_URL || "http://localhost:8080";
 
 interface SocketState {
   socket: Socket | null;
   isConnected: boolean;
+  connectionError: string | null;
   connect: () => void;
   disconnect: () => void;
 }
@@ -13,6 +15,7 @@ interface SocketState {
 const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   isConnected: false,
+  connectionError: null,
   connect: () => {
     if (get().socket) return; // Prevent multiple connections
 
@@ -22,13 +25,18 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("connect", () => {
-      set({ isConnected: true });
+      set({ isConnected: true, connectionError: null });
       console.log("Connected to Socket.IO server");
     });
 
     socket.on("disconnect", () => {
       set({ isConnected: false });
       console.log("Disconnected from Socket.IO server");
+    });
+
+    socket.on("connect_error", (error: Error) => {
+      set({ connectionError: error.message });
+      console.log(`Connection error: ${error.message}`);
     });
 
     socket.on("match_found", (message) => {
@@ -46,8 +54,9 @@ const useSocketStore = create<SocketState>((set, get) => ({
   disconnect: () => {
     const socket = get().socket;
     if (socket) {
+      socket.removeAllListeners();
       socket.disconnect();
-      set({ socket: null, isConnected: false });
+      set({ socket: null, isConnected: false, connectionError: null });
     }
   },
 }));
