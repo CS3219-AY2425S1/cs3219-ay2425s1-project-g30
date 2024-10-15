@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
 import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "../stores/AuthStore";
+import { useAuthStore } from "../stores/useAuthStore";
 
 export const useMe = () => {
   const router = useRouter();

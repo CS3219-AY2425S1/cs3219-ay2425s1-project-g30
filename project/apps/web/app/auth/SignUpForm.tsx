@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useZodForm } from "@/lib/form";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/stores/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 
 export function SignUpForm() {

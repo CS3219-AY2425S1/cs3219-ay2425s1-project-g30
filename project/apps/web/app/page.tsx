@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const Dashboard = () => {
   const user = useAuthStore.use.user();

@@ -6,7 +6,7 @@ import { type PropsWithChildren, useEffect, useMemo } from "react";
 import { SIGN_IN } from "@/lib/routes";
 
 import useSocketStore from "@/stores/useSocketStore";
-import { useAuthStore } from "@/stores/AuthStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 interface EnforceLoginStatePageWrapperProps {
   /**
