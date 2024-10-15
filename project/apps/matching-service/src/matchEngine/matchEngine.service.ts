@@ -15,28 +15,32 @@ export class MatchEngineService {
   ) {}
 
   async generateMatch(matchRequest: MatchRequestDto) {
-    const {userId, criteria} = matchRequest;
+    const {userId, category, complexity} = matchRequest;
 
-    const potentialMatch = await this.matchRedis.findPotentialMatch(criteria);
+    const matchedUser = await this.matchRedis.findPotentialMatch({category, complexity});
 
-    if (potentialMatch) {
-      await this.matchRedis.removeMatchRequest(potentialMatch.userId);
-      
+    if (matchedUser) {
+      // TODO: Get a random question from the question service then create match
       const matchData: MatchDataDto = {
         user1_id: userId,
-        user2_id: potentialMatch.userId,
-        complexity: criteria.complexity,
-        category: criteria.category,
+        user2_id: matchedUser.userId,
+        complexity: complexity,
+        category: category,
+        match_id: matchedUser.matchId,
+        question_id: "1234"
       };
       this.matchGateway.sendMatchFound({
-        userId: potentialMatch.userId,
+        userId: matchedUser.userId,
         message: 'success',
       });
       await this.matchSupabase.saveMatch(matchData);
     } else {
       // No match found, add the match to redis
-      await this.matchRedis.addMatchRequest(userId, criteria);
-      await this.matchEngineProduceExpiry.enqueueMatchExpiryRequest(matchRequest, 30000);
+      const matchid = await this.matchRedis.addMatchRequest(matchRequest);
+      if (!matchid) {
+        throw new Error("Failed to add match request");
+      }
+      await this.matchEngineProduceExpiry.enqueueMatchExpiryRequest(matchid, 30000);
     }
   }
 }

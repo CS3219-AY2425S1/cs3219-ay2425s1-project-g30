@@ -29,6 +29,7 @@ export class MatchRequestService {
     this.channelWrapper.sendToQueue(
       MATCH_QUEUE,
       Buffer.from(JSON.stringify(matchData)),
+      
     );
     return { success: true };
   }

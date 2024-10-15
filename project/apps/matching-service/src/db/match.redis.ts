@@ -1,26 +1,24 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import { CriteriaDto } from '@repo/dtos/match';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { CATEGORY, COMPLEXITY } from '@repo/dtos/generated/enums/questions.enums';
+import { CriteriaDto, MatchRequestDto } from '@repo/dtos/match';
 import { Cache } from 'cache-manager';
 import {
   MATCH_WAITING_KEY,
   SOCKET_USER_KEY,
   USER_SOCKET_KEY,
+  MATCH_CATEGORY, MATCH_GLOBAL, MATCH_REQUEST
 } from 'src/constants/redis';
+import Redis from 'ioredis';
+
 
 @Injectable()
 export class MatchRedis {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
-  async addMatchRequest(matchId: string, matchData: any) {
-    const key = `${MATCH_WAITING_KEY}-${matchId}`;
-    await this.cacheManager.set(key, matchData);
-  }
-
-  async getMatchRequest(matchId: string) {
-    const key = `${MATCH_WAITING_KEY}-${matchId}`;
-    return await this.cacheManager.get(key);
-  }
+  private readonly logger = new Logger(MatchRedis.name);
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject('IoredisClient') private redisClient: Redis,
+  ) {}
 
   async setUserToSocket({
     userId,
@@ -50,18 +48,127 @@ export class MatchRedis {
     const userSocketKey = `${USER_SOCKET_KEY}-${userId}`;
     return await this.cacheManager.get<string>(userSocketKey);
   }
-  async removeMatchRequest(matchId: string) {
-    const key = `${MATCH_WAITING_KEY}-${matchId}`;
-    await this.cacheManager.del(key);
-  }
 
-  async findPotentialMatch(criteria: CriteriaDto) {
+  async addMatchRequest(matchRequest: MatchRequestDto): Promise<string | null> {
+    const matchId : string = uuidv4();
+    const { category, complexity } = matchRequest;
+    const timestamp = Date.now();
     
-    return { userId: '123' };
+    // Store match requst details to redis in a hash
+    const hashKey = `${MATCH_REQUEST}-${matchId}`;
+    const globalSortedSetKey = `${MATCH_GLOBAL}`; // This one is for getting oldest requests across all categories
+
+    const pipeline = this.redisClient.multi();
+
+    pipeline.hset(hashKey, {
+      userId: matchRequest.userId,
+      complexity: complexity,
+      category: JSON.stringify(category),
+      timestamp: timestamp.toString(),
+    });
+
+    pipeline.zadd(globalSortedSetKey, timestamp, matchId);
+
+    // Add matchId to the sorted set for each category
+    for (const cat of category) {
+      const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
+      pipeline.zadd(sortedSetKey, timestamp, matchId);
+    }
+
+    try {
+      await pipeline.exec();
+    } catch (error) {
+      this.logger.error(`Error adding match request: ${error}`);
+      return null;
+    }
+
+    return matchId;
+  }
+  async getMatchRequest(matchId: string): Promise<MatchRequestDto | null> {
+    const hashKey = `${MATCH_REQUEST}-${matchId}`;
+    try {
+      const data = await this.redisClient.hgetall(hashKey);
+
+      if (!data || Object.keys(data).length === 0) return null;
+
+      return {
+        userId: data.userId as string,
+        complexity: data.complexity as COMPLEXITY,
+        category: JSON.parse(data.category) as CATEGORY[],
+        timestamp: parseInt(data.timestamp, 10),
+      };
+    } catch (error) {
+      this.logger.error(`Error fetching match request: ${error}`);
+      return null;
+    }
   }
 
-  async userMatchRequestExists(userId: string) {
-    const key = `${MATCH_WAITING_KEY}-${userId}`;
-    return await this.cacheManager.get(key);
+  async removeMatchRequest(matchId: string) : Promise<string | null> {
+    const hashKey = `${MATCH_REQUEST}-${matchId}`;
+    const matchRequest = await this.getMatchRequest(matchId);
+    if (!matchRequest) return null;
+
+    const { category, complexity } = matchRequest;
+    const pipeline = this.redisClient.multi();
+
+    for (const cat of category) {
+      const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
+      pipeline.zrem(sortedSetKey, matchId);
+    }
+
+    pipeline.del(hashKey);
+
+    try {
+      await pipeline.exec();
+      return matchId;
+    } catch (error) {
+      this.logger.error(`Error removing match request: ${error}`);
+      return null;
+    }
+  }
+
+  async findPotentialMatch(criteria: CriteriaDto): Promise<{ userId: string; matchId: string } | null> {
+    const { category, complexity } = criteria;
+
+    const pipeline = this.redisClient.pipeline()
+
+    category.forEach(cat => {
+      const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
+      pipeline.zrange(sortedSetKey, 0, 0);
+    });
+
+    const responses = await pipeline.exec();
+
+    if (!responses) return null
+
+    const fetchPromises = responses.map(async ([err, res], index) => {
+      if (err) {
+        this.logger.error(`Error fetching matchId(s) from category ${category[index]}:`, err);
+        return null;
+      }
+      const matchId: string = Array.isArray(res) ? res[0] : null;
+      if (!matchId) return null;
+  
+      const matchRequest = await this.getMatchRequest(matchId);
+      if (matchRequest) {
+        return { matchId, matchRequest };
+      }
+      return null;
+    });
+  
+    const matchResults = await Promise.all(fetchPromises);
+    
+     const validResults = matchResults
+    .filter(req => req !== null);
+
+    if (validResults.length === 0) return null; // No matches found
+
+    // sort by earliest first
+    validResults.sort((a, b) => a.matchRequest.timestamp - b.matchRequest.timestamp);
+    const oldestMatch = validResults[0];
+
+    await this.removeMatchRequest(oldestMatch.matchId);
+
+    return { userId: oldestMatch.matchRequest.userId, matchId: oldestMatch.matchId };
   }
 }

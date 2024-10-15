@@ -11,7 +11,7 @@ import { MatchEngineService } from './matchEngine/matchEngine.service';
 import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
 import { MatchRequestService } from './matchRequest/matchRequest.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import { RedisOptions } from './constants/redis';
+import { RedisOptions } from './redis/redis.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MatchingGateway } from './matching.gateway';
 
