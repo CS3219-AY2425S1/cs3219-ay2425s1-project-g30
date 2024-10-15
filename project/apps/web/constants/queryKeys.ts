@@ -1,4 +1,4 @@
 export enum QUERY_KEYS {
-  Me = "me",
-  Question = "question",
+  Me = 'me',
+  Question = 'question',
 }

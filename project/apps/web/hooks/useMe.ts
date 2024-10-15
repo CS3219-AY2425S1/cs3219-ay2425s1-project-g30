@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
 
-import { useMutation } from "@tanstack/react-query";
-import { useAuthStore } from "../store/AuthStore";
+import { useMutation } from '@tanstack/react-query';
+import { useAuthStore } from '../store/AuthStore';
 
 export const useMe = () => {
   const router = useRouter();
@@ -18,9 +18,9 @@ export const useMe = () => {
     }
   }, [fetchUser, user]);
 
-  const logoutMutation = useMutation({ 
+  const logoutMutation = useMutation({
     mutationFn: signOut,
-    onSuccess: async () => await router.push("/auth")
+    onSuccess: async () => await router.push('/auth'),
   });
 
   const logout = useCallback(
@@ -28,7 +28,7 @@ export const useMe = () => {
       return logoutMutation.mutate(undefined, {
         onSuccess: async () => {
           if (redirectToSignIn) {
-            await router.push("/auth");
+            await router.push('/auth');
           }
         },
       });

@@ -1,4 +1,4 @@
-import { useState, useEffect, startTransition } from "react";
+import { useState, useEffect, startTransition } from 'react';
 
 const useDebounce = <T>(
   value: T,

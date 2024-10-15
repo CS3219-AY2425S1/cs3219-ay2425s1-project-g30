@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
+    "format": "prettier --write \"**/*.ts\"",
     "start": "next start",
     "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives \"**/*.{js,ts,tsx}\" --fix",
     "type-check": "tsc"

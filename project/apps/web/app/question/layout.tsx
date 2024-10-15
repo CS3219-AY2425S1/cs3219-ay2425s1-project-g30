@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 // import { EnforceLoginStatePageWrapper } from "@/components/auth-wrappers/EnforceLoginStatePageWrapper";
 
 interface QuestionLayoutProps {
@@ -7,7 +7,7 @@ interface QuestionLayoutProps {
 
 const QuestionLayout = ({ children }: QuestionLayoutProps) => {
   // enforce login here
-  return children
+  return children;
 };
 
 export default QuestionLayout;

@@ -1,27 +1,28 @@
-"use client"
+'use client';
 
-import { Inter, Roboto } from "next/font/google";
-import ReactQueryProvider from "@/components/ReactQueryProvider";
-import Suspense from "@/components/Suspense";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Toaster } from "@/components/ui/toaster";
-import { useEffect } from "react";
-import { useAuthStore } from "@/store/AuthStore";
+import { Inter, Roboto } from 'next/font/google';
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
-import "./globals.css";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
-import { usePathname } from "next/navigation";
+import ReactQueryProvider from '@/components/ReactQueryProvider';
+import Sidebar from '@/components/Sidebar';
+import Suspense from '@/components/Suspense';
+import Topbar from '@/components/Topbar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Toaster } from '@/components/ui/toaster';
+import { useAuthStore } from '@/store/AuthStore';
+
+import './globals.css';
 
 const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  display: 'swap',
 });
 
 const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
 });
 
 export default function RootLayout({
@@ -32,9 +33,9 @@ export default function RootLayout({
   const fetchUser = useAuthStore.use.fetchUser();
   const pathname = usePathname();
 
-  const excludePaths = ["/auth"];
-  
-// Fetch user data on initial render, ensures logged in user data is available
+  const excludePaths = ['/auth'];
+
+  // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
     const initializeUser = async () => {
       try {
@@ -47,7 +48,7 @@ export default function RootLayout({
   }, [fetchUser]);
 
   const renderSidebarAndTopbar = !excludePaths.includes(pathname);
-  
+
   return (
     <html lang="en" className={inter.className}>
       <body className={roboto.className}>
@@ -56,7 +57,9 @@ export default function RootLayout({
             <div className="flex h-screen overflow-hidden">
               {renderSidebarAndTopbar && <Topbar />}
               {renderSidebarAndTopbar && <Sidebar />}
-              <main className={`flex-1 ${renderSidebarAndTopbar ? 'ml-20 mt-16 p-4' : ''} overflow-auto`}>
+              <main
+                className={`flex-1 ${renderSidebarAndTopbar ? 'ml-20 mt-16 p-4' : ''} overflow-auto`}
+              >
                 {children}
               </main>
             </div>

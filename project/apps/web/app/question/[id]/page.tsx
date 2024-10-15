@@ -1,18 +1,20 @@
-"use client";
+'use client';
 
-import DifficultyBadge from "@/components/DifficultyBadge";
-import { ActionModals } from "@/components/question/ActionModals";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import { fetchQuestionById } from "@/lib/api/question";
-import { QuestionDto } from "@repo/dtos/questions";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Suspense, useState } from "react";
-import QuestionSkeleton from "./components/QuestionSkeleton";
+import { QuestionDto } from '@repo/dtos/questions';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Suspense, useState } from 'react';
+
+import DifficultyBadge from '@/components/DifficultyBadge';
+import { ActionModals } from '@/components/question/ActionModals';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { fetchQuestionById } from '@/lib/api/question';
+
+import QuestionSkeleton from './components/QuestionSkeleton';
 
 interface QuestionPageProps {
   params: {
@@ -47,7 +49,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
 
       {/* Question Details */}
       <div
-        className={`bg-white shadow-md rounded-lg p-6 relative ${confirmLoading ? "opacity-50" : "opacity-100"}`}
+        className={`bg-white shadow-md rounded-lg p-6 relative ${confirmLoading ? 'opacity-50' : 'opacity-100'}`}
       >
         <div className="absolute flex gap-2 top-4 right-4">
           <Button

@@ -1,21 +1,23 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useToast } from "@/hooks/use-toast";
-import { createQuestion } from "@/lib/api/question";
-import { CreateQuestionDto } from "@repo/dtos/questions";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
-import { Suspense, useState } from "react";
-import CreateModal from "./components/CreateModal";
-import QuestionsSkeleton from "./components/QuestionsSkeleton";
+import { CreateQuestionDto } from '@repo/dtos/questions';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
+import { Suspense, useState } from 'react';
+
+import { ActionModals } from '@/components/question/ActionModals';
+import { Button } from '@/components/ui/button';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import {
   QuestionsStateProvider,
   useQuestionsState,
-} from "@/contexts/QuestionsStateContext";
-import { ActionModals } from "@/components/question/ActionModals";
-import { QuestionTable } from "./components/question-table/QuestionTable";
+} from '@/contexts/QuestionsStateContext';
+import { useToast } from '@/hooks/use-toast';
+import { createQuestion } from '@/lib/api/question';
+
+import CreateModal from './components/CreateModal';
+import { QuestionTable } from './components/question-table/QuestionTable';
+import QuestionsSkeleton from './components/QuestionsSkeleton';
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
@@ -38,16 +40,16 @@ const QuestionRepositoryContent = () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Question] });
       setCreateModalOpen(false);
       toast({
-        variant: "success",
-        title: "Success",
-        description: "Question created successfully",
+        variant: 'success',
+        title: 'Success',
+        description: 'Question created successfully',
       });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error: any) => {
       toast({
-        variant: "error",
-        title: "Error",
+        variant: 'error',
+        title: 'Error',
         description: error.message,
       });
     },
