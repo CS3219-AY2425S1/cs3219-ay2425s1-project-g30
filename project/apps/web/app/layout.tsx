@@ -9,6 +9,9 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/store/AuthStore";
 
 import "./globals.css";
+import Topbar from "@/components/Topbar";
+import Sidebar from "@/components/Sidebar";
+import { usePathname } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,8 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const fetchUser = useAuthStore.use.fetchUser();
+  const pathname = usePathname();
+
+  const excludePaths = ["/auth"];
   
-  // Fetch user data on initial render, ensures logged in user data is available
+// Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
     const initializeUser = async () => {
       try {
@@ -39,12 +45,22 @@ export default function RootLayout({
     };
     initializeUser();
   }, [fetchUser]);
+
+  const renderSidebarAndTopbar = !excludePaths.includes(pathname);
   
   return (
     <html lang="en" className={inter.className}>
       <body className={roboto.className}>
         <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <div className="flex h-screen overflow-hidden">
+              {renderSidebarAndTopbar && <Topbar />}
+              {renderSidebarAndTopbar && <Sidebar />}
+              <main className={`flex-1 ${renderSidebarAndTopbar ? 'ml-20 mt-16 p-4' : ''} overflow-auto`}>
+                {children}
+              </main>
+            </div>
+          </ReactQueryProvider>
           <Toaster />
         </Suspense>
       </body>
