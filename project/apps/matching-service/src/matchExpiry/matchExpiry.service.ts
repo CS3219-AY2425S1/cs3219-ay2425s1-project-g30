@@ -1,18 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { MatchRedis } from 'src/db/match.redis';
 
 @Injectable()
 export class MatchExpiryService {
+  private readonly logger = new Logger(MatchExpiryService.name);
   constructor(private readonly matchRedis: MatchRedis) {}
 
-  async handleExpiryMessage(_expiryMessage: any) {
+  async handleExpiryMessage(_expiredMatchId: string) {
     // Perform some sort of message handling
-    const {userId } = _expiryMessage;
-
-    const exists = await this.matchRedis.matchRequestExists(userId);
-    if (exists) {
-      // remove from redis
-      await this.matchRedis.removeMatchRequest(userId);
+    const exists = await this.matchRedis.removeMatchRequest(_expiredMatchId);
+    if (!exists) {
+      this.logger.error(`Match request with id ${_expiredMatchId} does not exist`);
     }
   }
 }

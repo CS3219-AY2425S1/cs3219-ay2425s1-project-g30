@@ -15,8 +15,8 @@ import { MatchEngineService } from './matchEngine/matchEngine.service';
 import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
 import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
 import { MatchingController } from './matching.controller';
-import { MatchingGateway } from './matching.gateway';
 import { MatchRequestService } from './matchRequest/matchRequest.service';
+import { MatchingGateway } from './matching.gateway';
 @Module({
   imports: [
     ConfigModule.forRoot({

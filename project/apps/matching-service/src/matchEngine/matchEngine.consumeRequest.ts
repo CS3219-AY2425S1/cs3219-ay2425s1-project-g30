@@ -35,7 +35,7 @@ export class MatchEngineConsumer implements OnModuleInit {
               channel.nack(message);
             }
           }
-        });
+        }, {exclusive: true}); // Enforcing this to justify the absence of lock in finding a match
       });
       this.logger.log('Consumer service started and listening for messages.');
     } catch (err) {
