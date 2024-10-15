@@ -1,23 +1,16 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CATEGORY, COMPLEXITY } from '@repo/dtos/generated/enums/questions.enums';
 import { CriteriaDto, MatchRequestDto } from '@repo/dtos/match';
-import { Cache } from 'cache-manager';
-import {
-  MATCH_WAITING_KEY,
-  SOCKET_USER_KEY,
-  USER_SOCKET_KEY,
-  MATCH_CATEGORY, MATCH_GLOBAL, MATCH_REQUEST
-} from 'src/constants/redis';
 import Redis from 'ioredis';
+import { MATCH_CATEGORY, MATCH_GLOBAL, MATCH_REQUEST, MATCH_WAITING_KEY, SOCKET_USER_KEY, USER_SOCKET_KEY } from 'src/constants/redis';
+import { v4 as uuidv4 } from 'uuid';
 
 
 @Injectable()
 export class MatchRedis {
   private readonly logger = new Logger(MatchRedis.name);
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    @Inject('IoredisClient') private redisClient: Redis,
+    @Inject('REDIS_CLIENT') private redisClient: Redis,
   ) {}
 
   async setUserToSocket({
@@ -30,23 +23,23 @@ export class MatchRedis {
     const userSocketKey = `${USER_SOCKET_KEY}-${userId}`;
     const socketUserKey = `${SOCKET_USER_KEY}-${socketId}`;
     // Bidirectional mapping so we can remove easily when disconnecting
-    await this.cacheManager.set(userSocketKey, socketId);
-    await this.cacheManager.set(socketUserKey, userId);
+    //await this.cacheManager.set(userSocketKey, socketId);
+    //await this.cacheManager.set(socketUserKey, userId);
   }
 
   async removeUserBySocketId(socketId: string) {
     const socketUserKey = `${SOCKET_USER_KEY}-${socketId}`;
-    const userId = await this.cacheManager.get(socketUserKey);
+    //const userId = await this.cacheManager.get(socketUserKey);
     if (userId) {
       const userSocketKey = `${USER_SOCKET_KEY}-${userId}`;
-      await this.cacheManager.del(userSocketKey);
+      //await this.cacheManager.del(userSocketKey);
     }
-    await this.cacheManager.del(socketUserKey);
+    //await this.cacheManager.del(socketUserKey);
   }
 
   async getSocketByUserId(userId: string) {
     const userSocketKey = `${USER_SOCKET_KEY}-${userId}`;
-    return await this.cacheManager.get<string>(userSocketKey);
+    //return await this.cacheManager.get<string>(userSocketKey);
   }
 
   async addMatchRequest(matchRequest: MatchRequestDto): Promise<string | null> {
