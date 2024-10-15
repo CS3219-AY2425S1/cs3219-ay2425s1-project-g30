@@ -14,7 +14,7 @@ export class MatchExpiryConsumer implements OnModuleInit {
     private readonly matchExpiryService: MatchExpiryService,
   ) {
     const connection_url =
-      configService.get<string>('RABBITMQ_URL') || 'amqp://localhost:5672';
+    configService.get<string>('RABBITMQ_URL') || 'amqp://localhost:5672';
     const connection = amqp.connect([connection_url]);
     this.channelWrapper = connection.createChannel();
   }

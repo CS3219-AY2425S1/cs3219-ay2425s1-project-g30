@@ -10,17 +10,15 @@ import { MatchEngineConsumer } from './matchEngine/matchEngine.consumeRequest';
 import { MatchEngineService } from './matchEngine/matchEngine.service';
 import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
 import { MatchRequestService } from './matchRequest/matchRequest.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { RedisOptions } from './redis/redis.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MatchingGateway } from './matching.gateway';
+import { RedisClientProvider } from './redis/redis.provider';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    CacheModule.registerAsync(RedisOptions),
     ClientsModule.register([
       {
         name: 'QUESTION_SERVICE',
@@ -58,6 +56,8 @@ import { MatchingGateway } from './matching.gateway';
     MatchExpiryService,
     MatchRequestService,
     MatchingGateway,
+    RedisClientProvider
   ],
+  exports: ['REDIS_CLIENT'],
 })
 export class MatchingModule {}
