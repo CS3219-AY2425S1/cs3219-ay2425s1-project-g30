@@ -1,4 +1,3 @@
-import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -16,7 +15,7 @@ import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
 import { MatchingController } from './matching.controller';
 import { MatchRequestService } from './matchRequest/matchRequest.service';
 import { MatchingGateway } from './matching.gateway';
-import { RedisClientProvider } from './redis/redis.provider';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -35,7 +34,7 @@ import { RedisClientProvider } from './redis/redis.provider';
       },
     }),
     EnvModule,
-    CacheModule.registerAsync(RedisOptions),
+    RedisModule,
     ClientsModule.registerAsync([
       {
         imports: [EnvModule],
@@ -80,9 +79,8 @@ import { RedisClientProvider } from './redis/redis.provider';
     MatchExpiryConsumer,
     MatchExpiryService,
     MatchRequestService,
-    MatchingGateway,
-    RedisClientProvider
+    MatchingGateway
   ],
-  exports: ['REDIS_CLIENT'],
+  exports: [],
 })
 export class MatchingModule {}
