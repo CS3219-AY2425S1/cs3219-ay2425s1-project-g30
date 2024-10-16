@@ -17,7 +17,7 @@ import { envSchema } from './config/env';
         if (!parsedEnv.success) {
           console.error(
             '❌ Invalid environment variables:',
-            parsedEnv.error.format(),
+            parsedEnv.error.flatten().fieldErrors,
           );
           throw new Error('Invalid environment variables');
         }
