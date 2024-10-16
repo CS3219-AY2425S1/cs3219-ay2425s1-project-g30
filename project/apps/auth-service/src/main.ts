@@ -19,17 +19,18 @@ async function bootstrap() {
   const AUTH_SERVICE_HOST = configService.get<string>('AUTH_SERVICE_HOST');
   appContext.close();
 
+  const host = NODE_ENV === 'development' ? 'localhost' : AUTH_SERVICE_HOST;
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AuthModule,
     {
       transport: Transport.TCP,
       options: {
-        host: NODE_ENV === 'development' ? 'localhost' : AUTH_SERVICE_HOST,
+        host: host,
         port: 3003,
       },
     },
   );
   await app.listen();
-  console.log(`Auth Service is listening on ${AUTH_SERVICE_HOST}:3003`);
+  console.log(`Auth Service is listening on ${host}:3003`);
 }
 bootstrap();

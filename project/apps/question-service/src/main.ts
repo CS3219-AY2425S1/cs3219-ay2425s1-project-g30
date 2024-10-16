@@ -21,17 +21,18 @@ async function bootstrap() {
   );
   appContext.close();
 
+  const host = NODE_ENV === 'development' ? 'localhost' : QUESTION_SERVICE_HOST;
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     QuestionsModule,
     {
       transport: Transport.TCP,
       options: {
-        host: NODE_ENV === 'development' ? 'localhost' : QUESTION_SERVICE_HOST,
+        host: host,
         port: 3001,
       },
     },
   );
   await app.listen();
-  console.log(`Question Service is listening on ${QUESTION_SERVICE_HOST}:3001`);
+  console.log(`Question Service is listening on ${host}:3001`);
 }
 bootstrap();
