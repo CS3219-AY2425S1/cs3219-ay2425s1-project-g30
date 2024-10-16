@@ -27,6 +27,12 @@ export const matchRequestSchema = criteriaSchema.extend({
   timestamp: z.number().int(),
 });
 
+export const matchCancelSchema = z.object({
+  match_req_id: z.string().uuid(),
+  user_id: z.string().uuid(),
+});
+
 export type CriteriaDto = z.infer<typeof criteriaSchema>;
 export type MatchDataDto = z.infer<typeof matchDataSchema>;
 export type MatchRequestDto = z.infer<typeof matchRequestSchema>;
+export type MatchCancelDto = z.infer<typeof matchCancelSchema>;
