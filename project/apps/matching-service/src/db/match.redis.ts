@@ -3,7 +3,16 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CATEGORY, COMPLEXITY } from '@repo/dtos/generated/enums/questions.enums';
 import { CriteriaDto, MatchRequestDto } from '@repo/dtos/match';
 import Redis from 'ioredis';
-import { MATCH_CATEGORY, MATCH_GLOBAL, MATCH_REQUEST, MATCH_WAITING_KEY, REDIS_CLIENT, SOCKET_USER_KEY, USER_SOCKET_KEY } from 'src/constants/redis';
+import {
+  MATCH_CANCELLED_KEY,
+  MATCH_CATEGORY,
+  MATCH_GLOBAL,
+  MATCH_REQUEST,
+  MATCH_WAITING_KEY,
+  REDIS_CLIENT,
+  SOCKET_USER_KEY,
+  USER_SOCKET_KEY,
+} from 'src/constants/redis';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -145,7 +154,12 @@ export class MatchRedis {
       if (!matchId) return null;
   
       const matchRequest = await this.getMatchRequest(matchId);
-      if (matchRequest) {
+
+      // Also need to check if the matchId is in the cancelled list
+      const cancelledKey = `${MATCH_CANCELLED_KEY}-${matchId}`;
+      const isCancelled = await this.redisClient.zscore(cancelledKey, matchId);
+
+      if (matchRequest && !isCancelled) {
         return { matchId, matchRequest };
       }
       return null;
@@ -165,5 +179,21 @@ export class MatchRedis {
     await this.removeMatchRequest(oldestMatch.matchId);
 
     return { userId: oldestMatch.matchRequest.userId, matchId: oldestMatch.matchId };
+  }
+
+  async addToCancelledMatchList(matchId: string) {
+    try {
+      const key = `${MATCH_CANCELLED_KEY}-${matchId}`;
+      const timestamp = Date.now();
+
+      await this.redisClient.zadd(key, timestamp, matchId);
+
+      // we can be certain that a matchId would have either been matched or expired within 1 hour
+      await this.redisClient.expire(key, 60 * 60); // 1 hour
+
+      this.logger.log(`Match ${matchId} added to cancelled list`);
+    } catch (error) {
+      this.logger.error(`Error adding match to cancelled list: ${error}`);
+    }
   }
 }

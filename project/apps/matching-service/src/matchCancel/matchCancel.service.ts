@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { MatchCancelDto } from '@repo/dtos/match';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
 
@@ -9,7 +10,7 @@ export class MatchCancelService {
     private readonly matchSupabase: MatchSupabase,
   ) {}
 
-  cancelMatchRequest(_matchData: any) {
-    // Perform match cancellation
+  async cancelMatchRequest(matchCancel: MatchCancelDto) {
+    this.matchRedis.addToCancelledMatchList(matchCancel.match_req_id);
   }
 }
