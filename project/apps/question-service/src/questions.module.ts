@@ -5,11 +5,23 @@ import { QuestionsController } from 'src/adapters/controllers/questions.controll
 import { QuestionsService } from 'src/domain/ports/questions.service';
 import { QuestionsRepository } from 'src/domain/ports/questions.repository';
 import { SupabaseQuestionsRepository } from 'src/adapters/db/questions.supabase';
+import { envSchema } from './config/env';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: (config) => {
+        const parsedEnv = envSchema.safeParse(config);
+        if (!parsedEnv.success) {
+          console.error(
+            '❌ Invalid environment variables:',
+            parsedEnv.error.format(),
+          );
+          throw new Error('Invalid environment variables');
+        }
+        return parsedEnv.data;
+      },
     }),
   ],
   controllers: [QuestionsController],
