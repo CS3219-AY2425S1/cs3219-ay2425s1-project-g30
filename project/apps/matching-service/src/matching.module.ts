@@ -14,11 +14,12 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './constants/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MatchingGateway } from './matching.gateway';
-
+import { envSchema } from './config/env';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: envSchema.parse,
     }),
     CacheModule.registerAsync(RedisOptions),
     ClientsModule.register([
