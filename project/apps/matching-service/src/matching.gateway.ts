@@ -111,4 +111,19 @@ export class MatchingGateway
       });
     }
   }
+
+  async sendMatchRequestExpired({
+    userId,
+    message,
+  }: {
+    userId: string;
+    message: string;
+  }) {
+    const socketId = await this.matchRedis.getSocketByUserId(userId);
+    this.sendMessageToClient({
+      socketId,
+      message,
+      event: MatchEvent.MATCH_REQUEST_EXPIRED,
+    });
+  }
 }

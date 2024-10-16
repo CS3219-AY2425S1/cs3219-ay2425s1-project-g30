@@ -103,7 +103,7 @@ export class MatchRedis {
     }
   }
 
-  async removeMatchRequest(matchId: string) : Promise<string | null> {
+  async removeMatchRequest(matchId: string) : Promise<MatchRequestDto | null> {
     this.logger.log(`Removing Match Request: ${matchId}`);
     const hashKey = `${MATCH_REQUEST}-${matchId}`;
     const matchRequest = await this.getMatchRequest(matchId);
@@ -120,7 +120,7 @@ export class MatchRedis {
 
     try {
       await pipeline.exec();
-      return matchId;
+      return matchRequest;
     } catch (error) {
       this.logger.error(`Error removing match request: ${error}`);
       return null;

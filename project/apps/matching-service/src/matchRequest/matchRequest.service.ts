@@ -24,7 +24,7 @@ export class MatchRequestService {
    * @param matchData Data related to the match request.
    */
   async enqueueMatchRequest(matchReq: MatchRequestMsgDto) {
-    this.logger.log(`Enqueuing match request: ${JSON.stringify(matchReq)}`);
+    this.logger.debug(`Enqueuing match request: ${JSON.stringify(matchReq)}`);
     await this.channelWrapper.sendToQueue(
       MATCH_QUEUE,
       JSON.stringify(matchReq)).then(() => {
