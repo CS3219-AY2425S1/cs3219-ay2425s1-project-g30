@@ -38,6 +38,7 @@ export class MatchExpiryConsumer implements OnModuleInit {
   }
 
   consumeMessage(matchId: string) {
+    matchId = matchId.replace(/^"(.*)"$/, '$1');
     this.logger.log('Received expiry message for match ID:', matchId);
     // pass message to service
     this.matchExpiryService.handleExpiryMessage(matchId);
