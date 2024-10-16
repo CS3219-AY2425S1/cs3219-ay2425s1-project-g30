@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MatchRequestService } from 'src/matchRequest/matchRequest.service';
 import { MatchCancelService } from './matchCancel/matchCancel.service';
-import { MatchRequestDto } from '@repo/dtos/match';
+import { MatchCancelDto, MatchRequestDto } from '@repo/dtos/match';
 
 @Controller()
 export class MatchingController {
@@ -17,7 +17,7 @@ export class MatchingController {
   }
 
   @MessagePattern({ cmd: 'cancel_match' })
-  async cancelMatch(@Payload() matchData: any) {
-    return await this.matchCancelService.cancelMatchRequest(matchData);
+  async cancelMatch(@Payload() matchCancel: MatchCancelDto) {
+    return await this.matchCancelService.cancelMatchRequest(matchCancel);
   }
 }
