@@ -6,7 +6,6 @@ import Redis from 'ioredis';
 import {
   MATCH_CANCELLED_KEY,
   MATCH_CATEGORY,
-  MATCH_GLOBAL,
   MATCH_REQUEST,
   MATCH_WAITING_KEY,
   REDIS_CLIENT,
@@ -86,9 +85,10 @@ export class MatchRedis {
   }
   async getMatchRequest(matchId: string): Promise<MatchRequestDto | null> {
     const hashKey = `${MATCH_REQUEST}-${matchId}`;
+    this.logger.debug(`Hash key: ${hashKey}`);
     try {
       const data = await this.redisClient.hgetall(hashKey);
-
+      this.logger.log(data);
       if (!data || Object.keys(data).length === 0) return null;
 
       return {
@@ -104,10 +104,10 @@ export class MatchRedis {
   }
 
   async removeMatchRequest(matchId: string) : Promise<string | null> {
+    this.logger.log(`Removing Match Request: ${matchId}`);
     const hashKey = `${MATCH_REQUEST}-${matchId}`;
     const matchRequest = await this.getMatchRequest(matchId);
     if (!matchRequest) return null;
-
     const { category, complexity } = matchRequest;
     const pipeline = this.redisClient.multi();
 

@@ -18,7 +18,7 @@ export const criteriaSchema = z.object({
 export const matchDataSchema = criteriaSchema.extend({
   user1_id: z.string().uuid(),
   user2_id: z.string().uuid(),
-  match_id: z.string().uuid(),
+  id: z.string().uuid(),
   question_id: z.string().uuid(),
 });
 

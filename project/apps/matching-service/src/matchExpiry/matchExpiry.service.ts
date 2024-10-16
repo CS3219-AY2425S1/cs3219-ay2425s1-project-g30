@@ -10,7 +10,7 @@ export class MatchExpiryService {
     // Perform some sort of message handling
     const exists = await this.matchRedis.removeMatchRequest(_expiredMatchId);
     if (!exists) {
-      this.logger.error(`Match request with id ${_expiredMatchId} does not exist`);
+      this.logger.warn(`Match request with id ${_expiredMatchId} does not exist`);
     }
     // Send notification to user about expiry of matchid
   }
