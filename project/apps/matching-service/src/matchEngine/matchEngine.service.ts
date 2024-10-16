@@ -37,6 +37,12 @@ export class MatchEngineService {
       const selectedCollection = await firstValueFrom(
         this.questionServiceClient.send<QuestionCollectionDto>({ cmd: 'get_questions' }, filters)
       );
+      
+      if (!selectedCollection || !selectedCollection.questions) {
+        this.logger.error(`Match Failed. No questions found for category ${category} and complexity ${complexity}`);
+        return;
+      } 
+
       // Choosing by random because get_questions will return collection in same sequence
       const ind: number =
       Math.floor(Math.random() * selectedCollection.questions.length);
