@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MatchingController } from './matching.controller';
 import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
 import { MatchExpiryProducer } from './matchEngine/matchEngine.produceExpiry';
@@ -19,31 +19,49 @@ import { envSchema } from './config/env';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validate: envSchema.parse,
+      validate: (config) => {
+        const parsedEnv = envSchema.safeParse(config);
+        if (!parsedEnv.success) {
+          console.error(
+            '❌ Invalid environment variables:',
+            parsedEnv.error.format(),
+          );
+          throw new Error('Invalid environment variables');
+        }
+        return parsedEnv.data;
+      },
     }),
     CacheModule.registerAsync(RedisOptions),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
+        imports: [ConfigModule],
         name: 'QUESTION_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host:
-            process.env.NODE_ENV === 'development'
-              ? 'localhost'
-              : process.env.QUESTION_SERVICE_HOST || 'localhost',
-          port: 3001,
-        },
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              configService.get<string>('NODE_ENV') === 'development'
+                ? 'localhost'
+                : configService.get<string>('QUESTION_SERVICE_HOST'),
+            port: 3001,
+          },
+        }),
+        inject: [ConfigService],
       },
       {
+        imports: [ConfigModule],
         name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host:
-            process.env.NODE_ENV === 'development'
-              ? 'localhost'
-              : process.env.AUTH_SERVICE_HOST || 'localhost',
-          port: 3003,
-        },
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              configService.get<string>('NODE_ENV') === 'development'
+                ? 'localhost'
+                : configService.get<string>('AUTH_SERVICE_HOST'),
+            port: 3003,
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],
