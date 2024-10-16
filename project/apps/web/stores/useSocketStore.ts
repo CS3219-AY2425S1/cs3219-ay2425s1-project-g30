@@ -1,8 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import { create } from 'zustand';
 
-const SOCKET_SERVER_URL =
-  process.env.NEXT_PUBLIC_MATCH_SOCKET_URL || 'http://localhost:8080';
+import { env } from '@/env.mjs';
+
+const SOCKET_SERVER_URL = env.NEXT_PUBLIC_MATCH_SOCKET_URL;
 
 interface SocketState {
   socket: Socket | null;

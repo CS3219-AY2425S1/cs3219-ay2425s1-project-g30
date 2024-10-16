@@ -8,8 +8,8 @@ export const RedisOptions: CacheModuleAsyncOptions = {
   useFactory: async (configService: ConfigService) => {
     const store = await redisStore({
       socket: {
-        host: configService.get<string>('REDIS_HOST') || 'localhost',
-        port: parseInt(configService.get<string>('REDIS_PORT')!) || 6379,
+        host: configService.get<string>('REDIS_HOST'),
+        port: configService.get<number>('REDIS_PORT'),
       },
     });
     return {
