@@ -22,8 +22,12 @@ export const matchDataSchema = criteriaSchema.extend({
   question_id: z.string().uuid(),
 });
 
-export const matchRequestSchema = criteriaSchema.extend({
+
+export const matchRequestMsgSchema = criteriaSchema.extend({
   userId: z.string().uuid(),
+});
+
+export const matchRequestSchema = matchRequestMsgSchema.extend({
   timestamp: z.number().int(),
 });
 
@@ -36,3 +40,4 @@ export type CriteriaDto = z.infer<typeof criteriaSchema>;
 export type MatchDataDto = z.infer<typeof matchDataSchema>;
 export type MatchRequestDto = z.infer<typeof matchRequestSchema>;
 export type MatchCancelDto = z.infer<typeof matchCancelSchema>;
+export type MatchRequestMsgDto = z.infer<typeof matchRequestMsgSchema>;

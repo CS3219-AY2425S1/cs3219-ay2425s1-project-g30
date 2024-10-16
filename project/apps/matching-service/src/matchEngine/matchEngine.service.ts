@@ -3,7 +3,7 @@ import { MatchExpiryProducer } from './matchEngine.produceExpiry';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
 import { MatchingGateway } from 'src/matching.gateway';
-import { MatchDataDto, MatchRequestDto } from '@repo/dtos/match';
+import { MatchDataDto, MatchRequestDto, MatchRequestMsgDto } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchEngineService {
@@ -14,7 +14,7 @@ export class MatchEngineService {
     private readonly matchGateway: MatchingGateway,
   ) {}
 
-  async generateMatch(matchRequest: MatchRequestDto) {
+  async generateMatch(matchRequest: MatchRequestMsgDto) {
     const {userId, category, complexity} = matchRequest;
 
     const matchedUser = await this.matchRedis.findPotentialMatch({category, complexity});
