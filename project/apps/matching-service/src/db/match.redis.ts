@@ -1,7 +1,7 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CATEGORY, COMPLEXITY } from '@repo/dtos/generated/enums/questions.enums';
-import { CriteriaDto, MatchRequestDto } from '@repo/dtos/match';
+import { CriteriaDto, MatchRequestDto, MatchRequestMsgDto } from '@repo/dtos/match';
 import Redis from 'ioredis';
 import {
   MATCH_CANCELLED_KEY,
@@ -53,15 +53,13 @@ export class MatchRedis {
     return await this.cacheManager.get(userSocketKey);
   }
 
-  async addMatchRequest(matchRequest: MatchRequestDto): Promise<string | null> {
+  async addMatchRequest(matchRequest: MatchRequestMsgDto): Promise<string | null> {
     const matchId : string = uuidv4();
     const { category, complexity } = matchRequest;
     const timestamp = Date.now();
     
     // Store match requst details to redis in a hash
     const hashKey = `${MATCH_REQUEST}-${matchId}`;
-    const globalSortedSetKey = `${MATCH_GLOBAL}`; // This one is for getting oldest requests across all categories
-
     const pipeline = this.redisClient.multi();
 
     pipeline.hset(hashKey, {
@@ -70,8 +68,6 @@ export class MatchRedis {
       category: JSON.stringify(category),
       timestamp: timestamp.toString(),
     });
-
-    pipeline.zadd(globalSortedSetKey, timestamp, matchId);
 
     // Add matchId to the sorted set for each category
     for (const cat of category) {

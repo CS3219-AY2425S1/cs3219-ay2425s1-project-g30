@@ -57,10 +57,9 @@ import { MatchingController } from './matching/matching.controller';
         name: 'MATCHING_SERVICE',
         transport: Transport.TCP,
         options: {
-          host:
-            process.env.NODE_ENV === 'development'
-              ? 'localhost'
-              : process.env.MATCHING_SERVICE_HOST || 'localhost',
+          host: process.env.NODE_ENV === 'development'
+          ? 'localhost'
+          : process.env.MATCHING_SERVICE_HOST || 'localhost',
           port: 3004,
         },
       },

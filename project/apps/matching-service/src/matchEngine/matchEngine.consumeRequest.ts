@@ -4,7 +4,7 @@ import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
 import { MatchEngineService } from './matchEngine.service';
-import { MatchRequestDto, matchRequestSchema } from '@repo/dtos/match';
+import { MatchRequestDto, MatchRequestMsgDto, matchRequestMsgSchema, matchRequestSchema } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchEngineConsumer implements OnModuleInit {
@@ -28,7 +28,7 @@ export class MatchEngineConsumer implements OnModuleInit {
           if (message) {
             try {
               const content = JSON.parse(message.content.toString());
-              const matchRequest: MatchRequestDto = matchRequestSchema.parse(content);
+              const matchRequest: MatchRequestMsgDto = matchRequestMsgSchema.parse(content);
               await this.consumeMessage(matchRequest);
               channel.ack(message);
             } catch (err) {
@@ -44,7 +44,7 @@ export class MatchEngineConsumer implements OnModuleInit {
     }
   }
 
-  public async consumeMessage(content: MatchRequestDto) {
+  public async consumeMessage(content: MatchRequestMsgDto) {
     this.logger.log('Processing Match Request:', content);
     this.matchEngineService.generateMatch(content);
   }
