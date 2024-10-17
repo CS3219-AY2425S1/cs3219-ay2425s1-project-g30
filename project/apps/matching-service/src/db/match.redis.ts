@@ -52,6 +52,13 @@ export class MatchRedis {
     return await this.cacheManager.get(userSocketKey);
   }
 
+  /**
+   * Adds a match request to redis. The match request is stored in a hash with the matchId as the key.
+   * The matchId is also added to the sorted set for each selected category in the match request.
+   * @param matchRequest The match request to add to redis
+   * @returns 
+   */
+
   async addMatchRequest(matchRequest: MatchRequestMsgDto): Promise<string | null> {
     const matchId : string = uuidv4();
     const { category, complexity } = matchRequest;
@@ -83,6 +90,12 @@ export class MatchRedis {
 
     return matchId;
   }
+
+  /**
+   * Fetches a match request from redis 
+   * @param matchId The matchId to fetch
+   * @returns The match request if found, otherwise null
+   */
   async getMatchRequest(matchId: string): Promise<MatchRequestDto | null> {
     const hashKey = `${MATCH_REQUEST}-${matchId}`;
     this.logger.debug(`Hash key: ${hashKey}`);
@@ -102,7 +115,13 @@ export class MatchRedis {
       return null;
     }
   }
-
+  
+  /**
+   * Removes a match request from redis that includes its match request hash key and 
+   * all the associated matchId in the respective sorted set(s)
+   * @param matchId The matchId to remove
+   * @returns 
+   */
   async removeMatchRequest(matchId: string) : Promise<MatchRequestDto | null> {
     this.logger.log(`Removing Match Request: ${matchId}`);
     const hashKey = `${MATCH_REQUEST}-${matchId}`;
@@ -126,6 +145,12 @@ export class MatchRedis {
       return null;
     }
   }
+
+  /**
+   * Finds a potential match in redis based on one of the selected categories and complexity
+   * @param criteria Match requester's selected categories and complexity
+   * @returns The userId and matchId of the potential match if found, otherwise null
+   */
 
   async findPotentialMatch(criteria: CriteriaDto): Promise<{ userId: string; matchId: string } | null> {
     const { category, complexity } = criteria;
@@ -176,6 +201,11 @@ export class MatchRedis {
 
     return { userId: oldestMatch.matchRequest.userId, matchId: oldestMatch.matchId };
   }
+
+  /**
+   * Adds a matchId to the cancelled list in redis
+   * @param matchId The matchId to add to the cancelled list
+   */
 
   async addToCancelledMatchList(matchId: string) {
     try {
