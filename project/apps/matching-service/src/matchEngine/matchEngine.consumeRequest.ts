@@ -4,7 +4,7 @@ import { ConfirmChannel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
 import { EnvService } from 'src/env/env.service';
 import { MatchEngineService } from './matchEngine.service';
-import { MatchRequestDto, MatchRequestMsgDto, matchRequestMsgSchema, matchRequestSchema } from '@repo/dtos/match';
+import { MatchRequestMsgDto, matchRequestMsgSchema } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchEngineConsumer implements OnModuleInit {
