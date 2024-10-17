@@ -2,6 +2,7 @@ import { Session } from "@supabase/auth-js";
 import { z } from "zod";
 import { Tables } from "./generated/types/auth.types";
 import { collectionMetadataSchema } from "./metadata";
+import { passwordSchema } from "./auth";
 
 export type UserDataDto = Tables<"profiles">;
 
@@ -35,9 +36,27 @@ export const updateUserSchema = z.object({
   id: z.string().uuid(),
   email: z.string().optional(),
   username: z.string().optional(),
-  password: z.string().optional(),
 });
+
+export const changePasswordSchema = z
+  .object({
+    id: z.string().uuid(),
+    oldPassword: passwordSchema,
+    newPassword: passwordSchema,
+    confirmNewPassword: passwordSchema,
+  })
+  .required()
+  .superRefine(({ confirmNewPassword, newPassword }, ctx) => {
+    if (confirmNewPassword !== newPassword) {
+      ctx.addIssue({
+        code: "custom",
+        message: "The passwords did not match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
 
 export type UserCollectionDto = z.infer<typeof userCollectionSchema>;
 export type UserFiltersDto = z.infer<typeof userFiltersSchema>;
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;
+export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;

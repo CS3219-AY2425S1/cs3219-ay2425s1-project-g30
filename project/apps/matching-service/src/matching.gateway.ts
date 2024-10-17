@@ -48,7 +48,7 @@ export class MatchingGateway
     const cookies = parse(cookie);
     const accessToken = cookies['access_token'];
     // Disconnect client if no token provided
-    if (! accessToken) {
+    if (!accessToken) {
       client.disconnect();
       return;
     }

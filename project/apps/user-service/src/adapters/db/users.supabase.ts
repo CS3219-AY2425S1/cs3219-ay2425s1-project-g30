@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
 import {
+  ChangePasswordDto,
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
@@ -13,6 +14,8 @@ import { UsersRepository } from 'src/domain/ports/users.repository';
 
 @Injectable()
 export class SupabaseUsersRepository implements UsersRepository {
+  private supabaseUrl: string;
+  private supabaseKey: string;
   private supabase: SupabaseClient;
 
   private readonly PROFILES_TABLE = 'profiles';
@@ -25,7 +28,21 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw new Error('Supabase URL and key must be provided');
     }
 
+    this.supabaseUrl = supabaseUrl;
+    this.supabaseKey = supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
+  }
+
+  // To pass the access token for authenticated requests
+  private getSupabaseClientWithToken(accessToken: string) {
+    const supabase = createClient(this.supabaseUrl, this.supabaseKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
+    return supabase;
   }
 
   async findAll(filters: UserFiltersDto): Promise<UserCollectionDto> {
@@ -94,18 +111,18 @@ export class SupabaseUsersRepository implements UsersRepository {
     return data;
   }
 
-  async updateById(userDetails: UpdateUserDto): Promise<UserDataDto> {
-    const {
-      id,
-      email: newEmail,
-      username: newUsername,
-      password: newPassword,
-    } = userDetails;
+  async updateById(body: {
+    updateUserDto: UpdateUserDto;
+    accessToken: string;
+  }): Promise<UserDataDto> {
+    const { id, email: newEmail, username: newUsername } = body.updateUserDto;
 
-    // Update user email and/or password in auth table
-    const { error: authError } = await this.supabase.auth.updateUser({
+    // Use Supabase client with access token
+    const supabase = this.getSupabaseClientWithToken(body.accessToken);
+
+    // Update user details in auth table
+    const { error: authError } = await supabase.auth.updateUser({
       email: newEmail,
-      password: newPassword,
       data: { username: newUsername },
     });
 
@@ -114,14 +131,6 @@ export class SupabaseUsersRepository implements UsersRepository {
     }
 
     // Update user details in profiles table
-    const updateData: any = {};
-    if (newEmail) {
-      updateData.email = newEmail;
-    }
-    if (newUsername) {
-      updateData.username = newUsername;
-    }
-
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .update({
@@ -169,6 +178,27 @@ export class SupabaseUsersRepository implements UsersRepository {
     console.error(data);
 
     return data;
+  }
+
+  async changePasswordById(body: {
+    changePasswordDto: ChangePasswordDto;
+    accessToken: string;
+  }): Promise<UserDataDto> {
+    const user = await this.findById(body.changePasswordDto.id);
+
+    // Use Supabase client with access token
+    const supabase = this.getSupabaseClientWithToken(body.accessToken);
+
+    // Update user details in auth table
+    const { error: authError } = await supabase.auth.updateUser({
+      password: body.changePasswordDto.newPassword,
+    });
+
+    if (authError) {
+      throw authError;
+    }
+
+    return user;
   }
 
   async deleteById(id: string): Promise<UserDataDto> {

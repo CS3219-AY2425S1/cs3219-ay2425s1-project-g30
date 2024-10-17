@@ -1,4 +1,5 @@
 import {
+  ChangePasswordDto,
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
@@ -29,7 +30,10 @@ export abstract class UsersRepository {
    * @param data - The updated data for the user.
    * @returns A promise that resolves to the updated UserDataDto object.
    */
-  abstract updateById(data: UpdateUserDto): Promise<UserDataDto>;
+  abstract updateById(body: {
+    updateUserDto: UpdateUserDto;
+    accessToken: string;
+  }): Promise<UserDataDto>;
 
   /**
    * Updates an existing user's privilege by their unique identifier.
@@ -37,6 +41,16 @@ export abstract class UsersRepository {
    * @returns A promise that resolves to a UserDataDto object.
    */
   abstract updatePrivilegeById(id: string): Promise<UserDataDto>;
+
+  /**
+   * Changes the password for a user by their unique identifier.
+   * @param data - The data required to change the user's password.
+   * @returns A promise that resolves to the updated UserDataDto object.
+   */
+  abstract changePasswordById(body: {
+    changePasswordDto: ChangePasswordDto;
+    accessToken: string;
+  }): Promise<UserDataDto>;
 
   /**
    * Deletes an existing by its unique identifier.
