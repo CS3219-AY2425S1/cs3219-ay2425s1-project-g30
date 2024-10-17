@@ -20,6 +20,14 @@ export class MatchEngineService {
     private readonly matchSupabase: MatchSupabase,
     private readonly matchGateway: MatchingGateway,
   ) {}
+  
+  /**
+   * Generates a match for the user based on the match request.
+   * If a match is found, the match data is saved to the database.
+   * If no match is found, the match request is added to the matching queue with an expiry time.
+   * @param matchRequest MQ message containing user id, array of categories and complexity to match
+   * @returns 
+   */
 
   async generateMatch(matchRequest: MatchRequestMsgDto) {
     const {userId, category, complexity} = matchRequest;
