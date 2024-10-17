@@ -148,6 +148,10 @@ export class MatchRedis {
 
   /**
    * Finds a potential match in redis based on one of the selected categories and complexity
+   * 1. Fetches all the matching matchIds from the sorted set for each category
+   * 2. Checks if the matchId is in the cancelled list
+   * 3. Sort the list of potential matches by earliest timestamp and choose the oldest request
+   * 4. Removes the match request from redis
    * @param criteria Match requester's selected categories and complexity
    * @returns The userId and matchId of the potential match if found, otherwise null
    */

@@ -18,7 +18,6 @@ export class MatchRequestService {
       },
     });
   }
-
   /**
    * Enqueues a match request to the matching queue.
    * @param matchData Data related to the match request.
