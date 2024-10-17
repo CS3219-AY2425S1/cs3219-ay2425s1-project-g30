@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { MatchingController } from './matching.controller';
 import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
 import { MatchExpiryProducer } from './matchEngine/matchEngine.produceExpiry';
