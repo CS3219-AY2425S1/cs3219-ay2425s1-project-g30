@@ -12,12 +12,7 @@ export class MatchRequestService {
   constructor(private readonly configService: ConfigService) {
     const connection_url =
       configService.get<string>('RABBITMQ_URL') || 'amqp://localhost:5672';
-    const connection = amqp.connect([connection_url], {
-      connectionOptions:{
-        
-      }
-    }
-    );
+    const connection = amqp.connect([connection_url]);
     this.logger.log(`Connecting to RabbitMQ at ${connection_url}`);
     if (!connection) {
       throw new Error('Failed to connect to RabbitMQ');
@@ -28,7 +23,6 @@ export class MatchRequestService {
       },
     });
   }
-
   /**
    * Enqueues a match request to the matching queue.
    * @param matchData Data related to the match request.
