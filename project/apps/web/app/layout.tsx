@@ -58,7 +58,7 @@ export default function RootLayout({
               {renderSidebarAndTopbar && <Topbar />}
               {renderSidebarAndTopbar && <Sidebar />}
               <main
-                className={`flex-1 ${renderSidebarAndTopbar ? 'ml-20 mt-16 p-4' : ''} overflow-auto`}
+                className={`flex-1 ${renderSidebarAndTopbar ? 'ml-20 mt-16' : ''} overflow-auto`}
               >
                 {children}
               </main>

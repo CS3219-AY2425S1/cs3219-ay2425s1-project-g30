@@ -1,28 +1,17 @@
 'use client';
 
-import Link from 'next/link';
-
-import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/stores/useAuthStore';
+import CardWaterfall from '@/components/dashboard/CardWaterfall';
+import MatchingForm from '@/components/dashboard/MatchingForm';
 
 const Dashboard = () => {
-  const user = useAuthStore.use.user();
-
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center">
-        <div className="font-bold">Dashboard Page</div>
-        <div className="flex items-center space-x-2">
-          {!user && (
-            <Link href="/auth" passHref>
-              <Button className="mt-4">Log In</Button>
-            </Link>
-          )}
-          <Link href="/questions" passHref>
-            <Button className="mt-4">Go to Questions Repository</Button>
-          </Link>
-        </div>
+    <div className="container mx-auto flex justify-between h-full">
+      {/* Left Side Form */}
+      <div className="flex w-2/5 justify-center items-center mr-12">
+        <MatchingForm />
       </div>
+      {/* Right Side Card Waterfall */}
+      <CardWaterfall className="w-3/5" />
     </div>
   );
 };
