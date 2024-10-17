@@ -7,8 +7,10 @@ import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const Sidebar = () => {
+  const user = useAuthStore.use.user();
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -41,55 +43,62 @@ const Sidebar = () => {
       transition={{ duration: 0.2 }}
     >
       <nav className="flex flex-col space-y-2 m-2 overflow-hidden">
-        {navItems.map((item) => (
-          <motion.div
-            key={item.name}
-            className={cn(
-              'flex items-center justify-start py-2 px-2 rounded-md transition-all duration-300',
-              pathname === item.href ? 'bg-gray-100' : 'hover:bg-gray-100',
-            )}
-          >
-            <Link href={item.href} className="flex items-center w-full">
-              <div className="ml-1.5">{item.icon}</div>
-              <AnimatePresence>
-                {isHovered && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="ml-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    {item.name}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Link>
-          </motion.div>
-        ))}
+        {navItems.map((item) => {
+          // if (item.name == "Profile" && !user) {
+          //   return;
+          // }
+          return (
+            <motion.div
+              key={item.name}
+              className={cn(
+                'flex items-center justify-start py-2 px-2 rounded-md transition-all duration-300',
+                pathname === item.href ? 'bg-gray-100' : 'hover:bg-gray-100',
+              )}
+            >
+              <Link href={item.href} className="flex items-center w-full">
+                <div className="ml-1.5">{item.icon}</div>
+                <AnimatePresence>
+                  {isHovered && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="ml-3 text-sm font-medium whitespace-nowrap"
+                    >
+                      {item.name}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            </motion.div>
+          );
+        })}
       </nav>
 
-      <motion.div
-        onClick={handleLogout}
-        className="flex items-center justify-start mx-2 py-2 px-2 rounded-md cursor-pointer hover:bg-gray-100 transition-all duration-300"
-      >
-        <div className="ml-1.5">
-          <LogOut className="w-5 h-5" />
-        </div>
-        <AnimatePresence>
-          {isHovered && (
-            <motion.span
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.3 }}
-              className="ml-3 text-sm font-medium whitespace-nowrap"
-            >
-              Logout
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      {user && (
+        <motion.div
+          onClick={handleLogout}
+          className="flex items-center justify-start mx-2 py-2 px-2 rounded-md cursor-pointer hover:bg-gray-100 transition-all duration-300"
+        >
+          <div className="ml-1.5">
+            <LogOut className="w-5 h-5" />
+          </div>
+          <AnimatePresence>
+            {isHovered && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3 }}
+                className="ml-3 text-sm font-medium whitespace-nowrap"
+              >
+                Logout
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
     </motion.aside>
   );
 };
