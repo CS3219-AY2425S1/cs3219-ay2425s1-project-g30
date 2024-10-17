@@ -3,11 +3,11 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CATEGORY, COMPLEXITY } from '@repo/dtos/generated/enums/questions.enums';
 import { CriteriaDto, MatchRequestDto, MatchRequestMsgDto } from '@repo/dtos/match';
 import Redis from 'ioredis';
+import { MATCH_EXPIRY_TTL } from 'src/constants/queue';
 import {
   MATCH_CANCELLED_KEY,
   MATCH_CATEGORY,
   MATCH_REQUEST,
-  MATCH_WAITING_KEY,
   REDIS_CLIENT,
   SOCKET_USER_KEY,
   USER_SOCKET_KEY,
@@ -185,7 +185,7 @@ export class MatchRedis {
       await this.redisClient.zadd(key, timestamp, matchId);
 
       // we can be certain that a matchId would have either been matched or expired within 1 hour
-      await this.redisClient.expire(key, 60 * 60); // 1 hour
+      await this.redisClient.expire(key, MATCH_EXPIRY_TTL); // 1 hour
 
       this.logger.log(`Match ${matchId} added to cancelled list`);
     } catch (error) {
