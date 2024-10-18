@@ -1,19 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { MatchingModule } from './matching.module';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { EnvService } from './env/env.service';
-import { Module } from '@nestjs/common';
-
-@Module({
-  providers: [EnvService],
-  exports: [EnvService],
-})
-class BootstrapConfigModule {}
+import { MatchingModule } from './matching.module';
 
 async function bootstrap() {
-  const appContext = await NestFactory.createApplicationContext(
-    BootstrapConfigModule,
-  );
+  const appContext = await NestFactory.createApplicationContext(MatchingModule);
   const envService = appContext.get(EnvService);
   const NODE_ENV = envService.get('NODE_ENV');
   const MATCHING_SERVICE_HOST = envService.get('MATCHING_SERVICE_HOST');

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LoggerModule } from 'nestjs-pino';
-import { ConfigModule } from '@nestjs/config';
+import { AuthController } from './auth/auth.controller';
+import { envSchema } from './env/env';
+import { EnvModule } from './env/env.module';
 import { EnvService } from './env/env.service';
+import { MatchingController } from './matching/matching.controller';
 import { QuestionsController } from './questions/questions.controller';
 import { UsersController } from './users/users.controller';
-import { AuthController } from './auth/auth.controller';
-import { MatchingController } from './matching/matching.controller';
-import { envSchema } from './env/env';
-import { EnvModule } from '../../user-service/src/domain/env/env.module';
 
 @Module({
   imports: [
