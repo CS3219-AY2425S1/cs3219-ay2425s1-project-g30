@@ -5,8 +5,8 @@ import { UsersController } from 'src/adapters/controllers/users.controller';
 import { SupabaseUsersRepository } from 'src/adapters/db/users.supabase';
 import { UsersService } from 'src/domain/ports/users.service';
 import { UsersRepository } from 'src/domain/ports/users.repository';
-import { envSchema } from './domain/env/env';
-import { EnvModule } from './domain/env/env.module';
+import { envSchema } from './env/env';
+import { EnvModule } from './env/env.module';
 
 @Module({
   imports: [

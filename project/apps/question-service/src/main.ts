@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { EnvService } from './domain/env/env.service';
+import { EnvService } from './env/env.service';
 import { QuestionsModule } from './questions.module';
 
 async function bootstrap() {

@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { EnvService } from 'src/domain/env/env.service';
+import { EnvService } from 'src/env/env.service';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 import {
   UserAuthRecordDto,

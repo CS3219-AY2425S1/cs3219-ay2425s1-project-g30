@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EnvService } from 'src/domain/env/env.service';
+import { EnvService } from 'src/env/env.service';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
 import {
   QuestionFiltersDto,

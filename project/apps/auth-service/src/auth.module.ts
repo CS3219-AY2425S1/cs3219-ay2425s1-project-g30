@@ -5,8 +5,8 @@ import { AuthController } from 'src/adapters/controllers/auth.controller';
 import { SupabaseAuthRepository } from 'src/adapters/db/auth.supabase';
 import { AuthService } from 'src/domain/ports/auth.service';
 import { AuthRepository } from 'src/domain/ports/auth.repository';
-import { envSchema } from './domain/env/env';
-import { EnvModule } from './domain/env/env.module';
+import { envSchema } from './env/env';
+import { EnvModule } from './env/env.module';
 
 @Module({
   imports: [
