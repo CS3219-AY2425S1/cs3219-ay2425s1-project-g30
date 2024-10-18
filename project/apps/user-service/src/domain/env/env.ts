@@ -8,3 +8,5 @@ export const envSchema = z.object({
 
   USER_SERVICE_HOST: z.string().default('localhost'),
 });
+
+export type Env = z.infer<typeof envSchema>;

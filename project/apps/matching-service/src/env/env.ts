@@ -9,6 +9,9 @@ export const envSchema = z.object({
   MATCHING_SERVICE_HOST: z.string().default('localhost'),
   QUESTION_SERVICE_HOST: z.string().default('localhost'),
   AUTH_SERVICE_HOST: z.string().default('localhost'),
+  RABBITMQ_URL: z.string().default('amqp://localhost:5672'),
   REDIS_HOST: z.string().default('localhost'),
   REDIS_PORT: z.coerce.number().default(6379),
 });
+
+export type Env = z.infer<typeof envSchema>;

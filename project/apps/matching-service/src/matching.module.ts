@@ -14,7 +14,9 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './constants/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MatchingGateway } from './matching.gateway';
-import { envSchema } from './config/env';
+import { envSchema } from './env/env';
+import { EnvModule } from './env/env.module';
+import { EnvService } from './env/env.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,37 +33,38 @@ import { envSchema } from './config/env';
         return parsedEnv.data;
       },
     }),
+    EnvModule,
     CacheModule.registerAsync(RedisOptions),
     ClientsModule.registerAsync([
       {
-        imports: [ConfigModule],
+        imports: [EnvModule],
         name: 'QUESTION_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
-              configService.get<string>('NODE_ENV') === 'development'
+              envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : configService.get<string>('QUESTION_SERVICE_HOST'),
+                : envService.get('QUESTION_SERVICE_HOST'),
             port: 3001,
           },
         }),
-        inject: [ConfigService],
+        inject: [EnvService],
       },
       {
-        imports: [ConfigModule],
+        imports: [EnvModule],
         name: 'AUTH_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
-              configService.get<string>('NODE_ENV') === 'development'
+              envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : configService.get<string>('AUTH_SERVICE_HOST'),
+                : envService.get('AUTH_SERVICE_HOST'),
             port: 3003,
           },
         }),
-        inject: [ConfigService],
+        inject: [EnvService],
       },
     ]),
   ],
