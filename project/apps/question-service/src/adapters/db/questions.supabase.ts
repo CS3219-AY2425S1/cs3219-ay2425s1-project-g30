@@ -122,7 +122,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     const categories = `{${escaped.map(item => `"${item}"`).join(',')}}`;
 
     const {data, error} = await this.supabase
-      .from(this.QUESTIONS_TABLE)
+      .from(this.RANDOM_ORDERED_QUESTIONS_TABLE)
       .select('id')
       .eq('q_complexity', complexity)
       .filter('q_category','ov', categories)
