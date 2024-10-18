@@ -5,7 +5,8 @@ import { QuestionsController } from 'src/adapters/controllers/questions.controll
 import { QuestionsService } from 'src/domain/ports/questions.service';
 import { QuestionsRepository } from 'src/domain/ports/questions.repository';
 import { SupabaseQuestionsRepository } from 'src/adapters/db/questions.supabase';
-import { envSchema } from './config/env';
+import { envSchema } from './domain/env/env';
+import { EnvModule } from './domain/env/env.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { envSchema } from './config/env';
         return parsedEnv.data;
       },
     }),
+    EnvModule,
   ],
   controllers: [QuestionsController],
   providers: [

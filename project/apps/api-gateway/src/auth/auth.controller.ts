@@ -23,14 +23,14 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { UserSessionDto } from '@repo/dtos/users';
 import { AuthGuard } from './auth.guard';
-import { ConfigService } from '@nestjs/config';
+import { EnvService } from 'src/env/env.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     @Inject('AUTH_SERVICE')
     private readonly authServiceClient: ClientProxy,
-    private readonly configService: ConfigService,
+    private readonly envService: EnvService,
   ) {}
 
   @Post('signup')
@@ -39,7 +39,7 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signup' }, body),
     );
-    const NODE_ENV = this.configService.get<string>('NODE_ENV');
+    const NODE_ENV = this.envService.get('NODE_ENV');
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
       secure: NODE_ENV === 'production',
@@ -65,7 +65,7 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signin' }, body),
     );
-    const NODE_ENV = this.configService.get<string>('NODE_ENV');
+    const NODE_ENV = this.envService.get('NODE_ENV');
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
       secure: NODE_ENV === 'production',

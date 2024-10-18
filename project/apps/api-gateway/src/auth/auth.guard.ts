@@ -5,7 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { EnvService } from 'src/env/env.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     @Inject('AUTH_SERVICE')
     private readonly authServiceClient: ClientProxy,
-    private readonly configService: ConfigService,
+    private readonly envService: EnvService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -40,7 +40,7 @@ export class AuthGuard implements CanActivate {
         await firstValueFrom(
           this.authServiceClient.send({ cmd: 'refresh' }, refreshToken),
         );
-      const NODE_ENV = this.configService.get<string>('NODE_ENV');
+      const NODE_ENV = this.envService.get('NODE_ENV');
       // Update new tokens in request and response cookies
       request.cookie('access_token', newAccessToken, {
         httpOnly: true,

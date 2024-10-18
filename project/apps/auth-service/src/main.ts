@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { AuthModule } from './auth.module';
-import { ConfigService } from '@nestjs/config';
+import { EnvService } from './domain/env/env.service';
 import { Module } from '@nestjs/common';
 
 @Module({
-  providers: [ConfigService],
-  exports: [ConfigService],
+  providers: [EnvService],
+  exports: [EnvService],
 })
 class BootstrapConfigModule {}
 
@@ -14,9 +14,9 @@ async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(
     BootstrapConfigModule,
   );
-  const configService = appContext.get(ConfigService);
-  const NODE_ENV = configService.get<string>('NODE_ENV');
-  const AUTH_SERVICE_HOST = configService.get<string>('AUTH_SERVICE_HOST');
+  const envService = appContext.get(EnvService);
+  const NODE_ENV = envService.get('NODE_ENV');
+  const AUTH_SERVICE_HOST = envService.get('AUTH_SERVICE_HOST');
   appContext.close();
 
   const host = NODE_ENV === 'development' ? 'localhost' : AUTH_SERVICE_HOST;

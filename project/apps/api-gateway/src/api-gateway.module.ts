@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LoggerModule } from 'nestjs-pino';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
+import { EnvService } from './env/env.service';
 import { QuestionsController } from './questions/questions.controller';
 import { UsersController } from './users/users.controller';
 import { AuthController } from './auth/auth.controller';
 import { MatchingController } from './matching/matching.controller';
-import { envSchema } from './config/env';
+import { envSchema } from './env/env';
+import { EnvModule } from '../../user-service/src/domain/env/env.module';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { envSchema } from './config/env';
         return parsedEnv.data;
       },
     }),
+    EnvModule,
     LoggerModule.forRoot({
       pinoHttp: {
         transport: {
@@ -33,64 +36,64 @@ import { envSchema } from './config/env';
     }),
     ClientsModule.registerAsync([
       {
-        imports: [ConfigModule],
+        imports: [EnvModule],
         name: 'QUESTION_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
-              configService.get<string>('NODE_ENV') === 'development'
+              envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : configService.get<string>('QUESTION_SERVICE_HOST'),
+                : envService.get('QUESTION_SERVICE_HOST'),
             port: 3001,
           },
         }),
-        inject: [ConfigService],
+        inject: [EnvService],
       },
       {
-        imports: [ConfigModule],
+        imports: [EnvModule],
         name: 'USER_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
-              configService.get<string>('NODE_ENV') === 'development'
+              envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : configService.get<string>('USER_SERVICE_HOST'),
+                : envService.get('USER_SERVICE_HOST'),
             port: 3002,
           },
         }),
-        inject: [ConfigService],
+        inject: [EnvService],
       },
       {
-        imports: [ConfigModule],
+        imports: [EnvModule],
         name: 'AUTH_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
-              configService.get<string>('NODE_ENV') === 'development'
+              envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : configService.get<string>('AUTH_SERVICE_HOST'),
+                : envService.get('AUTH_SERVICE_HOST'),
             port: 3003,
           },
         }),
-        inject: [ConfigService],
+        inject: [EnvService],
       },
       {
-        imports: [ConfigModule],
+        imports: [EnvModule],
         name: 'MATCHING_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
-              configService.get<string>('NODE_ENV') === 'development'
+              envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : configService.get<string>('MATCHING_SERVICE_HOST'),
+                : envService.get('MATCHING_SERVICE_HOST'),
             port: 3004,
           },
         }),
-        inject: [ConfigService],
+        inject: [EnvService],
       },
     ]),
   ],

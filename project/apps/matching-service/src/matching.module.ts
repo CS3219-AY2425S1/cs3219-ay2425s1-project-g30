@@ -1,22 +1,22 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MatchingController } from './matching.controller';
-import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
-import { MatchExpiryProducer } from './matchEngine/matchEngine.produceExpiry';
+import { ConfigModule } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RedisOptions } from './constants/redis';
 import { MatchRedis } from './db/match.redis';
 import { MatchSupabase } from './db/match.supabase';
-import { MatchCancelService } from './matchCancel/matchCancel.service';
-import { MatchEngineConsumer } from './matchEngine/matchEngine.consumeRequest';
-import { MatchEngineService } from './matchEngine/matchEngine.service';
-import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
-import { MatchRequestService } from './matchRequest/matchRequest.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { RedisOptions } from './constants/redis';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MatchingGateway } from './matching.gateway';
 import { envSchema } from './env/env';
 import { EnvModule } from './env/env.module';
 import { EnvService } from './env/env.service';
+import { MatchCancelService } from './matchCancel/matchCancel.service';
+import { MatchEngineConsumer } from './matchEngine/matchEngine.consumeRequest';
+import { MatchExpiryProducer } from './matchEngine/matchEngine.produceExpiry';
+import { MatchEngineService } from './matchEngine/matchEngine.service';
+import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
+import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
+import { MatchingController } from './matching.controller';
+import { MatchingGateway } from './matching.gateway';
+import { MatchRequestService } from './matchRequest/matchRequest.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
