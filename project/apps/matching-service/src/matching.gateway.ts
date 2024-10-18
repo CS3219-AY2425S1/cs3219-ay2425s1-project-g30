@@ -10,7 +10,10 @@ import { parse } from 'cookie';
 import { firstValueFrom } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { MatchRedis } from './db/match.redis';
-import { MATCH_REDIS_RETRY_ATTEMPTS, MATCH_REDIS_RETRY_DELAY, WEBSOCKET_RETRY_ATTEMPTS, WEBSOCKET_RETRY_DELAY } from './constants/websocket';
+import {
+  WEBSOCKET_RETRY_ATTEMPTS,
+  WEBSOCKET_RETRY_DELAY,
+} from './constants/websocket';
 
 enum MatchEvent {
   'MATCH_FOUND' = 'match_found',
@@ -50,7 +53,7 @@ export class MatchingGateway
     const cookies = parse(cookie);
     const accessToken = cookies['access_token'];
     // Disconnect client if no token provided
-    if (! accessToken) {
+    if (!accessToken) {
       client.disconnect();
       return;
     }
@@ -99,7 +102,7 @@ export class MatchingGateway
       const socketId = await this.matchRedis.getSocketByUserId(userId);
       if (!socketId) {
         throw new Error(`Socket not found for user ${userId}`);
-      }    
+      }
       const socket = this.server.sockets.sockets.get(socketId);
       if (!socket || !socket.connected) {
         throw new Error(`Socket ${socketId} is no longer connected`);
@@ -108,22 +111,29 @@ export class MatchingGateway
       socket.emit(event, message);
       this.logger.debug(`Message sent to socket ${socketId} on event ${event}`);
     } catch (error) {
-      this.logger.error(`Error sending message to user ${userId} on attempt ${attempt}: ${error.message}`);
+      this.logger.error(
+        `Error sending message to user ${userId} on attempt ${attempt}: ${error.message}`,
+      );
       if (attempt < WEBSOCKET_RETRY_ATTEMPTS) {
-        setTimeout(() => {
-          this.sendMessageToClient({
-            userId,
-            message,
-            event,
-            attempt: attempt + 1,
-          });
-        }, WEBSOCKET_RETRY_DELAY * 2 ** (attempt - 1)); // Exponential backoff
+        setTimeout(
+          () => {
+            this.sendMessageToClient({
+              userId,
+              message,
+              event,
+              attempt: attempt + 1,
+            });
+          },
+          WEBSOCKET_RETRY_DELAY * 2 ** (attempt - 1),
+        ); // Exponential backoff
       } else {
-        this.logger.error(`Failed to send message to user ${userId} after ${WEBSOCKET_RETRY_ATTEMPTS} attempts`);
+        this.logger.error(
+          `Failed to send message to user ${userId} after ${WEBSOCKET_RETRY_ATTEMPTS} attempts`,
+        );
       }
     }
   }
-  
+
   async sendMatchFound({
     userId,
     message,
@@ -154,9 +164,9 @@ export class MatchingGateway
         message,
         event: MatchEvent.MATCH_REQUEST_EXPIRED,
       });
-    } 
+    }
   }
-  
+
   async sendMatchInvalid({
     userId,
     message,
@@ -173,5 +183,4 @@ export class MatchingGateway
       });
     }
   }
-  
 }

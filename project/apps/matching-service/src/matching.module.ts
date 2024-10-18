@@ -79,7 +79,7 @@ import { RedisModule } from './redis/redis.module';
     MatchExpiryConsumer,
     MatchExpiryService,
     MatchRequestService,
-    MatchingGateway
+    MatchingGateway,
   ],
   exports: [],
 })

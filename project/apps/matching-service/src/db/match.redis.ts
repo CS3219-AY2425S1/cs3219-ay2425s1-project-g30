@@ -15,17 +15,14 @@ import {
   MATCH_CATEGORY,
   MATCH_REQUEST,
   REDIS_CLIENT,
-  SOCKET_USER_KEY,
-  USER_SOCKET_KEY,
 } from 'src/constants/redis';
+import { SOCKET_USER_KEY, USER_SOCKET_KEY } from 'src/constants/websocket';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MatchRedis {
   private readonly logger = new Logger(MatchRedis.name);
-  constructor(
-    @Inject(REDIS_CLIENT) private redisClient: Redis,
-  ) {}
+  constructor(@Inject(REDIS_CLIENT) private redisClient: Redis) {}
 
   async setUserToSocket({
     userId,
@@ -164,7 +161,7 @@ export class MatchRedis {
 
   async findPotentialMatch(
     criteria: MatchCriteriaDto,
-  ): Promise<{ userId: string; category : CATEGORY[],  matchId: string } | null> {
+  ): Promise<{ userId: string; category: CATEGORY[]; matchId: string } | null> {
     const { category, complexity } = criteria;
 
     const pipeline = this.redisClient.pipeline();
