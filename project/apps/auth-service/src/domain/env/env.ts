@@ -7,3 +7,5 @@ export const envSchema = z.object({
     .default('development'),
   AUTH_SERVICE_HOST: z.string().default('localhost'),
 });
+
+export type Env = z.infer<typeof envSchema>;
