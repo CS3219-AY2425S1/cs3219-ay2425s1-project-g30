@@ -3,7 +3,7 @@ import { z } from "zod";
 import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
 import { collectionMetadataSchema } from "./metadata";
 
-const categoryEum = z.nativeEnum(CATEGORY);
+const categoryEnum = z.nativeEnum(CATEGORY);
 const complexityEnum = z.nativeEnum(COMPLEXITY);
 
 export const sortQuestionsQuerySchema = z.object({
@@ -13,7 +13,7 @@ export const sortQuestionsQuerySchema = z.object({
 
 export const questionFiltersSchema = z.object({
   title: z.string().optional(),
-  categories: z.array(categoryEum).optional(),
+  categories: z.array(categoryEnum).optional(),
   complexities: z.array(complexityEnum).optional(),
   includeDeleted: z.coerce.boolean().optional(),
 
@@ -27,7 +27,7 @@ const commonQuestionFields = z.object({
   q_title: z.string().min(1, { message: "Title must not be empty" }),
   q_desc: z.string().min(1, { message: "Description must not be empty" }),
   q_category: z
-    .array(categoryEum)
+    .array(categoryEnum)
     .min(1, { message: "At least one category is required" })
     // enforce uniqueness of categories
     .refine((categories) => new Set(categories).size === categories.length, {

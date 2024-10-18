@@ -11,12 +11,14 @@ import {
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { QuestionsRepository } from 'src/domain/ports/questions.repository';
+import { MatchCriteriaDto } from '@repo/dtos/match';
 
 @Injectable()
 export class SupabaseQuestionsRepository implements QuestionsRepository {
   private supabase: SupabaseClient;
 
   private readonly QUESTIONS_TABLE = 'question_bank';
+  private readonly RANDOM_ORDERED_QUESTIONS_TABLE = 'random_question';
 
   constructor(private envService: EnvService) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
@@ -110,6 +112,28 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     }
 
     return data;
+  }
+
+  async findOneRandom(filters: MatchCriteriaDto): Promise<string> {
+    const { category, complexity } = filters;
+
+    // Serialize the category array to a string for filter pgres query
+    const escaped = category.map(item => item.replace(/\\/g, '\\\\').replace(/"/g, '\\"'));
+    const categories = `{${escaped.map(item => `"${item}"`).join(',')}}`;
+
+    const {data, error} = await this.supabase
+      .from(this.RANDOM_ORDERED_QUESTIONS_TABLE)
+      .select('id')
+      .eq('q_complexity', complexity)
+      .filter('q_category','ov', categories)
+      .limit(1)
+      .single<QuestionDto>();
+
+    if (error) {
+      return '';
+    }
+
+    return data.id;
   }
 
   async create(question: CreateQuestionDto): Promise<QuestionDto> {
