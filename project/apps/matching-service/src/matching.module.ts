@@ -1,48 +1,70 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MatchingController } from './matching.controller';
-import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
-import { MatchExpiryProducer } from './matchEngine/matchEngine.produceExpiry';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RedisOptions } from './constants/redis';
 import { MatchRedis } from './db/match.redis';
 import { MatchSupabase } from './db/match.supabase';
+import { envSchema } from './env/env';
+import { EnvModule } from './env/env.module';
+import { EnvService } from './env/env.service';
 import { MatchCancelService } from './matchCancel/matchCancel.service';
 import { MatchEngineConsumer } from './matchEngine/matchEngine.consumeRequest';
+import { MatchExpiryProducer } from './matchEngine/matchEngine.produceExpiry';
 import { MatchEngineService } from './matchEngine/matchEngine.service';
+import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
 import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
-import { MatchRequestService } from './matchRequest/matchRequest.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { RedisOptions } from './constants/redis';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MatchingController } from './matching.controller';
 import { MatchingGateway } from './matching.gateway';
-
+import { MatchRequestService } from './matchRequest/matchRequest.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: (config) => {
+        const parsedEnv = envSchema.safeParse(config);
+        if (!parsedEnv.success) {
+          console.error(
+            '❌ Invalid environment variables:',
+            parsedEnv.error.flatten().fieldErrors,
+          );
+          throw new Error('Invalid environment variables');
+        }
+        return parsedEnv.data;
+      },
     }),
+    EnvModule,
     CacheModule.registerAsync(RedisOptions),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
+        imports: [EnvModule],
         name: 'QUESTION_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host:
-            process.env.NODE_ENV === 'development'
-              ? 'localhost'
-              : process.env.QUESTION_SERVICE_HOST || 'localhost',
-          port: 3001,
-        },
+        useFactory: async (envService: EnvService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('QUESTION_SERVICE_HOST'),
+            port: 3001,
+          },
+        }),
+        inject: [EnvService],
       },
       {
+        imports: [EnvModule],
         name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host:
-            process.env.NODE_ENV === 'development'
-              ? 'localhost'
-              : process.env.AUTH_SERVICE_HOST || 'localhost',
-          port: 3003,
-        },
+        useFactory: async (envService: EnvService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('AUTH_SERVICE_HOST'),
+            port: 3003,
+          },
+        }),
+        inject: [EnvService],
       },
     ]),
   ],

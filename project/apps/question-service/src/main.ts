@@ -1,13 +1,17 @@
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { EnvService } from './env/env.service';
 import { QuestionsModule } from './questions.module';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const host =
-    process.env.NODE_ENV === 'development'
-      ? 'localhost'
-      : process.env.QUESTION_SERVICE_HOST || 'localhost';
+  const appContext =
+    await NestFactory.createApplicationContext(QuestionsModule);
+  const envService = appContext.get(EnvService);
+  const NODE_ENV = envService.get('NODE_ENV');
+  const QUESTION_SERVICE_HOST = envService.get('QUESTION_SERVICE_HOST');
+  appContext.close();
 
+  const host = NODE_ENV === 'development' ? 'localhost' : QUESTION_SERVICE_HOST;
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     QuestionsModule,
     {

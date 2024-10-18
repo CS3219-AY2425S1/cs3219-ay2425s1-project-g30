@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { EnvService } from 'src/env/env.service';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
 import {
   QuestionFiltersDto,
@@ -18,9 +18,9 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
 
   private readonly QUESTIONS_TABLE = 'question_bank';
 
-  constructor(private configService: ConfigService) {
-    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configService.get<string>('SUPABASE_KEY');
+  constructor(private envService: EnvService) {
+    const supabaseUrl = this.envService.get('SUPABASE_URL');
+    const supabaseKey = this.envService.get('SUPABASE_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase URL and key must be provided');

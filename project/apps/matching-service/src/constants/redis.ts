@@ -1,22 +1,23 @@
 import { CacheModuleAsyncOptions } from '@nestjs/cache-manager';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EnvModule } from 'src/env/env.module';
+import { EnvService } from 'src/env/env.service';
 import { redisStore } from 'cache-manager-redis-store';
 
 export const RedisOptions: CacheModuleAsyncOptions = {
   isGlobal: true,
-  imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => {
+  imports: [EnvModule],
+  useFactory: async (envService: EnvService) => {
     const store = await redisStore({
       socket: {
-        host: configService.get<string>('REDIS_HOST') || 'localhost',
-        port: parseInt(configService.get<string>('REDIS_PORT')!) || 6379,
+        host: envService.get('REDIS_HOST'),
+        port: envService.get('REDIS_PORT'),
       },
     });
     return {
       store: () => store,
     };
   },
-  inject: [ConfigService],
+  inject: [EnvService],
 };
 
 export const MATCH_WAITING_KEY = 'match-waiting';

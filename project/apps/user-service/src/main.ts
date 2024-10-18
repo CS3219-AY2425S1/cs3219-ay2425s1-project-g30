@@ -1,13 +1,16 @@
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { EnvService } from './env/env.service';
 import { UsersModule } from './users.module';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const host =
-    process.env.NODE_ENV === 'development'
-      ? 'localhost'
-      : process.env.USER_SERVICE_HOST || 'localhost';
+  const appContext = await NestFactory.createApplicationContext(UsersModule);
+  const envService = appContext.get(EnvService);
+  const NODE_ENV = envService.get('NODE_ENV');
+  const USER_SERVICE_HOST = envService.get('USER_SERVICE_HOST');
+  appContext.close();
 
+  const host = NODE_ENV === 'development' ? 'localhost' : USER_SERVICE_HOST;
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     UsersModule,
     {

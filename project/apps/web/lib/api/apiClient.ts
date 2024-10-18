@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+import { env } from '@/env.mjs';
+
 export class ApiError extends Error {
   constructor(
     public message: string,
@@ -11,7 +13,7 @@ export class ApiError extends Error {
 }
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,
 });
 

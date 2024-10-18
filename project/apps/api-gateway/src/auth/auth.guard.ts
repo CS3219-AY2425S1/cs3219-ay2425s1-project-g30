@@ -5,6 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { EnvService } from 'src/env/env.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
@@ -13,6 +14,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     @Inject('AUTH_SERVICE')
     private readonly authServiceClient: ClientProxy,
+    private readonly envService: EnvService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -38,25 +40,25 @@ export class AuthGuard implements CanActivate {
         await firstValueFrom(
           this.authServiceClient.send({ cmd: 'refresh' }, refreshToken),
         );
-
+      const NODE_ENV = this.envService.get('NODE_ENV');
       // Update new tokens in request and response cookies
       request.cookie('access_token', newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 60 * 60 * 1000, // 1 hour
       });
 
       response.cookie('access_token', newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 60 * 60 * 1000, // 1 hour
       });
 
       response.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
       });

@@ -23,12 +23,14 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { UserSessionDto } from '@repo/dtos/users';
 import { AuthGuard } from './auth.guard';
+import { EnvService } from 'src/env/env.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     @Inject('AUTH_SERVICE')
     private readonly authServiceClient: ClientProxy,
+    private readonly envService: EnvService,
   ) {}
 
   @Post('signup')
@@ -37,17 +39,17 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signup' }, body),
     );
-
+    const NODE_ENV = this.envService.get('NODE_ENV');
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
     });
@@ -63,17 +65,17 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signin' }, body),
     );
-
+    const NODE_ENV = this.envService.get('NODE_ENV');
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
     });

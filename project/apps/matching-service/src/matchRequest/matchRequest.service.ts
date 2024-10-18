@@ -1,16 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
+import { EnvService } from 'src/env/env.service';
 
 @Injectable()
 export class MatchRequestService {
   private readonly logger = new Logger(MatchRequestService.name);
   private channelWrapper: ChannelWrapper;
-  constructor(private readonly configService: ConfigService) {
-    const connection_url =
-      configService.get<string>('RABBITMQ_URL') || 'amqp://localhost:5672';
+  constructor(private readonly envService: EnvService) {
+    const connection_url = envService.get('RABBITMQ_URL');
     const connection = amqp.connect([connection_url]);
     this.channelWrapper = connection.createChannel({
       setup(channel: Channel) {
