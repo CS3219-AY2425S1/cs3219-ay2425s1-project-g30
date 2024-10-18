@@ -120,10 +120,12 @@ export class MatchingGateway
     message: string;
   }) {
     const socketId = await this.matchRedis.getSocketByUserId(userId);
-    this.sendMessageToClient({
-      socketId,
-      message,
-      event: MatchEvent.MATCH_REQUEST_EXPIRED,
-    });
+    if (socketId) {
+      this.sendMessageToClient({
+        socketId,
+        message,
+        event: MatchEvent.MATCH_REQUEST_EXPIRED,
+      });
+    } 
   }
 }

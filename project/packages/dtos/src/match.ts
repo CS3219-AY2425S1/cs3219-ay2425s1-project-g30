@@ -4,7 +4,7 @@ import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
 const categoryEnum = z.nativeEnum(CATEGORY);
 const complexityEnum = z.nativeEnum(COMPLEXITY);
 
-export const criteriaSchema = z.object({
+export const matchCriteriaSchema = z.object({
   complexity: complexityEnum,
   category: z
     .array(categoryEnum)
@@ -15,7 +15,7 @@ export const criteriaSchema = z.object({
     }),
 });
 
-export const matchDataSchema = criteriaSchema.extend({
+export const matchDataSchema = matchCriteriaSchema.extend({
   user1_id: z.string().uuid(),
   user2_id: z.string().uuid(),
   id: z.string().uuid(),
@@ -23,7 +23,7 @@ export const matchDataSchema = criteriaSchema.extend({
 });
 
 
-export const matchRequestMsgSchema = criteriaSchema.extend({
+export const matchRequestMsgSchema = matchCriteriaSchema.extend({
   userId: z.string().uuid(),
 });
 
@@ -36,7 +36,7 @@ export const matchCancelSchema = z.object({
   user_id: z.string().uuid(),
 });
 
-export type CriteriaDto = z.infer<typeof criteriaSchema>;
+export type MatchCriteriaDto = z.infer<typeof matchCriteriaSchema>;
 export type MatchDataDto = z.infer<typeof matchDataSchema>;
 export type MatchRequestDto = z.infer<typeof matchRequestSchema>;
 export type MatchCancelDto = z.infer<typeof matchCancelSchema>;

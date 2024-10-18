@@ -5,6 +5,10 @@ import {
   QuestionFiltersDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
+import {
+  MatchCriteriaDto,
+} from '@repo/dtos/match';
+
 
 import { QuestionsService } from 'src/domain/ports/questions.service';
 @Controller()
@@ -19,6 +23,11 @@ export class QuestionsController {
   @MessagePattern({ cmd: 'get_question' })
   async getQuestionById(@Payload() id: string) {
     return await this.questionsService.findById(id);
+  }
+
+  @MessagePattern({ cmd: 'get_random_question' })
+  async getRandomQuestion(@Payload() filters: MatchCriteriaDto) {
+    return await this.questionsService.findRandom(filters);
   }
 
   @MessagePattern({ cmd: 'create_question' })

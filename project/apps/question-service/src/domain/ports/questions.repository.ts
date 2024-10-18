@@ -1,3 +1,4 @@
+import { MatchCriteriaDto } from '@repo/dtos/match';
 import {
   CreateQuestionDto,
   QuestionFiltersDto,
@@ -24,6 +25,14 @@ export abstract class QuestionsRepository {
    * @returns A promise that resolves to a QuestionDto object.
    */
   abstract findById(id: string): Promise<QuestionDto>;
+
+
+  /**
+   * Retrieves a random question that matches the given filters.
+   * @param filters - The criteria used to filter the questions.
+   * @returns A promise that resolves to the id of the question.
+   */
+  abstract findOneRandom(filters: MatchCriteriaDto): Promise<string>;
 
   /**
    * Creates a new question with the given data.
