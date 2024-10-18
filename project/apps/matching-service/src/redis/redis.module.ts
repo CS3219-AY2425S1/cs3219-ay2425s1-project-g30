@@ -1,27 +1,26 @@
 import { Module, Logger } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { REDIS_CLIENT } from 'src/constants/redis';
+import { EnvModule } from 'src/env/env.module';
+import { EnvService } from 'src/env/env.service';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [EnvModule],
   providers: [
     {
       provide: REDIS_CLIENT,
-      useFactory: (configService: ConfigService): Redis => {
+      useFactory: (envService: EnvService): Redis => {
         const client = new Redis({
-          host: configService.get<string>('REDIS_HOST') || 'localhost',
-          port: configService.get<number>('REDIS_PORT') || 6379,
-          db: configService.get<number>('REDIS_DB') || 0,
+          host: envService.get('REDIS_HOST'),
+          port: envService.get('REDIS_PORT'),
         });
 
         client.on('error', (err) => {
           Logger.error(`Redis error: ${err.message}`, '', 'RedisModule');
         });
-
         return client;
       },
-      inject: [ConfigService],
+      inject: [EnvService],
     },
   ],
   exports: [REDIS_CLIENT],
