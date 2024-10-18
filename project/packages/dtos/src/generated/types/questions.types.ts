@@ -44,7 +44,39 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      random_question: {
+        Row: {
+          created_at: string | null;
+          deleted_at: string | null;
+          id: string | null;
+          q_category: Database["public"]["Enums"]["Category"][] | null;
+          q_complexity: Database["public"]["Enums"]["Complexity"] | null;
+          q_desc: string | null;
+          q_title: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          deleted_at?: string | null;
+          id?: string | null;
+          q_category?: Database["public"]["Enums"]["Category"][] | null;
+          q_complexity?: Database["public"]["Enums"]["Complexity"] | null;
+          q_desc?: string | null;
+          q_title?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          deleted_at?: string | null;
+          id?: string | null;
+          q_category?: Database["public"]["Enums"]["Category"][] | null;
+          q_complexity?: Database["public"]["Enums"]["Complexity"] | null;
+          q_desc?: string | null;
+          q_title?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       [_ in never]: never;
