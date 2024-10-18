@@ -21,7 +21,6 @@ interface MatchingFormProps {
 }
 
 const MatchingForm = ({ startMatching }: MatchingFormProps) => {
-  const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Professional'];
   const complexities = Object.values(COMPLEXITY);
   const categories = Object.values(CATEGORY);
 
@@ -46,7 +45,9 @@ const MatchingForm = ({ startMatching }: MatchingFormProps) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Question Difficulty Dropdown */}
         <div>
-          <label className="block text-black mb-2">Question Difficulty</label>
+          <div className="block text-sm font-bold text-black mb-2">
+            Question Difficulty
+          </div>
           <Select>
             <SelectTrigger>
               <SelectValue placeholder="Select question difficulty" />
@@ -63,7 +64,9 @@ const MatchingForm = ({ startMatching }: MatchingFormProps) => {
 
         {/* Categories Section */}
         <div>
-          <label className="block text-black mb-2">Categories</label>
+          <div className="block text-sm font-bold text-black mb-2">
+            Categories
+          </div>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <Badge

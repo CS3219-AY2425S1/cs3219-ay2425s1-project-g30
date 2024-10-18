@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import CardWaterfall from '@/components/dashboard/CardWaterfall';
@@ -12,10 +13,16 @@ const Dashboard = () => {
   const { isMatching, setIsMatching } = useMatchStore();
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef<number | null>(null);
+  const router = useRouter();
 
   const startMatching = () => {
     setIsMatching(true);
     setTimer(0);
+
+    // TODO: Replace with actual matching reroute logic
+    setTimeout(() => {
+      router.push('/match/1');
+    }, 3000);
 
     if (!intervalRef.current) {
       intervalRef.current = window.setInterval(() => {
@@ -78,10 +85,10 @@ const Dashboard = () => {
             key="form-and-results"
             {...fadeAnimation}
           >
-            <div className="flex w-2/5 justify-center items-center mr-12">
+            <div className="flex w-2/5 justify-center items-center">
               <MatchingForm startMatching={startMatching} />
             </div>
-            <CardWaterfall className="w-3/5" />
+            <CardWaterfall className="ml-20 w-3/5" />
           </motion.div>
         )}
       </AnimatePresence>
