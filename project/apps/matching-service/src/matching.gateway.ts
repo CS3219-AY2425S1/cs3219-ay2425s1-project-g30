@@ -14,6 +14,7 @@ import { MatchRedis } from './db/match.redis';
 enum MatchEvent {
   'MATCH_FOUND' = 'match_found',
   'MATCH_REQUEST_EXPIRED' = 'match_request_expired',
+  'MATCH_INVALID' = 'match_invalid',
 }
 
 @WebSocketGateway(8080, {
@@ -127,5 +128,22 @@ export class MatchingGateway
         event: MatchEvent.MATCH_REQUEST_EXPIRED,
       });
     } 
+  }
+  
+  async sendMatchInvalid({
+    userId,
+    message,
+  }: {
+    userId: string;
+    message: string;
+  }) {
+    const socketId = await this.matchRedis.getSocketByUserId(userId);
+    if (socketId) {
+      this.sendMessageToClient({
+        socketId,
+        message,
+        event: MatchEvent.MATCH_INVALID,
+      });
+    }
   }
 }

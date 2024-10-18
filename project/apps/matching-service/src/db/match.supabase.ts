@@ -42,10 +42,6 @@ export class MatchSupabase {
     const selectedQuestionId = await firstValueFrom(
       this.questionServiceClient.send<string>({ cmd: 'get_random_question' }, filters)
     );
-    
-    if (!selectedQuestionId) {
-      throw new Error('No questions found for match');
-    }
     return selectedQuestionId
   }
 }

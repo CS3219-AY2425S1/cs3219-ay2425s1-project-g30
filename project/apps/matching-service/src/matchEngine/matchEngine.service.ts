@@ -41,6 +41,15 @@ export class MatchEngineService {
       };
       
       const selectedQuestion = await this.matchSupabase.getRandomQuestion(filters);
+
+      if (selectedQuestion === '') {
+        this.logger.warn(`No suitable questions found for match ${matchedData.matchId}`);
+        this.matchGateway.sendMatchInvalid({
+          userId: userId,
+          message: 'No suitable questions found for match',
+        });
+        return;
+      }
       const matchData: MatchDataDto = {
         user1_id: userId,
         user2_id: matchedData.userId,

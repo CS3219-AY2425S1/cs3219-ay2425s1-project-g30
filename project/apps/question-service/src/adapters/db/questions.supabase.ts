@@ -130,7 +130,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
       .single<QuestionDto>();
 
     if (error) {
-      throw error;
+      return '';
     }
 
     return data.id;
