@@ -36,7 +36,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
   }
 
   return (
-    <div className="container p-4 mx-auto">
+    <div className="container p-6 mx-auto">
       {/* Back Button */}
       <div className="flex items-center my-4">
         <Link href="/questions">

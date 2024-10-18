@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const QuestionSkeleton = () => {
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-6">
       {/* Back Button */}
       <div className="flex items-center my-4">
         <Skeleton className="h-10 w-48" />

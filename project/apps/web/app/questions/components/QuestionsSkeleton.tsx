@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
 const QuestionsSkeleton = () => (
-  <div className="container mx-auto p-4">
+  <div className="container mx-auto p-6">
     {/* Table Header */}
     <div className="flex items-center my-4">
       <h1 className="text-xl font-semibold">

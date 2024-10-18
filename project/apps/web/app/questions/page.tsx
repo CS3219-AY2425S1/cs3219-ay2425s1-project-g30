@@ -60,7 +60,7 @@ const QuestionRepositoryContent = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-6">
       {/* Header */}
       <div className="flex justify-between items-center my-4">
         <h1 className="text-xl font-semibold">Question Repository</h1>
