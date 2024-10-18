@@ -12,6 +12,7 @@ import {
   Query,
   ForbiddenException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -19,13 +20,16 @@ import {
   userFiltersSchema,
   UserFiltersDto,
   updateUserSchema,
+  changePasswordSchema,
+  ChangePasswordDto,
 } from '@repo/dtos/users';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
-// @UseGuards(AuthGuard) // comment out if we dw auth for now
+@UseGuards(AuthGuard) // comment out if we dw auth for now
 export class UsersController {
   constructor(
     @Inject('USER_SERVICE')
@@ -78,7 +82,10 @@ export class UsersController {
       throw new ForbiddenException('Access denied.');
     }
 
-    return this.usersServiceClient.send({ cmd: 'update_user' }, updateUserDto);
+    return this.usersServiceClient.send(
+      { cmd: 'update_user' },
+      { updateUserDto, accessToken },
+    );
   }
 
   @Patch(':id')
@@ -94,6 +101,48 @@ export class UsersController {
     }
 
     return this.usersServiceClient.send({ cmd: 'update_privilege' }, id);
+  }
+
+  @Patch('password/:id')
+  async changePasswordById(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(changePasswordSchema))
+    changePasswordDto: ChangePasswordDto,
+  ) {
+    if (id != changePasswordDto.id) {
+      throw new BadRequestException('ID in URL does not match ID in body');
+    }
+
+    // Check if user is admin or user is changing their own password [DELETE once role guard is implemented]
+    const accessToken = req.cookies['access_token'];
+    const { userData } = await firstValueFrom(
+      this.authServiceClient.send({ cmd: 'me' }, accessToken),
+    );
+
+    if (userData.role != 'Admin' && userData.id != id) {
+      throw new ForbiddenException('Access denied.');
+    }
+
+    // Check if old password matches
+    const { error } = await firstValueFrom(
+      this.authServiceClient.send(
+        { cmd: 'sign_in' },
+        {
+          email: userData.email,
+          password: changePasswordDto.oldPassword,
+        },
+      ),
+    );
+
+    if (error) {
+      throw new BadRequestException('Old password is incorrect');
+    }
+
+    return this.usersServiceClient.send(
+      { cmd: 'change_password' },
+      { changePasswordDto, accessToken },
+    );
   }
 
   @Delete(':id')

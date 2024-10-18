@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import {
+  ChangePasswordDto,
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
@@ -80,24 +81,28 @@ export class UsersService {
    * @returns {Promise<UserDataDto>} A promise that resolves to the updated user data transfer object.
    * @throws {BadRequestException} - If another user with the same email or username already exists.
    */
-  async updateById(userDetails: UpdateUserDto): Promise<UserDataDto> {
+  async updateById(body: {
+    updateUserDto: UpdateUserDto;
+    accessToken: string;
+  }): Promise<UserDataDto> {
     try {
       const filter: UserFiltersDto = {
-        email: userDetails.email,
-        username: userDetails.username,
+        email: body.updateUserDto.email,
+        username: body.updateUserDto.username,
       };
 
       const existingUserCollection = await this.usersRepository.findAll(filter);
 
       if (
         existingUserCollection.metadata.count &&
-        existingUserCollection.users[0].id !== userDetails.id
+        existingUserCollection.users[0].id !== body.updateUserDto.id
       ) {
         throw new BadRequestException(
-          `The email or username is already in use by another user`);
+          `The email or username is already in use by another user`,
+        );
       }
 
-      const user = await this.usersRepository.updateById(userDetails);
+      const user = await this.usersRepository.updateById(body);
 
       this.logger.log(`updated user with id ${user.id}`);
 
@@ -123,6 +128,28 @@ export class UsersService {
       return user;
     } catch (error) {
       this.handleError('update user privilege by id', error);
+    }
+  }
+
+  /**
+   * Changes a user's password by their unique identifier.
+   *
+   * @param {ChangePasswordDto} changePasswordDto - The change password data transfer object.
+   * @returns {Promise<UserDataDto>} A promise that resolves to the updated user data transfer object.
+   * @throws Will throw an error if the user's password cannot be changed.
+   */
+  async changePasswordById(body: {
+    changePasswordDto: ChangePasswordDto;
+    accessToken: string;
+  }): Promise<UserDataDto> {
+    try {
+      const user = await this.usersRepository.changePasswordById(body);
+
+      this.logger.log(`changed password for user with id ${user.id}`);
+
+      return user;
+    } catch (error) {
+      this.handleError('change password by id', error);
     }
   }
 
