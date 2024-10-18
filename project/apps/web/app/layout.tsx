@@ -11,6 +11,7 @@ import Topbar from '@/components/Topbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toaster } from '@/components/ui/toaster';
 import { useAuthStore } from '@/stores/useAuthStore';
+import useMatchStore from '@/stores/useMatchStore';
 
 import './globals.css';
 
@@ -31,6 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const fetchUser = useAuthStore.use.fetchUser();
+  const { isMatching } = useMatchStore();
   const pathname = usePathname();
 
   const excludePaths = ['/auth'];
@@ -54,11 +56,15 @@ export default function RootLayout({
       <body className={roboto.className}>
         <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
           <ReactQueryProvider>
-            <div className="flex h-screen overflow-hidden">
-              {renderSidebarAndTopbar && <Topbar />}
-              {renderSidebarAndTopbar && <Sidebar />}
+            <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
+              {renderSidebarAndTopbar && !isMatching && (
+                <>
+                  <Topbar />
+                  <Sidebar />
+                </>
+              )}
               <main
-                className={`flex-1 ${renderSidebarAndTopbar ? 'ml-20 mt-16' : ''} overflow-auto`}
+                className={`flex-1 transition-all duration-500 ease-in-out ${renderSidebarAndTopbar && !isMatching ? 'ml-20 mt-16' : 'mt-0 ml-0'} overflow-auto`}
               >
                 {children}
               </main>

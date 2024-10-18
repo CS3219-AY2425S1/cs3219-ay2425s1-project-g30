@@ -1,5 +1,12 @@
 'use client';
 
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -9,52 +16,70 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export default function MatchingForm() {
-  const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Professional'];
-  const questionDifficulties = ['Easy', 'Medium', 'Hard'];
+interface MatchingFormProps {
+  startMatching: () => void;
+}
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+const MatchingForm = ({ startMatching }: MatchingFormProps) => {
+  const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Professional'];
+  const complexities = Object.values(COMPLEXITY);
+  const categories = Object.values(CATEGORY);
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    console.log('Form submitted');
+    startMatching();
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((cat) => cat !== category)
+        : [...prev, category],
+    );
   };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 w-full max-w-md">
       <h2 className="text-xl font-bold mb-4">Find Your Match</h2>
-
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Skill Level Dropdown */}
-        <div>
-          <label className="block text-black mb-1">Skill Level</label>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select skill level" />
-            </SelectTrigger>
-            <SelectContent>
-              {skillLevels.map((level) => (
-                <SelectItem key={level} value={level}>
-                  {level}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         {/* Question Difficulty Dropdown */}
         <div>
-          <label className="block text-black mb-1">Question Difficulty</label>
+          <label className="block text-black mb-2">Question Difficulty</label>
           <Select>
             <SelectTrigger>
               <SelectValue placeholder="Select question difficulty" />
             </SelectTrigger>
             <SelectContent>
-              {questionDifficulties.map((difficulty) => (
+              {complexities.map((difficulty) => (
                 <SelectItem key={difficulty} value={difficulty}>
                   {difficulty}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Categories Section */}
+        <div>
+          <label className="block text-black mb-2">Categories</label>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <Badge
+                key={category}
+                onClick={() => toggleCategory(category)}
+                variant={
+                  selectedCategories.includes(category)
+                    ? 'default'
+                    : 'secondary'
+                }
+                className="cursor-pointer"
+              >
+                {category}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Submit Button */}
@@ -66,4 +91,6 @@ export default function MatchingForm() {
       </form>
     </div>
   );
-}
+};
+
+export default MatchingForm;

@@ -36,7 +36,8 @@ const CardWaterfall = ({
 
   return (
     <div
-      className={`relative w-full h-[${distance}] overflow-hidden ${className}`}
+      className={`relative w-full overflow-hidden ${className}`}
+      style={{ height: `${distance}px` }}
     >
       {/* Non-looping Initial Cards */}
       {showInitial &&
