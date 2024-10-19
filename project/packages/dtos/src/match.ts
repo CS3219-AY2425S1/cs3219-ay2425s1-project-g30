@@ -20,6 +20,8 @@ export const matchDataSchema = matchCriteriaSchema.extend({
   user2_id: z.string().uuid(),
   id: z.string().uuid(),
   question_id: z.string().uuid(),
+  start_time: z.number().int(),
+  end_time: z.number().int().nullable(),
 });
 
 export const matchRequestMsgSchema = matchCriteriaSchema.extend({
