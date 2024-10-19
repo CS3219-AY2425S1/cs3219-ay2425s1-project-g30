@@ -23,22 +23,19 @@ export class MatchEngineConsumer implements OnModuleInit {
     try {
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
         await channel.assertQueue(MATCH_QUEUE, { durable: true });
-        await channel.consume(
-          MATCH_QUEUE,
-          async (message) => {
-            if (message) {
-              try {
-                const content = JSON.parse(message.content.toString());
-                const matchRequest = matchRequestMsgSchema.parse(content);
-                await this.consumeMessage(matchRequest);
-                channel.ack(message);
-              } catch (err) {
-                this.logger.error('Error occurred consuming message:', err);
-                channel.nack(message);
-              }
+        await channel.consume(MATCH_QUEUE, async (message) => {
+          if (message) {
+            try {
+              const content = JSON.parse(message.content.toString());
+              const matchRequest = matchRequestMsgSchema.parse(content);
+              await this.consumeMessage(matchRequest);
+              channel.ack(message);
+            } catch (err) {
+              this.logger.error('Error occurred consuming message:', err);
+              channel.nack(message);
             }
-          },
-        );
+          }
+        });
       });
       this.logger.log('Consumer service started and listening for messages.');
     } catch (err) {

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common';
 import { MatchRequestMsgDto } from '@repo/dtos/match';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
@@ -24,14 +24,14 @@ export class MatchRequestService {
    */
   async enqueueMatchRequest(matchReq: MatchRequestMsgDto) {
     this.logger.debug(`Enqueuing match request: ${JSON.stringify(matchReq)}`);
-    await this.channelWrapper.sendToQueue(
-      MATCH_QUEUE,
-      JSON.stringify(matchReq)).then(() => {
+    await this.channelWrapper
+      .sendToQueue(MATCH_QUEUE, JSON.stringify(matchReq))
+      .then(() => {
         this.logger.log('Match request enqueued');
-      }).catch((err) => {
+      })
+      .catch((err) => {
         this.logger.error(`Failed to enqueue match request: ${err.message}`);
-      }
-    )
+      });
     return { success: true };
   }
 }
