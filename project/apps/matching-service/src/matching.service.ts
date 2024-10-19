@@ -6,10 +6,10 @@ export class MatchService {
   constructor(private readonly matchSupabase: MatchSupabase) {}
 
   async getMatchById(matchId: string) {
-    this.matchSupabase.getMatchesByUserId(matchId);
+    return await this.matchSupabase.getMatch(matchId);
   }
 
   async getMatchesByUserId(userId: string) {
-    this.matchSupabase.getMatchesByUserId(userId);
+    return await this.matchSupabase.getMatchesByUserId(userId);
   }
 }
