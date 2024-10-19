@@ -71,7 +71,7 @@ export class MatchEngineService {
         category: category,
         id: matchedData.matchId,
         question_id: selectedQuestion,
-        end_time: Date.now()
+        end_time: Date.now(),
       };
 
       this.logger.debug(
@@ -91,7 +91,6 @@ export class MatchEngineService {
       await this.matchSupabase.saveMatch(matchData);
 
       // TODO: Call Collaboration service to intiialize a new collaboration session
-
     } else {
       this.logger.log(
         `No match found for user ${userId}, adding to matching queue`,
