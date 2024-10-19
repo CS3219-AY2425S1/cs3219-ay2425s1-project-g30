@@ -1,28 +1,97 @@
 'use client';
 
-import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
+import CardWaterfall from '@/components/dashboard/CardWaterfall';
+import MatchingForm from '@/components/dashboard/MatchingForm';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/stores/useAuthStore';
+import useMatchStore from '@/stores/useMatchStore';
 
 const Dashboard = () => {
-  const user = useAuthStore.use.user();
+  const { isMatching, setIsMatching } = useMatchStore();
+  const [timer, setTimer] = useState(0);
+  const intervalRef = useRef<number | null>(null);
+  const router = useRouter();
+
+  const startMatching = () => {
+    setIsMatching(true);
+    setTimer(0);
+
+    // TODO: Replace with actual matching reroute logic
+    setTimeout(() => {
+      router.push('/match/1');
+    }, 3000);
+
+    if (!intervalRef.current) {
+      intervalRef.current = window.setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
+    }
+  };
+
+  const stopMatching = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setIsMatching(false);
+  };
+
+  useEffect(() => {
+    if (timer >= 5) {
+      stopMatching();
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  const fadeAnimation = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: { duration: 0.5 },
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center">
-        <div className="font-bold">Dashboard Page</div>
-        <div className="flex items-center space-x-2">
-          {!user && (
-            <Link href="/auth" passHref>
-              <Button className="mt-4">Log In</Button>
-            </Link>
-          )}
-          <Link href="/questions" passHref>
-            <Button className="mt-4">Go to Questions Repository</Button>
-          </Link>
-        </div>
-      </div>
+    <div className="container mx-auto flex justify-between h-full">
+      <AnimatePresence mode="wait">
+        {isMatching ? (
+          <motion.div
+            className="flex flex-col gap-4 items-center justify-center w-full"
+            key="searching"
+            {...fadeAnimation}
+          >
+            <div className="flex flex-row">
+              <div className="text-lg font-medium mr-2">Searching...</div>
+              <div className="text-gray-600 font-medium text-lg">
+                ({timer}s)
+              </div>
+            </div>
+            <Button variant="default" onClick={stopMatching}>
+              Cancel
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.div
+            className="flex w-full justify-between items-center"
+            key="form-and-results"
+            {...fadeAnimation}
+          >
+            <div className="flex w-2/5 justify-center items-center">
+              <MatchingForm startMatching={startMatching} />
+            </div>
+            <CardWaterfall className="ml-20 w-3/5" />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
