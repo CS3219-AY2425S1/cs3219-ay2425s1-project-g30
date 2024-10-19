@@ -71,7 +71,6 @@ export class MatchEngineService {
         category: category,
         id: matchedData.matchId,
         question_id: selectedQuestion,
-        end_time: Date.now(),
       };
 
       this.logger.debug(
