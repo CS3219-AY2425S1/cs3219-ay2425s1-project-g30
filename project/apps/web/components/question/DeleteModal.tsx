@@ -17,12 +17,12 @@ interface DeleteModalProps {
   questionTitle: string;
 }
 
-export default function DeleteModal({
+const DeleteModal = ({
   open,
   setOpen,
   onDelete,
   questionTitle,
-}: DeleteModalProps) {
+}: DeleteModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
@@ -46,4 +46,6 @@ export default function DeleteModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default DeleteModal;

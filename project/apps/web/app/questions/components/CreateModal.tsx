@@ -41,11 +41,7 @@ interface CreateModalProps {
   onCreate: (data: CreateQuestionDto) => void;
 }
 
-export default function CreateModal({
-  open,
-  setOpen,
-  onCreate,
-}: CreateModalProps) {
+const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
   const form = useZodForm({
     schema: createQuestionSchema,
     defaultValues: {
@@ -213,4 +209,6 @@ export default function CreateModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default CreateModal;

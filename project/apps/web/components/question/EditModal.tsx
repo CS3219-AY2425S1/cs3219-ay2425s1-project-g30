@@ -42,12 +42,12 @@ interface EditModalProps {
   initialValues: UpdateQuestionDto;
 }
 
-export default function EditModal({
+const EditModal = ({
   open,
   setOpen,
   onSubmit,
   initialValues,
-}: EditModalProps) {
+}: EditModalProps) => {
   const form = useZodForm({
     schema: updateQuestionSchema,
     defaultValues: {
@@ -212,4 +212,6 @@ export default function EditModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default EditModal;

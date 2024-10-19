@@ -18,10 +18,10 @@ const Topbar = () => {
   const user = useAuthStore.use.user();
   const logout = useAuthStore.use.signOut();
   const router = useRouter();
-  function handleLogout() {
+  const handleLogout = () => {
     logout();
     router.push('/');
-  }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white text-black p-4 shadow z-50">
