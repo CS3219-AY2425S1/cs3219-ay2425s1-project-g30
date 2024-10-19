@@ -29,8 +29,11 @@ const Dashboard = () => {
         title: 'Success',
         description: 'Match created successfully',
       });
+      // TODO: Replace with actual matching reroute logic
+      router.push('/match/1');
     },
     onError: (error: any) => {
+      setIsMatching(false);
       toast({
         variant: 'error',
         title: 'Error',
@@ -40,23 +43,15 @@ const Dashboard = () => {
   });
 
   const handleCreateMatch = (newMatch: MatchRequestDto) => {
-    createMutation.mutate(newMatch);
-  };
-
-  const startMatching = () => {
-    setIsMatching(true);
     setTimer(0);
-
-    // TODO: Replace with actual matching reroute logic
-    setTimeout(() => {
-      router.push('/match/1');
-    }, 3000);
 
     if (!intervalRef.current) {
       intervalRef.current = window.setInterval(() => {
         setTimer((prev) => prev + 1);
       }, 1000);
     }
+
+    createMutation.mutate(newMatch);
   };
 
   const stopMatching = () => {
@@ -64,7 +59,9 @@ const Dashboard = () => {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
     setIsMatching(false);
+    // TODO: Delete mutation here
   };
 
   useEffect(() => {
@@ -114,10 +111,7 @@ const Dashboard = () => {
             {...fadeAnimation}
           >
             <div className="flex w-2/5 justify-center items-center">
-              <MatchingForm
-                startMatching={startMatching}
-                onMatch={handleCreateMatch}
-              />
+              <MatchingForm onMatch={handleCreateMatch} />
             </div>
             <CardWaterfall className="ml-20 w-3/5" />
           </motion.div>

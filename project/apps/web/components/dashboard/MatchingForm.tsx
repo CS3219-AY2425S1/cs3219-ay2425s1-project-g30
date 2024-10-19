@@ -24,13 +24,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useZodForm } from '@/lib/form';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface MatchingFormProps {
-  startMatching: () => void;
   onMatch: (matchRequest: MatchRequestDto) => void;
 }
 
-const MatchingForm = ({ startMatching, onMatch }: MatchingFormProps) => {
+const MatchingForm = ({ onMatch }: MatchingFormProps) => {
+  const user = useAuthStore.use.user();
   const form = useZodForm({
     schema: matchCriteriaSchema,
     defaultValues: {
@@ -42,8 +43,19 @@ const MatchingForm = ({ startMatching, onMatch }: MatchingFormProps) => {
   const complexities = Object.values(COMPLEXITY);
   const categories = Object.values(CATEGORY);
 
-  const handleSubmit = (data: any): void => {
-    startMatching();
+  const handleSubmit = (data: {
+    complexity: COMPLEXITY;
+    category: CATEGORY[];
+  }): void => {
+    if (user) {
+      const matchRequest: MatchRequestDto = {
+        ...data,
+        userId: user.id,
+        // TODO: finalize date handling
+        timestamp: new Date().getTime(),
+      };
+      onMatch(matchRequest);
+    }
     console.log(data);
   };
 
