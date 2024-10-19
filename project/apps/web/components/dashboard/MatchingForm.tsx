@@ -4,10 +4,18 @@ import {
   CATEGORY,
   COMPLEXITY,
 } from '@repo/dtos/generated/enums/questions.enums';
-import { useState } from 'react';
+import { matchCriteriaSchema, MatchRequestDto } from '@repo/dtos/match';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -15,83 +23,113 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useZodForm } from '@/lib/form';
 
 interface MatchingFormProps {
   startMatching: () => void;
+  onMatch: (matchRequest: MatchRequestDto) => void;
 }
 
-const MatchingForm = ({ startMatching }: MatchingFormProps) => {
+const MatchingForm = ({ startMatching, onMatch }: MatchingFormProps) => {
+  const form = useZodForm({
+    schema: matchCriteriaSchema,
+    defaultValues: {
+      complexity: undefined,
+      category: [],
+    },
+  });
+
   const complexities = Object.values(COMPLEXITY);
   const categories = Object.values(CATEGORY);
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
+  const handleSubmit = (data: any): void => {
     startMatching();
+    console.log(data);
   };
 
-  const toggleCategory = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((cat) => cat !== category)
-        : [...prev, category],
-    );
-  };
+  const renderLabelWithAsterisk = (label: string) => (
+    <span>
+      {label} <span className="text-red-500">*</span>
+    </span>
+  );
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 w-full max-w-md">
       <h2 className="text-xl font-bold mb-4">Find Your Match</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Question Difficulty Dropdown */}
-        <div>
-          <div className="block text-sm font-bold text-black mb-2">
-            Question Difficulty
-          </div>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select question difficulty" />
-            </SelectTrigger>
-            <SelectContent>
-              {complexities.map((difficulty) => (
-                <SelectItem key={difficulty} value={difficulty}>
-                  {difficulty}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          {/* Question Difficulty Dropdown */}
+          <FormField
+            control={form.control}
+            name="complexity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="block text-sm font-bold text-black mb-2">
+                  {renderLabelWithAsterisk('Difficulty')}
+                </FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select question difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {complexities.map((difficulty) => (
+                        <SelectItem key={difficulty} value={difficulty}>
+                          {difficulty}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Categories Section */}
-        <div>
-          <div className="block text-sm font-bold text-black mb-2">
-            Categories
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Badge
-                key={category}
-                onClick={() => toggleCategory(category)}
-                variant={
-                  selectedCategories.includes(category)
-                    ? 'default'
-                    : 'secondary'
-                }
-                className="cursor-pointer"
-              >
-                {category}
-              </Badge>
-            ))}
-          </div>
-        </div>
+          {/* Categories Section */}
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="block text-sm font-bold text-black mb-2">
+                  {renderLabelWithAsterisk('Categories')}
+                </FormLabel>
+                <FormControl>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => (
+                      <Badge
+                        key={cat}
+                        onClick={() =>
+                          field.value?.includes(cat)
+                            ? field.onChange(
+                                field.value?.filter((value) => value !== cat),
+                              )
+                            : field.onChange([...field.value, cat])
+                        }
+                        variant={
+                          field.value?.includes(cat) ? 'default' : 'secondary'
+                        }
+                        className="cursor-pointer"
+                      >
+                        {cat}
+                      </Badge>
+                    ))}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Submit Button */}
-        <div className="pt-4">
-          <Button type="submit" variant="default" className="w-full">
-            Find Match
-          </Button>
-        </div>
-      </form>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button type="submit" variant="default" className="w-full">
+              Find Match
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 };

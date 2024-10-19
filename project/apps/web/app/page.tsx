@@ -1,5 +1,7 @@
 'use client';
 
+import { MatchRequestDto } from '@repo/dtos/match';
+import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -7,6 +9,8 @@ import { useEffect, useRef, useState } from 'react';
 import CardWaterfall from '@/components/dashboard/CardWaterfall';
 import MatchingForm from '@/components/dashboard/MatchingForm';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { createMatch } from '@/lib/api/match';
 import useMatchStore from '@/stores/useMatchStore';
 
 const Dashboard = () => {
@@ -14,6 +18,30 @@ const Dashboard = () => {
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef<number | null>(null);
   const router = useRouter();
+  const { toast } = useToast();
+
+  const createMutation = useMutation({
+    mutationFn: (newMatch: MatchRequestDto) => createMatch(newMatch),
+    onMutate: () => setIsMatching(true),
+    onSuccess: async () => {
+      toast({
+        variant: 'success',
+        title: 'Success',
+        description: 'Match created successfully',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: 'error',
+        title: 'Error',
+        description: error.message,
+      });
+    },
+  });
+
+  const handleCreateMatch = (newMatch: MatchRequestDto) => {
+    createMutation.mutate(newMatch);
+  };
 
   const startMatching = () => {
     setIsMatching(true);
@@ -86,7 +114,10 @@ const Dashboard = () => {
             {...fadeAnimation}
           >
             <div className="flex w-2/5 justify-center items-center">
-              <MatchingForm startMatching={startMatching} />
+              <MatchingForm
+                startMatching={startMatching}
+                onMatch={handleCreateMatch}
+              />
             </div>
             <CardWaterfall className="ml-20 w-3/5" />
           </motion.div>
