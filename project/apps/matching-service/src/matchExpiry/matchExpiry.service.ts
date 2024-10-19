@@ -15,7 +15,7 @@ export class MatchExpiryService {
     const matchRequest =
       await this.matchRedis.removeMatchRequest(expiredMatchId);
     if (!matchRequest) {
-      this.logger.warn(
+      this.logger.debug(
         `Match request with id ${expiredMatchId} does not exist`,
       );
       return;

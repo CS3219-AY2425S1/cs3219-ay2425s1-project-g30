@@ -30,6 +30,7 @@ export class MatchSupabase {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
+<<<<<<< HEAD
   /**
    * Saves a match to the database
    * @param {MatchDataDto} matchData The match data to save
@@ -39,12 +40,18 @@ export class MatchSupabase {
   async saveMatch(matchData: MatchDataDto): Promise<void> {
     const parsedMatchData = matchDataSchema.parse(matchData);
     const { error } = await this.supabase
+=======
+  async saveMatch(matchData: MatchDataDto): Promise<any> {
+    const parsedMatchData = matchDataSchema.parse(matchData);
+    const { data, error } = await this.supabase
+>>>>>>> origin/main
       .from(this.MATCHES_TABLE)
       .insert(parsedMatchData);
 
     if (error) {
       throw new Error(`Error inserting match: ${error.message}`);
     }
+<<<<<<< HEAD
   }
 
   /**
@@ -95,6 +102,12 @@ export class MatchSupabase {
    * @returns The id of the selected question
    */
 
+=======
+
+    return data;
+  }
+
+>>>>>>> origin/main
   async getRandomQuestion(filters: MatchCriteriaDto): Promise<string> {
     // Call the question service to get a random question based on the filters
     const selectedQuestionId = await firstValueFrom(

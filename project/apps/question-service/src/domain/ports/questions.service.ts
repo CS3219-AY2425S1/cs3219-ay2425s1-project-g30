@@ -79,8 +79,12 @@ export class QuestionsService {
    */
   async findRandom(filters: MatchCriteriaDto): Promise<string> {
     try {
+<<<<<<< HEAD
       const randomQuestionId =
         await this.questionsRepository.findOneRandom(filters);
+=======
+      const randomQuestionId = await this.questionsRepository.findOneRandom(filters);
+>>>>>>> origin/main
 
       this.logger.log(`fetched random question with id ${randomQuestionId}`);
 
@@ -90,6 +94,10 @@ export class QuestionsService {
     }
   }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
   /**
    * Creates a new question.
    *
