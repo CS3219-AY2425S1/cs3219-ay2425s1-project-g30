@@ -10,10 +10,15 @@ import { parse } from 'cookie';
 import { firstValueFrom } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { MatchRedis } from './db/match.redis';
+import {
+  WEBSOCKET_RETRY_ATTEMPTS,
+  WEBSOCKET_RETRY_DELAY,
+} from './constants/websocket';
 
 enum MatchEvent {
   'MATCH_FOUND' = 'match_found',
   'MATCH_REQUEST_EXPIRED' = 'match_request_expired',
+  'MATCH_INVALID' = 'match_invalid',
 }
 
 @WebSocketGateway(8080, {
@@ -48,7 +53,7 @@ export class MatchingGateway
     const cookies = parse(cookie);
     const accessToken = cookies['access_token'];
     // Disconnect client if no token provided
-    if (! accessToken) {
+    if (!accessToken) {
       client.disconnect();
       return;
     }
@@ -83,15 +88,50 @@ export class MatchingGateway
   }
 
   async sendMessageToClient({
-    socketId,
+    userId,
     message,
     event,
+    attempt = 1,
   }: {
-    socketId: string;
+    userId: string;
     message: any;
     event: MatchEvent;
+    attempt?: number;
   }) {
-    this.server.to(socketId).emit(event, message);
+    try {
+      const socketId = await this.matchRedis.getSocketByUserId(userId);
+      if (!socketId) {
+        throw new Error(`Socket not found for user ${userId}`);
+      }
+      const socket = this.server.sockets.sockets.get(socketId);
+      if (!socket || !socket.connected) {
+        throw new Error(`Socket ${socketId} is no longer connected`);
+      }
+
+      socket.emit(event, message);
+      this.logger.debug(`Message sent to socket ${socketId} on event ${event}`);
+    } catch (error) {
+      this.logger.error(
+        `Error sending message to user ${userId} on attempt ${attempt}: ${error.message}`,
+      );
+      if (attempt < WEBSOCKET_RETRY_ATTEMPTS) {
+        setTimeout(
+          () => {
+            this.sendMessageToClient({
+              userId,
+              message,
+              event,
+              attempt: attempt + 1,
+            });
+          },
+          WEBSOCKET_RETRY_DELAY * 2 ** (attempt - 1),
+        ); // Exponential backoff
+      } else {
+        this.logger.error(
+          `Failed to send message to user ${userId} after ${WEBSOCKET_RETRY_ATTEMPTS} attempts`,
+        );
+      }
+    }
   }
 
   async sendMatchFound({
@@ -101,13 +141,45 @@ export class MatchingGateway
     userId: string;
     message: string;
   }) {
-    const socketId = await this.matchRedis.getSocketByUserId(userId);
-    // TODO: Implement a retry mechanism here if there is either no socket id or the sending failed
-    if (socketId) {
+    if (userId) {
       this.sendMessageToClient({
-        socketId,
+        userId,
         message,
         event: MatchEvent.MATCH_FOUND,
+      });
+    }
+  }
+
+  async sendMatchRequestExpired({
+    userId,
+    message,
+  }: {
+    userId: string;
+    message: string;
+  }) {
+    const socketId = await this.matchRedis.getSocketByUserId(userId);
+    if (socketId) {
+      this.sendMessageToClient({
+        userId,
+        message,
+        event: MatchEvent.MATCH_REQUEST_EXPIRED,
+      });
+    }
+  }
+
+  async sendMatchInvalid({
+    userId,
+    message,
+  }: {
+    userId: string;
+    message: string;
+  }) {
+    const socketId = await this.matchRedis.getSocketByUserId(userId);
+    if (socketId) {
+      this.sendMessageToClient({
+        userId,
+        message,
+        event: MatchEvent.MATCH_INVALID,
       });
     }
   }

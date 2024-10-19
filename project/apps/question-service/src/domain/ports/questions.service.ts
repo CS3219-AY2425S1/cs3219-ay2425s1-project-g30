@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
+import { MatchCriteriaDto } from '@repo/dtos/match';
 import {
   CreateQuestionDto,
   QuestionFiltersDto,
@@ -70,6 +71,24 @@ export class QuestionsService {
       this.handleError('fetch question by id', error);
     }
   }
+
+  /**
+   * Fetches a random question based on the provided filters.
+   * @param {MatchCriteriaDto} filters - The filters to apply when fetching the question
+   * @returns {string} A promise that resolves to the id of the question
+   */
+  async findRandom(filters: MatchCriteriaDto): Promise<string> {
+    try {
+      const randomQuestionId = await this.questionsRepository.findOneRandom(filters);
+
+      this.logger.log(`fetched random question with id ${randomQuestionId}`);
+
+      return randomQuestionId;
+    } catch (error) {
+      this.handleError('fetch random question', error);
+    }
+  }
+
 
   /**
    * Creates a new question.

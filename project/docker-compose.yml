@@ -105,6 +105,15 @@ services:
       - 6739:6739
     volumes:
       - redis_data:/data
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - 5540:5540
+    networks:
+      - backend
+    depends_on:
+      - redis  # Ensure Redis starts before Redis Insight
 networks:
   backend:
     driver: bridge

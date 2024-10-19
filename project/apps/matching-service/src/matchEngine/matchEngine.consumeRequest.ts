@@ -4,6 +4,7 @@ import { ConfirmChannel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
 import { EnvService } from 'src/env/env.service';
 import { MatchEngineService } from './matchEngine.service';
+import { MatchRequestMsgDto, matchRequestMsgSchema } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchEngineConsumer implements OnModuleInit {
@@ -24,9 +25,15 @@ export class MatchEngineConsumer implements OnModuleInit {
         await channel.assertQueue(MATCH_QUEUE, { durable: true });
         await channel.consume(MATCH_QUEUE, async (message) => {
           if (message) {
-            const content = JSON.parse(message.content.toString());
-            this.consumeMessage(content);
-            channel.ack(message);
+            try {
+              const content = JSON.parse(message.content.toString());
+              const matchRequest = matchRequestMsgSchema.parse(content);
+              await this.consumeMessage(matchRequest);
+              channel.ack(message);
+            } catch (err) {
+              this.logger.error('Error occurred consuming message:', err);
+              channel.nack(message);
+            }
           }
         });
       });
@@ -36,9 +43,8 @@ export class MatchEngineConsumer implements OnModuleInit {
     }
   }
 
-  public consumeMessage(content: any) {
-    this.logger.log('Received message:', content);
-    // Perform some sort of match generation
+  public async consumeMessage(content: MatchRequestMsgDto) {
+    this.logger.log('Processing Match Request:', content);
     this.matchEngineService.generateMatch(content);
   }
 }

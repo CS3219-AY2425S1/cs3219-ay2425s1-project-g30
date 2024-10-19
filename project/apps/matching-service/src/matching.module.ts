@@ -1,8 +1,6 @@
-import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { RedisOptions } from './constants/redis';
 import { MatchRedis } from './db/match.redis';
 import { MatchSupabase } from './db/match.supabase';
 import { envSchema } from './env/env';
@@ -15,8 +13,10 @@ import { MatchEngineService } from './matchEngine/matchEngine.service';
 import { MatchExpiryConsumer } from './matchExpiry/matchExpiry.consumeExpiry';
 import { MatchExpiryService } from './matchExpiry/matchExpiry.service';
 import { MatchingController } from './matching.controller';
-import { MatchingGateway } from './matching.gateway';
 import { MatchRequestService } from './matchRequest/matchRequest.service';
+import { MatchingGateway } from './matching.gateway';
+import { RedisModule } from './redis/redis.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,7 +34,7 @@ import { MatchRequestService } from './matchRequest/matchRequest.service';
       },
     }),
     EnvModule,
-    CacheModule.registerAsync(RedisOptions),
+    RedisModule,
     ClientsModule.registerAsync([
       {
         imports: [EnvModule],
@@ -81,5 +81,6 @@ import { MatchRequestService } from './matchRequest/matchRequest.service';
     MatchRequestService,
     MatchingGateway,
   ],
+  exports: [],
 })
 export class MatchingModule {}
