@@ -118,14 +118,16 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     const { category, complexity } = filters;
 
     // Serialize the category array to a string for filter pgres query
-    const escaped = category.map(item => item.replace(/\\/g, '\\\\').replace(/"/g, '\\"'));
-    const categories = `{${escaped.map(item => `"${item}"`).join(',')}}`;
+    const escaped = category.map((item) =>
+      item.replace(/\\/g, '\\\\').replace(/"/g, '\\"'),
+    );
+    const categories = `{${escaped.map((item) => `"${item}"`).join(',')}}`;
 
-    const {data, error} = await this.supabase
+    const { data, error } = await this.supabase
       .from(this.RANDOM_ORDERED_QUESTIONS_TABLE)
       .select('id')
       .eq('q_complexity', complexity)
-      .filter('q_category','ov', categories)
+      .filter('q_category', 'ov', categories)
       .limit(1)
       .single<QuestionDto>();
 

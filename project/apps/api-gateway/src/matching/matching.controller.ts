@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('matches')
@@ -14,5 +14,14 @@ export class MatchingController {
       { cmd: 'find_match' },
       matchCriteria,
     );
+  }
+  @Get(':id')
+  async getMatchById(@Param('id') id: string) {
+    return this.matchingServiceClient.send({ cmd: 'get_match' }, id);
+  }
+
+  @Get('user/:id')
+  async getMatchesByUserId(@Param('id') id: string) {
+    return this.matchingServiceClient.send({ cmd: 'get_user_matches' }, id);
   }
 }

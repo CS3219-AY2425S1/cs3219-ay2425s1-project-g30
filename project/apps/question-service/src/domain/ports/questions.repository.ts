@@ -26,7 +26,6 @@ export abstract class QuestionsRepository {
    */
   abstract findById(id: string): Promise<QuestionDto>;
 
-
   /**
    * Retrieves a random question that matches the given filters.
    * @param filters - The criteria used to filter the questions.
