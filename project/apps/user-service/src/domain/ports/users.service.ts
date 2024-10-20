@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import {
+  ChangePasswordDto,
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
@@ -80,25 +81,25 @@ export class UsersService {
    * @returns {Promise<UserDataDto>} A promise that resolves to the updated user data transfer object.
    * @throws {BadRequestException} - If another user with the same email or username already exists.
    */
-  async updateById(userDetails: UpdateUserDto): Promise<UserDataDto> {
+  async updateById(updateUserDto: UpdateUserDto): Promise<UserDataDto> {
     try {
       const filter: UserFiltersDto = {
-        email: userDetails.email,
-        username: userDetails.username,
+        email: updateUserDto.email,
+        username: updateUserDto.username,
       };
 
       const existingUserCollection = await this.usersRepository.findAll(filter);
 
       if (
         existingUserCollection.metadata.count &&
-        existingUserCollection.users[0].id !== userDetails.id
+        existingUserCollection.users[0].id !== updateUserDto.id
       ) {
         throw new BadRequestException(
           `The email or username is already in use by another user`,
         );
       }
 
-      const user = await this.usersRepository.updateById(userDetails);
+      const user = await this.usersRepository.updateById(updateUserDto);
 
       this.logger.log(`updated user with id ${user.id}`);
 
@@ -128,19 +129,41 @@ export class UsersService {
   }
 
   /**
+   * Changes a user's password by their unique identifier.
+   *
+   * @param {ChangePasswordDto} changePasswordDto - The change password data transfer object.
+   * @returns {Promise<UserDataDto>} A promise that resolves to the updated user data transfer object.
+   * @throws Will throw an error if the user's password cannot be changed.
+   */
+  async changePasswordById(
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<UserDataDto> {
+    try {
+      const user =
+        await this.usersRepository.changePasswordById(changePasswordDto);
+
+      this.logger.log(`changed password for user with id ${user.id}`);
+
+      return user;
+    } catch (error) {
+      this.handleError('change password by id', error);
+    }
+  }
+
+  /**
    * Deletes a user by their unique identifier.
    *
    * @param {string} id - The unique identifier of the user to be deleted.
    * @returns {Promise<UserDataDto>} A promise that resolves to the deleted user data transfer object.
    * @throws Will throw an error if the user cannot be deleted.
    */
-  async deleteById(id: string): Promise<UserDataDto> {
+  async deleteById(id: string): Promise<boolean> {
     try {
-      const user = await this.usersRepository.deleteById(id);
+      const isDeleted = await this.usersRepository.deleteById(id);
 
       this.logger.log(`deleted user with id ${id}`);
 
-      return user;
+      return isDeleted;
     } catch (error) {
       this.handleError('delete user by id', error);
     }

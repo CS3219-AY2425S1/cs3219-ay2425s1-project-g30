@@ -6,7 +6,6 @@ interface QuestionLayoutProps {
 }
 
 const QuestionLayout = ({ children }: QuestionLayoutProps) => {
-  // enforce login here
   return children;
 };
 

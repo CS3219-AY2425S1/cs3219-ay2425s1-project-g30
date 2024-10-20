@@ -3,6 +3,7 @@ import { EnvService } from 'src/env/env.service';
 import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
 import {
+  ChangePasswordDto,
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
@@ -93,34 +94,22 @@ export class SupabaseUsersRepository implements UsersRepository {
     return data;
   }
 
-  async updateById(userDetails: UpdateUserDto): Promise<UserDataDto> {
-    const {
-      id,
-      email: newEmail,
-      username: newUsername,
-      password: newPassword,
-    } = userDetails;
+  async updateById(updateUserDto: UpdateUserDto): Promise<UserDataDto> {
+    const { id, email: newEmail, username: newUsername } = updateUserDto;
 
-    // Update user email and/or password in auth table
-    const { error: authError } = await this.supabase.auth.updateUser({
-      email: newEmail,
-      password: newPassword,
-      data: { username: newUsername },
-    });
+    const { error: authError } = await this.supabase.auth.admin.updateUserById(
+      updateUserDto.id,
+      {
+        email: newEmail,
+        app_metadata: { username: newUsername },
+      },
+    );
 
     if (authError) {
       throw authError;
     }
 
     // Update user details in profiles table
-    const updateData: any = {};
-    if (newEmail) {
-      updateData.email = newEmail;
-    }
-    if (newUsername) {
-      updateData.username = newUsername;
-    }
-
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .update({
@@ -137,24 +126,12 @@ export class SupabaseUsersRepository implements UsersRepository {
     return data;
   }
 
-  async updatePrivilegeById(id: string): Promise<any> {
+  async updatePrivilegeById(id: string): Promise<UserDataDto> {
     const user = await this.findById(id);
     const newRole = user.role == ROLE.Admin ? ROLE.User : ROLE.Admin;
 
-    // Update user role in auth table
-    const { error: authError } = await this.supabase.auth.admin.updateUserById(
-      id,
-      {
-        role: newRole.toLowerCase(),
-      },
-    );
-
-    if (authError) {
-      throw authError;
-    }
-
     // Update user role in profiles table
-    const { data, error } = await this.supabase
+    const { data: updatedUser, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .update({ role: newRole })
       .eq('id', id)
@@ -165,19 +142,29 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw error;
     }
 
-    console.error(data);
-
-    return data;
+    return updatedUser;
   }
 
-  async deleteById(id: string): Promise<UserDataDto> {
-    // Delete user from auth table
-    const { error: authError } = await this.supabase.auth.admin.deleteUser(id);
+  async changePasswordById(
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<UserDataDto> {
+    // Update user password in auth table
+    const { error: authError } = await this.supabase.auth.admin.updateUserById(
+      changePasswordDto.id,
+      {
+        password: changePasswordDto.newPassword,
+      },
+    );
+
     if (authError) {
       throw authError;
     }
 
-    // Delete user from profiles table
+    return await this.findById(changePasswordDto.id);
+  }
+
+  async deleteById(id: string): Promise<boolean> {
+    // Delete user from profiles table first
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .delete()
@@ -188,6 +175,12 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw error;
     }
 
-    return data;
+    // Then delete user from auth table
+    const { error: authError } = await this.supabase.auth.admin.deleteUser(id);
+    if (authError) {
+      throw authError;
+    }
+
+    return data == null;
   }
 }

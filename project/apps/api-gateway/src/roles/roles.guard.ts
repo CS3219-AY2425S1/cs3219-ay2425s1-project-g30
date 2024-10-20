@@ -22,11 +22,15 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
+    if (!user) {
+      throw new ForbiddenException('User is not authenticated.');
+    }
+
     if (requiredRoles.some((role) => user.role == role)) {
       return true;
     } else {
       throw new ForbiddenException(
-        'You do not have permission for this resource',
+        'You do not have permission to do this. Please contact an administrator.',
       );
     }
   }

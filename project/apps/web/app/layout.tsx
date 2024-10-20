@@ -4,6 +4,7 @@ import { Inter, Roboto } from 'next/font/google';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 import Sidebar from '@/components/Sidebar';
 import Suspense from '@/components/Suspense';
@@ -33,8 +34,10 @@ const LayoutWithSidebarAndTopbar = ({
 }) => {
   const pathname = usePathname();
   const { isSearching } = useSocketStore();
+  const user = useAuthStore.use.user();
+  const signOut = useAuthStore.use.signOut();
 
-  const excludePaths = ['/auth'];
+  const excludePaths = ['/login'];
 
   // TODO: validate match path
   const renderSidebarAndTopbar =
@@ -44,8 +47,8 @@ const LayoutWithSidebarAndTopbar = ({
     <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
       {renderSidebarAndTopbar && !isSearching && (
         <>
-          <Topbar />
-          <Sidebar />
+          <Topbar user={user} />
+          <Sidebar signOut={signOut} />
         </>
       )}
       <main
@@ -62,8 +65,11 @@ const RootLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const pathname = usePathname();
   const fetchUser = useAuthStore.use.fetchUser();
   const { connect, disconnect } = useSocketStore();
+  const excludeLoginStatePaths = ['/login'];
+  const shouldEnforceLoginState = !excludeLoginStatePaths.includes(pathname);
 
   // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
@@ -87,7 +93,11 @@ const RootLayout = ({
       <body className={roboto.className}>
         <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
           <ReactQueryProvider>
-            <LayoutWithSidebarAndTopbar>{children}</LayoutWithSidebarAndTopbar>
+            <EnforceLoginStatePageWrapper enabled={shouldEnforceLoginState}>
+              <LayoutWithSidebarAndTopbar>
+                {children}
+              </LayoutWithSidebarAndTopbar>
+            </EnforceLoginStatePageWrapper>
           </ReactQueryProvider>
           <Toaster />
         </Suspense>

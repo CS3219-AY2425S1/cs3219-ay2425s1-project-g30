@@ -86,7 +86,6 @@ export class AuthController {
   }
 
   @Post('signout')
-  @UseGuards(AuthGuard)
   async signOut(@Res() res: Response) {
     this.authServiceClient.send({ cmd: 'signout' }, {});
     res.clearCookie('access_token');

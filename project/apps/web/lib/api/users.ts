@@ -1,4 +1,5 @@
 import {
+  ChangePasswordDto,
   UpdateUserDto,
   UserCollectionDto,
   UserDataDto,
@@ -25,6 +26,16 @@ export const updateUser = async (
 
 export const updateUserPrivilege = async (id: string): Promise<UserDataDto> => {
   return await apiCall('patch', `/users/${id}`);
+};
+
+export const changePassword = async (
+  changePasswordDto: ChangePasswordDto,
+): Promise<UserDataDto> => {
+  return await apiCall(
+    'patch',
+    `/users/password/${changePasswordDto.id}`,
+    changePasswordDto,
+  );
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
