@@ -93,7 +93,7 @@ export class MatchEngineService {
       // TODO: Call Collaboration service to intiialize a new collaboration session
     } else {
       this.logger.log(
-        `No match found for user ${userId}, adding to matching queue`,
+        `No immediate match found for user ${userId}, adding to matching queue`,
       );
       // No match found, add the match to redis
       const match_req_id = await this.matchRedis.addMatchRequest(matchRequest);

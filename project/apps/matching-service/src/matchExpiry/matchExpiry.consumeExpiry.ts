@@ -39,8 +39,7 @@ export class MatchExpiryConsumer implements OnModuleInit {
   consumeMessage(match_req_Id: string) {
     match_req_Id = match_req_Id.replace(/^"(.*)"$/, '$1'); // To remove quotes
     this.logger.log(
-      'Received expiry message for match request ID:',
-      match_req_Id,
+      'Received expiry message for match request ID:' + match_req_Id,
     );
     this.matchExpiryService.handleExpiryMessage(match_req_Id);
   }

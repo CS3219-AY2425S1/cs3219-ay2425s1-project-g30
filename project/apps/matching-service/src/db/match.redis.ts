@@ -5,7 +5,7 @@ import {
 } from '@repo/dtos/generated/enums/questions.enums';
 import { MatchRequestDto } from '@repo/dtos/match';
 import Redis from 'ioredis';
-import { MATCH_CANCEL_TTL } from 'src/constants/queue';
+import { MATCH_CANCEL_TTL, MATCH_FETCH_LIMIT } from 'src/constants/queue';
 import {
   MATCH_CANCELLED_KEY,
   MATCH_CATEGORY,
@@ -79,6 +79,7 @@ export class MatchRedis {
 
     try {
       await pipeline.exec();
+      this.logger.log(`Match request added for id: ${match_req_id}`);
     } catch (error) {
       this.logger.error(`Error adding match request: ${error}`);
       return null;
@@ -123,8 +124,10 @@ export class MatchRedis {
     match_req_Id: string,
   ): Promise<MatchRequestDto | null> {
     this.logger.log(`Removing Match Request: ${match_req_Id}`);
+
     const hashKey = `${MATCH_REQUEST}-${match_req_Id}`;
     const matchRequest = await this.getMatchRequest(match_req_Id);
+
     if (!matchRequest) return null;
     const { category, complexity } = matchRequest;
     const pipeline = this.redisClient.multi();
@@ -138,6 +141,16 @@ export class MatchRedis {
 
     try {
       await pipeline.exec();
+
+      // Confirm that the match request has been removed
+      const existingMatchRequest = await this.getMatchRequest(match_req_Id);
+      if (existingMatchRequest) {
+        this.logger.error(`Match request ${match_req_Id} not removed`);
+        return null;
+      } else {
+        this.logger.log(`Match request ${match_req_Id} removed`);
+      }
+
       return matchRequest;
     } catch (error) {
       this.logger.error(`Error removing match request: ${error}`);
@@ -174,7 +187,9 @@ export class MatchRedis {
 
     categories.forEach((cat) => {
       const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
-      pipeline.zrange(sortedSetKey, 0, 0);
+
+      // Note: we do not just fetch the first match request, because we need to check if it is cancelled
+      pipeline.zrange(sortedSetKey, 0, MATCH_FETCH_LIMIT - 1);
     });
 
     const responses = await pipeline.exec();
@@ -189,18 +204,35 @@ export class MatchRedis {
         );
         return null;
       }
-      const match_req_Id: string = Array.isArray(res) ? res[0] : null;
-      if (!match_req_Id) return null;
 
-      const matchRequest = await this.getMatchRequest(match_req_Id);
-      if (!matchRequest || matchRequest.userId === userId) return null;
+      for (const match_req_Id of res as string[]) {
+        if (!match_req_Id) continue;
 
-      // Also need to check if the match_req_Id is in the cancelled list
-      const isCancelled = await this.isMatchRequestCancelled(match_req_Id);
+        const matchRequest = await this.getMatchRequest(match_req_Id);
+        if (!matchRequest || matchRequest.userId === userId) continue;
 
-      if (matchRequest && !isCancelled) {
-        return matchRequest;
+        // Also need to check if the match_req_Id is in the cancelled list
+        const isCancelled = await this.isMatchRequestCancelled(match_req_Id);
+        if (isCancelled) {
+          this.logger.debug(
+            `Match request ${match_req_Id} is cancelled, removing match request and skipping`,
+          );
+          // Remove the cancelled match request from the sorted set
+          await this.removeMatchRequest(match_req_Id);
+          continue;
+        }
+
+        if (matchRequest && !isCancelled) {
+          // Partner match request found
+          this.logger.debug(`Partner match request found: ${match_req_Id}`);
+
+          // Remove the partner match request from the sorted set
+          await this.removeMatchRequest(match_req_Id);
+          return matchRequest;
+        }
       }
+
+      // No match found for this category
       return null;
     });
 
