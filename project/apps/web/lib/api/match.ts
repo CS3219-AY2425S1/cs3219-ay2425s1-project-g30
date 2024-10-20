@@ -7,3 +7,13 @@ export const createMatch = async (
 ): Promise<MatchDataDto> => {
   return await apiCall('post', '/matches', null, queryParams);
 };
+
+export const getMatchById = async (id: string): Promise<MatchDataDto> => {
+  return await apiCall('get', `/matches/${id}`);
+};
+
+export const getMatchesByUserId = async (
+  id: string,
+): Promise<MatchDataDto[]> => {
+  return await apiCall('get', `/matches/user/${id}`);
+};

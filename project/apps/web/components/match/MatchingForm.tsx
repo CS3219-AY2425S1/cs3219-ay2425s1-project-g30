@@ -5,6 +5,7 @@ import {
   COMPLEXITY,
 } from '@repo/dtos/generated/enums/questions.enums';
 import { matchCriteriaSchema, MatchRequestDto } from '@repo/dtos/match';
+import dayjs from 'dayjs';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -51,8 +52,7 @@ const MatchingForm = ({ onMatch }: MatchingFormProps) => {
       const matchRequest: MatchRequestDto = {
         ...data,
         userId: user.id,
-        // TODO: finalize date handling
-        timestamp: new Date().getTime(),
+        timestamp: dayjs().unix(),
       };
       onMatch(matchRequest);
     }

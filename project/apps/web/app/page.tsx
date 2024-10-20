@@ -23,14 +23,16 @@ const Dashboard = () => {
   const createMutation = useMutation({
     mutationFn: (newMatch: MatchRequestDto) => createMatch(newMatch),
     onMutate: () => setIsMatching(true),
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       toast({
         variant: 'success',
         title: 'Success',
         description: 'Match created successfully',
       });
-      // TODO: Replace with actual matching reroute logic
-      router.push('/match/1');
+
+      console.log({ data });
+      const matchId = data.id;
+      router.push(`/match/${matchId}`);
     },
     onError: (error: any) => {
       setIsMatching(false);
