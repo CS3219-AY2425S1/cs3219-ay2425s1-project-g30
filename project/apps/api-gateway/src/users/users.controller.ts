@@ -13,6 +13,8 @@ import {
   ForbiddenException,
   BadRequestException,
   UseGuards,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -24,12 +26,15 @@ import {
   ChangePasswordDto,
 } from '@repo/dtos/users';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
-import { Request } from 'express';
+import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
 import { firstValueFrom } from 'rxjs';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/roles/roles.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { Request, Response } from 'express';
 
 @Controller('users')
-@UseGuards(AuthGuard) // comment out if we dw auth for now
+@UseGuards(AuthGuard, RolesGuard)
 export class UsersController {
   constructor(
     @Inject('USER_SERVICE')
@@ -40,19 +45,9 @@ export class UsersController {
   ) {}
 
   @Get()
+  @Roles(ROLE.Admin)
   @UsePipes(new ZodValidationPipe(userFiltersSchema))
-  async getUsers(@Req() req: Request, @Query() filters: UserFiltersDto) {
-    const accessToken = req.cookies['access_token'];
-
-    // Check if user is admin, else forbid access [DELETE once role guard is implemented]
-    const userData = await firstValueFrom(
-      this.authServiceClient.send({ cmd: 'me' }, accessToken),
-    );
-
-    if (userData.role != 'Admin') {
-      throw new ForbiddenException('Access denied.');
-    }
-
+  async getUsers(@Query() filters: UserFiltersDto) {
     return this.usersServiceClient.send({ cmd: 'get_users' }, filters);
   }
 
@@ -72,40 +67,29 @@ export class UsersController {
       throw new BadRequestException('ID in URL does not match ID in body');
     }
 
-    // Check if admin or user is updating their own account [DELETE once role guard is implemented]
+    // Check if admin or user is updating their own account
     const accessToken = req.cookies['access_token'];
     const userData = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
 
-    if (userData.role != 'Admin' && userData.id != id) {
+    if (userData.role != ROLE.Admin && userData.id != id) {
       throw new ForbiddenException('Access denied.');
     }
 
-    return this.usersServiceClient.send(
-      { cmd: 'update_user' },
-      { updateUserDto, accessToken },
-    );
+    return this.usersServiceClient.send({ cmd: 'update_user' }, updateUserDto);
   }
 
   @Patch(':id')
-  async updateUserPrivilegeById(@Req() req: Request, @Param('id') id: string) {
-    const accessToken = req.cookies['access_token'];
-
-    // Check if user is admin [DELETE once role guard is implemented]
-    const { userData } = await firstValueFrom(
-      this.authServiceClient.send({ cmd: 'me' }, accessToken),
-    );
-    if (userData.role != 'Admin') {
-      throw new ForbiddenException('Access denied.');
-    }
-
+  @Roles(ROLE.Admin)
+  async updateUserPrivilegeById(@Param('id') id: string) {
     return this.usersServiceClient.send({ cmd: 'update_privilege' }, id);
   }
 
   @Patch('password/:id')
   async changePasswordById(
     @Req() req: Request,
+    @Res() res: Response,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(changePasswordSchema))
     changePasswordDto: ChangePasswordDto,
@@ -114,50 +98,77 @@ export class UsersController {
       throw new BadRequestException('ID in URL does not match ID in body');
     }
 
-    // Check if user is admin or user is changing their own password [DELETE once role guard is implemented]
+    // Check if user is admin or user is changing their own password
     const accessToken = req.cookies['access_token'];
-    const { userData } = await firstValueFrom(
+    const userData = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
 
-    if (userData.role != 'Admin' && userData.id != id) {
+    if (userData.role != ROLE.Admin && userData.id != id) {
       throw new ForbiddenException('Access denied.');
     }
 
-    // Check if old password matches
-    const { error } = await firstValueFrom(
+    const updatedUser = await firstValueFrom(
+      this.usersServiceClient.send(
+        { cmd: 'change_password' },
+        changePasswordDto,
+      ),
+    );
+
+    // Sign back in and update cookies with new password
+    const { session } = await firstValueFrom(
       this.authServiceClient.send(
-        { cmd: 'sign_in' },
+        { cmd: 'signin' },
         {
-          email: userData.email,
-          password: changePasswordDto.oldPassword,
+          email: updatedUser.email,
+          password: changePasswordDto.newPassword,
         },
       ),
     );
 
-    if (error) {
-      throw new BadRequestException('Old password is incorrect');
-    }
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+    res.cookie('access_token', session.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
+    res.cookie('refresh_token', session.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
+    });
 
-    return this.usersServiceClient.send(
-      { cmd: 'change_password' },
-      { changePasswordDto, accessToken },
-    );
+    return res.status(HttpStatus.OK).json(updatedUser);
   }
 
   @Delete(':id')
-  async deleteUserById(@Req() req: Request, @Param('id') id: string) {
+  async deleteUserById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string,
+  ) {
     const accessToken = req.cookies['access_token'];
 
-    // Check if admin is deleting, else deny access [DELETE once role guard is implemented]
-    const { userData } = await firstValueFrom(
+    // Check if admin is deleting user or user is deleting their own account
+    const userData = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
 
-    if (userData.role != 'Admin') {
+    if (userData.role != ROLE.Admin && userData.id != id) {
       throw new ForbiddenException('Access denied.');
     }
 
-    return this.usersServiceClient.send({ cmd: 'delete_user' }, id);
+    // Delete user and clear session
+    const isDeleted = await firstValueFrom(
+      this.usersServiceClient.send({ cmd: 'delete_user' }, id),
+    );
+    await this.authServiceClient.send({ cmd: 'signout' }, {});
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
+    return res.status(HttpStatus.OK).json(isDeleted);
   }
 }

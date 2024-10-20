@@ -13,8 +13,6 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { UsersRepository } from 'src/domain/ports/users.repository';
 @Injectable()
 export class SupabaseUsersRepository implements UsersRepository {
-  private supabaseUrl: string;
-  private supabaseKey: string;
   private supabase: SupabaseClient;
 
   private readonly PROFILES_TABLE = 'profiles';
@@ -27,21 +25,7 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw new Error('Supabase URL and key must be provided');
     }
 
-    this.supabaseUrl = supabaseUrl;
-    this.supabaseKey = supabaseKey;
     this.supabase = createClient(supabaseUrl, supabaseKey);
-  }
-
-  // To pass the access token for authenticated requests
-  private getSupabaseClientWithToken(accessToken: string) {
-    const supabase = createClient(this.supabaseUrl, this.supabaseKey, {
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
-    return supabase;
   }
 
   async findAll(filters: UserFiltersDto): Promise<UserCollectionDto> {
@@ -110,20 +94,16 @@ export class SupabaseUsersRepository implements UsersRepository {
     return data;
   }
 
-  async updateById(body: {
-    updateUserDto: UpdateUserDto;
-    accessToken: string;
-  }): Promise<UserDataDto> {
-    const { id, email: newEmail, username: newUsername } = body.updateUserDto;
+  async updateById(updateUserDto: UpdateUserDto): Promise<UserDataDto> {
+    const { id, email: newEmail, username: newUsername } = updateUserDto;
 
-    // Use Supabase client with access token
-    const supabase = this.getSupabaseClientWithToken(body.accessToken);
-
-    // Update user details in auth table
-    const { error: authError } = await supabase.auth.updateUser({
-      email: newEmail,
-      data: { username: newUsername },
-    });
+    const { error: authError } = await this.supabase.auth.admin.updateUserById(
+      updateUserDto.id,
+      {
+        email: newEmail,
+        app_metadata: { username: newUsername },
+      },
+    );
 
     if (authError) {
       throw authError;
@@ -146,24 +126,12 @@ export class SupabaseUsersRepository implements UsersRepository {
     return data;
   }
 
-  async updatePrivilegeById(id: string): Promise<any> {
+  async updatePrivilegeById(id: string): Promise<UserDataDto> {
     const user = await this.findById(id);
     const newRole = user.role == ROLE.Admin ? ROLE.User : ROLE.Admin;
 
-    // Update user role in auth table
-    const { error: authError } = await this.supabase.auth.admin.updateUserById(
-      id,
-      {
-        role: newRole.toLowerCase(),
-      },
-    );
-
-    if (authError) {
-      throw authError;
-    }
-
     // Update user role in profiles table
-    const { data, error } = await this.supabase
+    const { data: updatedUser, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .update({ role: newRole })
       .eq('id', id)
@@ -174,40 +142,29 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw error;
     }
 
-    console.error(data);
-
-    return data;
+    return updatedUser;
   }
 
-  async changePasswordById(body: {
-    changePasswordDto: ChangePasswordDto;
-    accessToken: string;
-  }): Promise<UserDataDto> {
-    const user = await this.findById(body.changePasswordDto.id);
-
-    // Use Supabase client with access token
-    const supabase = this.getSupabaseClientWithToken(body.accessToken);
-
-    // Update user details in auth table
-    const { error: authError } = await supabase.auth.updateUser({
-      password: body.changePasswordDto.newPassword,
-    });
+  async changePasswordById(
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<UserDataDto> {
+    // Update user password in auth table
+    const { error: authError } = await this.supabase.auth.admin.updateUserById(
+      changePasswordDto.id,
+      {
+        password: changePasswordDto.newPassword,
+      },
+    );
 
     if (authError) {
       throw authError;
     }
 
-    return user;
+    return await this.findById(changePasswordDto.id);
   }
 
-  async deleteById(id: string): Promise<UserDataDto> {
-    // Delete user from auth table
-    const { error: authError } = await this.supabase.auth.admin.deleteUser(id);
-    if (authError) {
-      throw authError;
-    }
-
-    // Delete user from profiles table
+  async deleteById(id: string): Promise<boolean> {
+    // Delete user from profiles table first
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .delete()
@@ -218,6 +175,12 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw error;
     }
 
-    return data;
+    // Then delete user from auth table
+    const { error: authError } = await this.supabase.auth.admin.deleteUser(id);
+    if (authError) {
+      throw authError;
+    }
+
+    return data == null;
   }
 }

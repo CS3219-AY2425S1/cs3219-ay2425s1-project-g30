@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import { changePassword, deleteUser } from '@/lib/api/users';
 
 interface ActionModalsProps {
-  id: string;
   user: UserDataDto;
   setConfirmLoading: (val: boolean) => void;
   isChangePasswordModalOpen: boolean;
@@ -21,7 +20,6 @@ interface ActionModalsProps {
 }
 
 export const ActionModals = ({
-  id,
   user,
   setConfirmLoading,
   isChangePasswordModalOpen,
@@ -34,11 +32,14 @@ export const ActionModals = ({
 
   const { toast } = useToast();
 
-  const editMutation = useMutation({
+  const changePasswordMutation = useMutation({
     mutationFn: (updatedPassword: ChangePasswordDto) =>
       changePassword(updatedPassword),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.Question, user.id],
+      });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
       setChangePasswordModalOpen(false);
       toast({
@@ -62,11 +63,11 @@ export const ActionModals = ({
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.Me, id],
+        queryKey: [QUERY_KEYS.Me, user.id],
       });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
       setDeleteModalOpen(false);
-      router.push('/');
+      router.replace('/'); // replace, not push, to disallow return to deleted user's profile
       toast({
         variant: 'success',
         title: 'Success',
@@ -84,11 +85,11 @@ export const ActionModals = ({
   });
 
   const handleChangePassword = (updatedPassword: ChangePasswordDto) => {
-    editMutation.mutate(updatedPassword);
+    changePasswordMutation.mutate(updatedPassword);
   };
 
   const handleDeleteUser = () => {
-    deleteMutation.mutate(id);
+    deleteMutation.mutate(user.id);
   };
 
   return (

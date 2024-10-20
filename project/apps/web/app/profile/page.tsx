@@ -34,6 +34,7 @@ const ProfilePageContent = () => {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const {
+    confirmLoading,
     setConfirmLoading,
     isChangePasswordModalOpen,
     isDeleteModalOpen,
@@ -50,6 +51,11 @@ const ProfilePageContent = () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
       setIsEditingUsername(false);
       setIsEditingEmail(false);
+      toast({
+        variant: 'success',
+        title: 'Success',
+        description: 'User updated successfully',
+      });
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
@@ -125,6 +131,7 @@ const ProfilePageContent = () => {
                         <>
                           <Button
                             type="button"
+                            disabled={confirmLoading}
                             className="bg-blue-500 hover:bg-blue-700 text-white"
                             onClick={() => handleUpdate('username')}
                           >
@@ -135,6 +142,7 @@ const ProfilePageContent = () => {
                       ) : (
                         <Button
                           type="button"
+                          disabled={confirmLoading}
                           className="bg-blue-500 hover:bg-blue-700 text-white"
                           onClick={() => setIsEditingUsername(true)}
                         >
@@ -166,6 +174,7 @@ const ProfilePageContent = () => {
                         <>
                           <Button
                             type="button"
+                            disabled={confirmLoading}
                             className="bg-blue-500 hover:bg-blue-700 text-white"
                             onClick={() => handleUpdate('email')}
                           >
@@ -176,6 +185,7 @@ const ProfilePageContent = () => {
                       ) : (
                         <Button
                           type="button"
+                          disabled={confirmLoading}
                           className="bg-blue-500 hover:bg-blue-700 text-white"
                           onClick={() => setIsEditingEmail(true)}
                         >
@@ -195,6 +205,7 @@ const ProfilePageContent = () => {
                     <FormLabel className="w-28 text-base">Password</FormLabel>
                     <Button
                       type="button"
+                      disabled={confirmLoading}
                       className="w-min bg-blue-500 hover:bg-blue-700"
                       onClick={() => setChangePasswordModalOpen(true)}
                     >
@@ -206,6 +217,7 @@ const ProfilePageContent = () => {
             />
             <Button
               type="button"
+              disabled={confirmLoading}
               className="w-1/3 bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
               onClick={() => setDeleteModalOpen(true)}
             >
@@ -216,7 +228,6 @@ const ProfilePageContent = () => {
       </div>
       {user && (
         <ActionModals
-          id={user.id}
           user={user}
           setConfirmLoading={setConfirmLoading}
           isChangePasswordModalOpen={isChangePasswordModalOpen}

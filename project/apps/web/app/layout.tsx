@@ -33,6 +33,8 @@ const LayoutWithSidebarAndTopbar = ({
 }) => {
   const pathname = usePathname();
   const { isMatching } = useMatchStore();
+  const user = useAuthStore.use.user();
+  const signOut = useAuthStore.use.signOut();
 
   const excludePaths = ['/auth'];
 
@@ -44,8 +46,8 @@ const LayoutWithSidebarAndTopbar = ({
     <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
       {renderSidebarAndTopbar && !isMatching && (
         <>
-          <Topbar />
-          <Sidebar />
+          <Topbar user={user} signOut={signOut} />
+          <Sidebar user={user} signOut={signOut}/>
         </>
       )}
       <main

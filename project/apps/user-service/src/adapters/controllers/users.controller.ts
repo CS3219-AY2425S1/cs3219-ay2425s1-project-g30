@@ -22,10 +22,8 @@ export class UsersController {
   }
 
   @MessagePattern({ cmd: 'update_user' })
-  async updateUserById(
-    @Payload() payload: { updateUserDto: UpdateUserDto; accessToken: string },
-  ) {
-    return await this.usersService.updateById(payload);
+  async updateUserById(@Payload() updateUserDto: UpdateUserDto) {
+    return await this.usersService.updateById(updateUserDto);
   }
 
   @MessagePattern({ cmd: 'update_privilege' })
@@ -34,14 +32,8 @@ export class UsersController {
   }
 
   @MessagePattern({ cmd: 'change_password' })
-  async changePasswordById(
-    @Payload()
-    payload: {
-      changePasswordDto: ChangePasswordDto;
-      accessToken: string;
-    },
-  ) {
-    return await this.usersService.changePasswordById(payload);
+  async changePasswordById(@Payload() changePasswordDto: ChangePasswordDto) {
+    return await this.usersService.changePasswordById(changePasswordDto);
   }
 
   @MessagePattern({ cmd: 'delete_user' })

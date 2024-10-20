@@ -39,15 +39,14 @@ export default function ChangePasswordModal({
     schema: changePasswordSchema,
     defaultValues: {
       id: userId,
-      oldPassword: '',
       newPassword: '',
       confirmNewPassword: '',
     },
   });
 
-  const handleSubmit = (data: ChangePasswordDto) => {
+  const handleSubmit = (values: ChangePasswordDto) => {
     const updatedData: ChangePasswordDto = {
-      ...data,
+      ...values,
       id: userId,
     };
     onSubmit(updatedData);
@@ -57,7 +56,6 @@ export default function ChangePasswordModal({
     if (open) {
       form.reset({
         id: userId,
-        oldPassword: '',
         newPassword: '',
         confirmNewPassword: '',
       });
@@ -79,47 +77,38 @@ export default function ChangePasswordModal({
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
           >
-            {/* Old Password Field */}
-            <FormField
-              control={form.control}
-              name="oldPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-black">Old Password</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter old password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email Field */}
+            {/* New Password Field */}
             <FormField
               control={form.control}
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-black">New password</FormLabel>
+                  <FormLabel>New password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter new password" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="Enter new password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Password Field */}
+            {/* Confirm New Password Field */}
             <FormField
               control={form.control}
               name="confirmNewPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-black">
-                    Confirm new password
-                  </FormLabel>
+                  <FormLabel>Confirm new password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter new password again" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="Enter new password again"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,7 +125,6 @@ export default function ChangePasswordModal({
               </Button>
               <Button
                 type="submit"
-                variant="default"
                 disabled={Object.keys(form.formState.errors).length !== 0}
               >
                 Change Password

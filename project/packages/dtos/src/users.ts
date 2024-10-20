@@ -41,7 +41,6 @@ export const updateUserSchema = z.object({
 export const changePasswordSchema = z
   .object({
     id: z.string().uuid(),
-    oldPassword: passwordSchema,
     newPassword: passwordSchema,
     confirmNewPassword: passwordSchema,
   })

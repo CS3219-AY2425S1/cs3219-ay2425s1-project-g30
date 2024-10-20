@@ -1,18 +1,23 @@
 'use client';
 
+import { UserDataDto } from '@repo/dtos/users';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HomeIcon, ListIcon, UserRound, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/useAuthStore';
 
-const Sidebar = () => {
-  const user = useAuthStore.use.user();
+interface SidebarProps {
+  user: UserDataDto | null;
+  signOut: () => void;
+}
+
+const Sidebar = ({ user, signOut }: SidebarProps) => {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
 
   const navItems = [
     { name: 'Dashboard', href: '/', icon: <HomeIcon className="w-5 h-5" /> },
@@ -29,8 +34,8 @@ const Sidebar = () => {
   ];
 
   const handleLogout = () => {
-    // TODO: Handle Logout
-    console.log('Logout clicked');
+    signOut();
+    router.replace('/');
   };
 
   return (
@@ -44,9 +49,9 @@ const Sidebar = () => {
     >
       <nav className="flex flex-col space-y-2 m-2 overflow-hidden">
         {navItems.map((item) => {
-          // if (item.name == "Profile" && !user) {
-          //   return;
-          // }
+          if (item.name == 'Profile' && !user) {
+            return;
+          }
           return (
             <motion.div
               key={item.name}

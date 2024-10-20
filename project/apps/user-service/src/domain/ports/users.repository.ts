@@ -27,13 +27,10 @@ export abstract class UsersRepository {
 
   /**
    * Updates an existing user's details with the given data.
-   * @param data - The updated data for the user.
+   * @param updateUserDto - The updated data for the user.
    * @returns A promise that resolves to the updated UserDataDto object.
    */
-  abstract updateById(body: {
-    updateUserDto: UpdateUserDto;
-    accessToken: string;
-  }): Promise<UserDataDto>;
+  abstract updateById(updateUserDto: UpdateUserDto): Promise<UserDataDto>;
 
   /**
    * Updates an existing user's privilege by their unique identifier.
@@ -44,18 +41,17 @@ export abstract class UsersRepository {
 
   /**
    * Changes the password for a user by their unique identifier.
-   * @param data - The data required to change the user's password.
+   * @param changePasswordDto - The change password data transfer object.
    * @returns A promise that resolves to the updated UserDataDto object.
    */
-  abstract changePasswordById(body: {
-    changePasswordDto: ChangePasswordDto;
-    accessToken: string;
-  }): Promise<UserDataDto>;
+  abstract changePasswordById(
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<UserDataDto>;
 
   /**
    * Deletes an existing by its unique identifier.
    * @param id - The unique identifier of the user to be deleted.
-   * @returns A promise that resolves to the deleted UserDataDto object.
+   * @returns A promise that resolves to a boolean indicating the success of the operation.
    */
-  abstract deleteById(id: string): Promise<UserDataDto>;
+  abstract deleteById(id: string): Promise<boolean>;
 }

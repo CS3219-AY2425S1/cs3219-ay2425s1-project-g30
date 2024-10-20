@@ -1,5 +1,6 @@
 'use client';
 
+import { UserDataDto } from '@repo/dtos/users';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -12,15 +13,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuthStore } from '@/stores/useAuthStore';
 
-const Topbar = () => {
-  const user = useAuthStore.use.user();
-  const logout = useAuthStore.use.signOut();
+interface TopBarProps {
+  user: UserDataDto | null;
+  signOut: () => void;
+}
+
+const Topbar = ({ user, signOut }: TopBarProps) => {
   const router = useRouter();
   function handleLogout() {
-    logout();
-    router.push('/');
+    signOut();
+    router.replace('/');
   }
 
   return (
