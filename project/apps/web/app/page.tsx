@@ -11,36 +11,29 @@ import MatchingForm from '@/components/match/MatchingForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { createMatch } from '@/lib/api/match';
-import useMatchStore from '@/stores/useMatchStore';
+import useSocketStore from '@/stores/useSocketStore';
 
 const Dashboard = () => {
-  const { isMatching, setIsMatching } = useMatchStore();
+  const { isSearching, startSearch, stopSearch, connect, disconnect } =
+    useSocketStore();
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef<number | null>(null);
-  const router = useRouter();
   const { toast } = useToast();
 
   const createMutation = useMutation({
     mutationFn: (newMatch: MatchRequestDto) => createMatch(newMatch),
-    onMutate: () => setIsMatching(true),
-    onSuccess: async (data) => {
-      toast({
-        variant: 'success',
-        title: 'Success',
-        description: 'Match created successfully',
-      });
-
-      console.log({ data });
-      const matchId = data.id;
-      router.push(`/match/${matchId}`);
+    onMutate: () => {
+      startSearch();
+      connect();
     },
     onError: (error: any) => {
-      setIsMatching(false);
+      stopSearch();
       toast({
         variant: 'error',
         title: 'Error',
         description: error.message,
       });
+      disconnect();
     },
   });
 
@@ -62,15 +55,9 @@ const Dashboard = () => {
       intervalRef.current = null;
     }
 
-    setIsMatching(false);
-    // TODO: Delete mutation here
+    stopSearch();
+    disconnect();
   };
-
-  useEffect(() => {
-    if (timer >= 5) {
-      stopMatching();
-    }
-  }, [timer]);
 
   useEffect(() => {
     return () => {
@@ -90,7 +77,7 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto flex justify-between h-full overflow-hidden">
       <AnimatePresence mode="wait">
-        {isMatching ? (
+        {isSearching ? (
           <motion.div
             className="flex flex-col gap-4 items-center justify-center w-full"
             key="searching"

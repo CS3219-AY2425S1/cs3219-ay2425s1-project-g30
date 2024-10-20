@@ -1,3 +1,4 @@
+import { MatchDataDto } from '@repo/dtos/match';
 import { io, Socket } from 'socket.io-client';
 import { create } from 'zustand';
 
@@ -8,14 +9,18 @@ const SOCKET_SERVER_URL = env.NEXT_PUBLIC_MATCH_SOCKET_URL;
 interface SocketState {
   socket: Socket | null;
   isConnected: boolean;
+  isSearching: boolean;
   connectionError: string | null;
   connect: () => void;
+  startSearch: () => void;
+  stopSearch: () => void;
   disconnect: () => void;
 }
 
 const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   isConnected: false,
+  isSearching: false,
   connectionError: null,
   connect: () => {
     if (get().socket) return; // Prevent multiple connections
@@ -40,24 +45,40 @@ const useSocketStore = create<SocketState>((set, get) => ({
       console.log(`Connection error: ${error.message}`);
     });
 
-    socket.on('match_found', (message) => {
-      // TODO: Implement logic to show match found
-      console.log(message);
+    socket.on('match_found', (message: MatchDataDto) => {
+      console.log('Match found:', message);
+      get().stopSearch();
     });
 
-    socket.on('match_request_expired', (message) => {
-      // TODO: Implement logic to show no match found
-      console.log(message);
+    socket.on('match_invalid', (message: string) => {
+      console.log('Match invalid:', message);
+      get().stopSearch();
+    });
+
+    socket.on('match_request_expired', (message: string) => {
+      console.log('Match request expired:', message);
+      get().stopSearch();
     });
 
     set({ socket });
   },
+  startSearch: () => {
+    set({ isSearching: true });
+  },
+  stopSearch: () => {
+    set({ isSearching: false });
+  },
   disconnect: () => {
     const socket = get().socket;
     if (socket) {
-      socket.removeAllListeners();
       socket.disconnect();
-      set({ socket: null, isConnected: false, connectionError: null });
+      socket.removeAllListeners();
+      set({
+        socket: null,
+        isConnected: false,
+        isSearching: false,
+        connectionError: null,
+      });
     }
   },
 }));

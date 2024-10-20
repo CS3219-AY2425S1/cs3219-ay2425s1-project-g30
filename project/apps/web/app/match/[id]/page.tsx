@@ -2,16 +2,14 @@
 
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 
 import MatchSkeleton from '@/components/match/MatchSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/useAuthStore';
-import useMatchStore from '@/stores/useMatchStore';
 
 const MatchPageContent = () => {
-  const { setIsMatching } = useMatchStore();
   const user = useAuthStore.use.user();
 
   // TODO: Replace placeholder user name and question
@@ -21,10 +19,6 @@ const MatchPageContent = () => {
     description:
       'This is a placeholder description of the question. It can be a long and detailed problem statement.',
   };
-
-  useEffect(() => {
-    setIsMatching(false);
-  }, [setIsMatching]);
 
   return (
     <div className="h-screen py-4 px-8">
