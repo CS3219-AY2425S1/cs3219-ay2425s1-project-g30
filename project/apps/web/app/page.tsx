@@ -14,7 +14,7 @@ import { createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 
 const Dashboard = () => {
-  const { isSearching, startSearch, stopSearch } = useSocketStore();
+  const { isSearching, startSearch, toastMessage, clearToastMessage, stopSearch } = useSocketStore();
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef<number | null>(null);
   const { toast } = useToast();
@@ -54,6 +54,17 @@ const Dashboard = () => {
 
     stopSearch();
   };
+
+  useEffect(() => {
+    if (toastMessage) {
+      toast({
+        variant: toastMessage.variant,
+        title: toastMessage.title,
+        description: toastMessage.description,
+      });
+      clearToastMessage();
+    }
+  }, [toastMessage, toast, clearToastMessage]);
 
   useEffect(() => {
     return () => {
