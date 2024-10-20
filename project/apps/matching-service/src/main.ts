@@ -8,7 +8,6 @@ async function bootstrap() {
   const envService = app.get(EnvService);
   const NODE_ENV = envService.get('NODE_ENV');
   const MATCHING_SERVICE_HOST = envService.get('MATCHING_SERVICE_HOST');
-  // appContext.close();
 
   const host = NODE_ENV === 'development' ? 'localhost' : MATCHING_SERVICE_HOST;
   app.connectMicroservice<MicroserviceOptions>({
