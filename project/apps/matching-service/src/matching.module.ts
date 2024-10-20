@@ -20,6 +20,20 @@ import { MatchService } from './matching.service';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: (config) => {
+        const parsedEnv = envSchema.safeParse(config);
+        if (!parsedEnv.success) {
+          console.error(
+            '❌ Invalid environment variables:',
+            parsedEnv.error.flatten().fieldErrors,
+          );
+          throw new Error('Invalid environment variables');
+        }
+        return parsedEnv.data;
+      },
+    }),
     EnvModule,
     RedisModule,
     ClientsModule.registerAsync([
