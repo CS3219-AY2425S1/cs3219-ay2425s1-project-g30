@@ -63,9 +63,11 @@ const useSocketStore = create<SocketState>((set, get) => ({
     set({ socket });
   },
   startSearch: () => {
+    console.log('Search started...');
     set({ isSearching: true });
   },
   stopSearch: () => {
+    console.log('Search stopped...');
     set({ isSearching: false });
   },
   disconnect: () => {

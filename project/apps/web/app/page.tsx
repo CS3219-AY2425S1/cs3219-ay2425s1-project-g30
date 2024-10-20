@@ -14,8 +14,7 @@ import { createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 
 const Dashboard = () => {
-  const { isSearching, startSearch, stopSearch, connect, disconnect } =
-    useSocketStore();
+  const { isSearching, startSearch, stopSearch } = useSocketStore();
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef<number | null>(null);
   const { toast } = useToast();
@@ -24,7 +23,6 @@ const Dashboard = () => {
     mutationFn: (newMatch: MatchRequestDto) => createMatch(newMatch),
     onMutate: () => {
       startSearch();
-      connect();
     },
     onError: (error: any) => {
       stopSearch();
@@ -33,7 +31,6 @@ const Dashboard = () => {
         title: 'Error',
         description: error.message,
       });
-      disconnect();
     },
   });
 
@@ -56,7 +53,6 @@ const Dashboard = () => {
     }
 
     stopSearch();
-    disconnect();
   };
 
   useEffect(() => {

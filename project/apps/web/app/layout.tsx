@@ -63,18 +63,24 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   const fetchUser = useAuthStore.use.fetchUser();
+  const { connect, disconnect } = useSocketStore();
 
   // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
     const initializeUser = async () => {
       try {
         await fetchUser();
+        connect();
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
     };
     initializeUser();
-  }, [fetchUser]);
+
+    return () => {
+      disconnect();
+    };
+  }, [fetchUser, connect, disconnect]);
 
   return (
     <html lang="en" className={inter.className}>
