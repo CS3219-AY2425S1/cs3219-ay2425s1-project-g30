@@ -56,7 +56,6 @@ const MatchingForm = ({ onMatch }: MatchingFormProps) => {
       };
       onMatch(matchRequest);
     }
-    console.log(data);
   };
 
   const renderLabelWithAsterisk = (label: string) => (

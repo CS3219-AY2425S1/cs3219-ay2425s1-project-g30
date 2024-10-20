@@ -86,7 +86,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto flex justify-between h-full">
+    <div className="container mx-auto flex justify-between h-full overflow-hidden">
       <AnimatePresence mode="wait">
         {isMatching ? (
           <motion.div

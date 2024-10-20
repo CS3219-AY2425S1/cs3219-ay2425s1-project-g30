@@ -16,7 +16,7 @@ import {
   SortingState,
   Updater,
 } from '@tanstack/react-table';
-import { startTransition, useState } from 'react';
+import { startTransition, useEffect, useState } from 'react';
 
 import {
   ControlledTableStateProps,
@@ -60,6 +60,14 @@ export function QuestionTable() {
     () => setConfirmLoading(false),
   );
 
+  useEffect(() => {
+    if (confirmLoading) {
+      setConfirmLoading(true);
+    } else {
+      setConfirmLoading(false);
+    }
+  }, [pagination, sorting, debouncedColumnFilters, setConfirmLoading]);
+
   const { data } = useSuspenseQuery<QuestionCollectionDto>({
     queryKey: [
       QUERY_KEYS.Question,
@@ -68,43 +76,38 @@ export function QuestionTable() {
       debouncedColumnFilters,
     ],
     queryFn: async () => {
-      setConfirmLoading(true);
-      try {
-        const title = debouncedColumnFilters.find((f) => f.id === 'q_title')
-          ?.value as string;
+      const title = debouncedColumnFilters.find((f) => f.id === 'q_title')
+        ?.value as string;
 
-        const categories = debouncedColumnFilters.find(
-          (f) => f.id === 'q_category',
-        )?.value as CATEGORY[];
+      const categories = debouncedColumnFilters.find(
+        (f) => f.id === 'q_category',
+      )?.value as CATEGORY[];
 
-        const complexities = debouncedColumnFilters.find(
-          (f) => f.id === 'q_complexity',
-        )?.value as COMPLEXITY[];
+      const complexities = debouncedColumnFilters.find(
+        (f) => f.id === 'q_complexity',
+      )?.value as COMPLEXITY[];
 
-        const offset = pagination.pageIndex * pagination.pageSize;
-        const limit = pagination.pageSize;
+      const offset = pagination.pageIndex * pagination.pageSize;
+      const limit = pagination.pageSize;
 
-        const sort = sorting.map(
-          (s) =>
-            ({
-              field: s.id,
-              order: s.desc ? 'desc' : 'asc',
-            }) as SortQuestionsQueryDto,
-        );
+      const sort = sorting.map(
+        (s) =>
+          ({
+            field: s.id,
+            order: s.desc ? 'desc' : 'asc',
+          }) as SortQuestionsQueryDto,
+      );
 
-        const queryParams: QuestionFiltersDto = {
-          title,
-          categories,
-          complexities,
-          offset,
-          limit,
-          sort,
-        };
+      const queryParams: QuestionFiltersDto = {
+        title,
+        categories,
+        complexities,
+        offset,
+        limit,
+        sort,
+      };
 
-        return await fetchQuestions(queryParams);
-      } finally {
-        setConfirmLoading(false);
-      }
+      return await fetchQuestions(queryParams);
     },
   });
 
