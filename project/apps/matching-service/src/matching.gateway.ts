@@ -38,13 +38,7 @@ export class MatchingGateway
     @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
     private readonly matchRedis: MatchRedis,
   ) {}
-  afterInit() {
-    this.logger.log(
-      'Matching gateway instntiated with: ',
-      Math.random().toString(36).substring(7),
-      this.server,
-    );
-  }
+
   async handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
 
