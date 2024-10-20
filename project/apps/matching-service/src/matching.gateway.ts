@@ -32,12 +32,22 @@ export class MatchingGateway
 {
   @WebSocketServer()
   server: Server;
+
+  @WebSocketServer()
+  server2: Server;
+
   private readonly logger = new Logger(MatchingGateway.name);
+  private readonly instanceId;
 
   constructor(
     @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
     private readonly matchRedis: MatchRedis,
-  ) {}
+  ) {
+    this.instanceId = Math.random().toString(36).substring(7);
+    this.logger.log(
+      'MatchingGateway initialized with instanceId: ' + this.instanceId,
+    );
+  }
 
   async handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
@@ -145,6 +155,10 @@ export class MatchingGateway
         event: MatchEvent.MATCH_FOUND,
       });
     }
+  }
+
+  getInstanceId() {
+    return this.instanceId;
   }
 
   async sendMatchRequestExpired({
