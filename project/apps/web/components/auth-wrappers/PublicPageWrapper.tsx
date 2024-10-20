@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { type PropsWithChildren } from 'react';
+import { useEffect, type PropsWithChildren } from 'react';
 
 import { LANDING } from '@/lib/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -34,12 +34,18 @@ export const PublicPageWrapper = ({
   const user = useAuthStore.use.user();
   const searchParams = useSearchParams();
 
+  useEffect(() => {
+    if (user && redirect.strict) {
+      const callbackUrl =
+        searchParams?.get('callbackUrl') ?? redirect.defaultUrl ?? LANDING;
+      router.replace(callbackUrl);
+    }
+  }, [user, redirect, searchParams, router]);
+
   if (user && redirect.strict) {
-    const callbackUrl =
-      searchParams?.get('callbackUrl') ?? redirect.defaultUrl ?? LANDING;
-    router.replace(callbackUrl);
     return <div>Loading...</div>;
   }
+
 
   return <>{children}</>;
 };
