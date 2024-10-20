@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { MatchCancelDto, MatchRequestMsgDto } from '@repo/dtos/match';
 
 @Controller('matches')
 export class MatchingController {
@@ -9,15 +10,15 @@ export class MatchingController {
   ) {}
 
   @Post()
-  async findMatch(@Body() matchRequest: any) {
+  async findMatch(@Body() matchRequest: MatchRequestMsgDto) {
     return this.matchingServiceClient.send({ cmd: 'find_match' }, matchRequest);
   }
 
   @Post('cancel')
-  async cancelMatch(@Body() match: any) {
+  async cancelMatch(@Body() matchCancel: MatchCancelDto) {
     return this.matchingServiceClient.send(
       { cmd: 'cancel_match' },
-      match.match_req_id,
+      matchCancel,
     );
   }
 

@@ -33,7 +33,6 @@ export const matchRequestSchema = matchRequestMsgSchema.extend({
 
 export const matchCancelSchema = z.object({
   match_req_id: z.string().uuid(),
-  user_id: z.string().uuid(),
 });
 
 export type MatchCriteriaDto = z.infer<typeof matchCriteriaSchema>;

@@ -1,6 +1,6 @@
 'use client';
 
-import { MatchRequestMsgDto } from '@repo/dtos/match';
+import { MatchCancelDto, MatchRequestMsgDto } from '@repo/dtos/match';
 import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -40,7 +40,7 @@ const Dashboard = () => {
   });
 
   const cancelMatchMutation = useMutation({
-    mutationFn: (match_req_id: string) => cancelMatch(match_req_id),
+    mutationFn: (matchCancel: MatchCancelDto) => cancelMatch(matchCancel),
     onSuccess: () => {
       toast({
         title: 'Canceled',
@@ -80,7 +80,8 @@ const Dashboard = () => {
     }
 
     if (matchReqId) {
-      cancelMatchMutation.mutate(matchReqId);
+      const cancelMatchReq: MatchCancelDto = { match_req_id: matchReqId };
+      cancelMatchMutation.mutate(cancelMatchReq);
     }
     stopSearch();
   };
@@ -135,7 +136,8 @@ const Dashboard = () => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (matchReqId) {
-        cancelMatchMutation.mutate(matchReqId);
+        const matchCancel: MatchCancelDto = { match_req_id: matchReqId };
+        cancelMatchMutation.mutate(matchCancel);
       }
     };
 
