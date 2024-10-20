@@ -3,7 +3,7 @@
 import { MatchRequestMsgDto } from '@repo/dtos/match';
 import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';  // Updated to handle routing
 import { useEffect, useRef, useState } from 'react';
 
 import CardWaterfall from '@/components/match/CardWaterfall';
@@ -14,10 +14,11 @@ import { createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 
 const Dashboard = () => {
-  const { isSearching, startSearch, toastMessage, clearToastMessage, stopSearch } = useSocketStore();
+  const { isSearching, startSearch, stopSearch, socket } = useSocketStore(); // Removed toast message logic
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef<number | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const createMutation = useMutation({
     mutationFn: (newMatch: MatchRequestMsgDto) => createMatch(newMatch),
@@ -56,16 +57,52 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (toastMessage) {
-      toast({
-        variant: toastMessage.variant,
-        title: toastMessage.title,
-        description: toastMessage.description,
-      });
-      clearToastMessage();
-    }
-  }, [toastMessage, toast, clearToastMessage]);
+    if (!socket) return;
 
+    const handleMatchFound = (message: any) => {
+      console.log('Match found:', message);
+      stopSearch();
+      toast({
+        variant: 'success',
+        title: 'Match Found',
+        description: 'Your match was successful.',
+      });
+      router.push(`/match/${message.id}`);
+    };
+
+    const handleMatchInvalid = (message: string) => {
+      console.log('Match invalid:', message);
+      stopSearch();
+      toast({
+        variant: 'error',
+        title: 'Match Invalid',
+        description: 'Your match was invalid.',
+      });
+    };
+
+    const handleMatchRequestExpired = (message: string) => {
+      console.log('Match request expired:', message);
+      stopSearch();
+      toast({
+        variant: 'error',
+        title: 'Match Expired',
+        description: 'Your match request has expired. Please try again.',
+      });
+    };
+
+    socket.on('match_found', handleMatchFound);
+    socket.on('match_invalid', handleMatchInvalid);
+    socket.on('match_request_expired', handleMatchRequestExpired);
+
+    // Clean up the event listeners when the component is unmounted
+    return () => {
+      socket.off('match_found', handleMatchFound);
+      socket.off('match_invalid', handleMatchInvalid);
+      socket.off('match_request_expired', handleMatchRequestExpired);
+    };
+  }, [socket, stopSearch, toast, router]);
+
+  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
