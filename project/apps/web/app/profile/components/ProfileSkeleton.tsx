@@ -2,33 +2,26 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const ProfileSkeleton = () => (
   <div className="container mx-auto p-4">
-    {/* Table Header */}
+    {/* Profile Header */}
     <div className="flex items-center my-4">
-      <h1 className="text-xl font-semibold">
-        <Skeleton className="h-6 w-48" />
-      </h1>
+      <Skeleton className="h-10 w-32" />
     </div>
 
-    {/* Table */}
-    <div className="w-full overflow-hidden">
-      {/* Table Header */}
-      <div className="grid grid-cols-3 gap-4 p-4">
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
+    {/* Profile Details */}
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="flex items-center mb-4 gap-4">
+        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-8 w-48" />
       </div>
+      <Skeleton className="h-6 w-full mb-4" />
+      <Skeleton className="h-6 w-full mb-4" />
+      <Skeleton className="h-6 w-5/6 mb-6" />
+    </div>
 
-      {/* Table Body */}
-      {[...Array(5)].map((_, index) => (
-        <div
-          key={index}
-          className="grid grid-cols-3 gap-4 p-4 border-t border-gray-200"
-        >
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-1/4" />
-          <Skeleton className="h-6 w-full" />
-        </div>
-      ))}
+    {/* Action Buttons */}
+    <div className="flex gap-4 mt-6">
+      <Skeleton className="h-10 w-32" />
+      <Skeleton className="h-10 w-32" />
     </div>
   </div>
 );
