@@ -1,9 +1,9 @@
-import { MatchDataDto, MatchRequestDto } from '@repo/dtos/match';
+import { MatchDataDto, MatchRequestMsgDto } from '@repo/dtos/match';
 
 import { apiCall } from '@/lib/api/apiClient';
 
 export const createMatch = async (
-  queryParams: MatchRequestDto,
+  queryParams: MatchRequestMsgDto,
 ): Promise<MatchDataDto> => {
   return await apiCall('post', '/matches', null, queryParams);
 };

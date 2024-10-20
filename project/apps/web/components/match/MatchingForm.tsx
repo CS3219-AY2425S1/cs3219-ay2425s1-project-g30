@@ -4,8 +4,7 @@ import {
   CATEGORY,
   COMPLEXITY,
 } from '@repo/dtos/generated/enums/questions.enums';
-import { matchCriteriaSchema, MatchRequestDto } from '@repo/dtos/match';
-import dayjs from 'dayjs';
+import { matchCriteriaSchema, MatchRequestMsgDto } from '@repo/dtos/match';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,7 +27,7 @@ import { useZodForm } from '@/lib/form';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 interface MatchingFormProps {
-  onMatch: (matchRequest: MatchRequestDto) => void;
+  onMatch: (matchRequest: MatchRequestMsgDto) => void;
 }
 
 const MatchingForm = ({ onMatch }: MatchingFormProps) => {
@@ -49,10 +48,9 @@ const MatchingForm = ({ onMatch }: MatchingFormProps) => {
     category: CATEGORY[];
   }): void => {
     if (user) {
-      const matchRequest: MatchRequestDto = {
+      const matchRequest: MatchRequestMsgDto = {
         ...data,
         userId: user.id,
-        timestamp: dayjs().unix(),
       };
       onMatch(matchRequest);
     }

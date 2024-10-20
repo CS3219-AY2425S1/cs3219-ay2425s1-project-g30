@@ -1,6 +1,6 @@
 'use client';
 
-import { MatchRequestDto } from '@repo/dtos/match';
+import { MatchRequestMsgDto } from '@repo/dtos/match';
 import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -20,7 +20,7 @@ const Dashboard = () => {
   const { toast } = useToast();
 
   const createMutation = useMutation({
-    mutationFn: (newMatch: MatchRequestDto) => createMatch(newMatch),
+    mutationFn: (newMatch: MatchRequestMsgDto) => createMatch(newMatch),
     onMutate: () => {
       startSearch();
     },
@@ -34,7 +34,7 @@ const Dashboard = () => {
     },
   });
 
-  const handleCreateMatch = (newMatch: MatchRequestDto) => {
+  const handleCreateMatch = (newMatch: MatchRequestMsgDto) => {
     setTimer(0);
 
     if (!intervalRef.current) {
