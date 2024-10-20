@@ -106,17 +106,13 @@ export class MatchingGateway
     attempt?: number;
   }) {
     try {
-      this.logger.debug('here1 ');
       const socketId = await this.matchRedis.getSocketByUserId(userId);
-      this.logger.debug('here2');
       if (!socketId) {
         throw new Error(`Socket not found for user ${userId}`);
       }
-      console.log(this.server);
-      this.logger.debug(this.server);
-      const socket = this.server.to(socketId).emit(event, message);
+      const socket = this.server.to(socketId);
 
-      // socket.emit(event, message);
+      socket.emit(event, message);
       this.logger.debug(`Message sent to socket ${socketId} on event ${event}`);
     } catch (error) {
       this.logger.error(
