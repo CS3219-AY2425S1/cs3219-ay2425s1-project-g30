@@ -7,23 +7,24 @@ import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 
 async function bootstrap() {
-  const appContext = await NestFactory.createApplicationContext(EnvModule);
+  const appContext = await NestFactory.createApplicationContext(MatchingModule);
   const envService = appContext.get(EnvService);
   const NODE_ENV = envService.get('NODE_ENV');
   const MATCHING_SERVICE_HOST = envService.get('MATCHING_SERVICE_HOST');
-  // app.close();
+  appContext.close();
 
   const host = NODE_ENV === 'development' ? 'localhost' : MATCHING_SERVICE_HOST;
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.TCP,
-    options: {
-      host: host,
-      port: 3004,
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    MatchingModule,
+    {
+      transport: Transport.TCP,
+      options: {
+        host: host,
+        port: 3004,
+      },
     },
-  });
+  );
 
-  await app.startAllMicroservices();
-  await app.listen(3004);
-  console.log(`Matching Service is listening on ${host}:3004`);
+  await app.listen();
 }
 bootstrap();

@@ -31,7 +31,10 @@ export class MatchExpiryService {
 
     this.logger.log(`matchGatewayId: ${this.matchGateway.getInstanceId()}`);
     if (!this.matchGateway.server) {
-      this.logger.error('MatchGateway server is not initialized');
+      this.logger.error(
+        'MatchGateway server is not initialized, instanceId: ' +
+          this.matchGateway.getInstanceId(),
+      );
       return;
     }
 
