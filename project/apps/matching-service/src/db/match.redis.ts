@@ -146,6 +146,16 @@ export class MatchRedis {
   }
 
   /**
+   * Checks if a match request has been cancelled
+   * @param match_req_Id The match_req_Id to check
+   * @returns True if the match request has been cancelled, otherwise false
+   */
+  async isMatchRequestCancelled(match_req_Id: string): Promise<boolean> {
+    const key = `${MATCH_CANCELLED_KEY}-${match_req_Id}`;
+    return !!(await this.redisClient.get(key));
+  }
+
+  /**
    * Finds a potential match in redis based on one of the selected categories and complexity
    * 1. Fetches all the matching match_req_Ids from the sorted set for each category
    * 2. Checks if the match_req_Id is in the cancelled list
@@ -186,8 +196,7 @@ export class MatchRedis {
       if (!matchRequest || matchRequest.userId === userId) return null;
 
       // Also need to check if the match_req_Id is in the cancelled list
-      const cancelledKey = `${MATCH_CANCELLED_KEY}-${match_req_Id}`;
-      const isCancelled = await this.redisClient.get(cancelledKey);
+      const isCancelled = await this.isMatchRequestCancelled(match_req_Id);
 
       if (matchRequest && !isCancelled) {
         return matchRequest;
