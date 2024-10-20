@@ -24,8 +24,8 @@ export class MatchExpiryConsumer implements OnModuleInit {
         await channel.assertQueue(MATCH_EXPIRY_QUEUE, { durable: true });
         await channel.consume(MATCH_EXPIRY_QUEUE, async (message) => {
           if (message) {
-            const matchId = message.content.toString();
-            this.consumeMessage(matchId);
+            const match_req_Id = message.content.toString();
+            this.consumeMessage(match_req_Id);
             channel.ack(message);
           }
         });
@@ -36,9 +36,9 @@ export class MatchExpiryConsumer implements OnModuleInit {
     }
   }
 
-  consumeMessage(matchId: string) {
-    matchId = matchId.replace(/^"(.*)"$/, '$1'); // To remove quotes
-    this.logger.log('Received expiry message for match ID:', matchId);
-    this.matchExpiryService.handleExpiryMessage(matchId);
+  consumeMessage(match_req_Id: string) {
+    match_req_Id = match_req_Id.replace(/^"(.*)"$/, '$1'); // To remove quotes
+    this.logger.log('Received expiry message for match request ID:', match_req_Id);
+    this.matchExpiryService.handleExpiryMessage(match_req_Id);
   }
 }

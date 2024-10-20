@@ -6,7 +6,7 @@ import { MatchingGateway } from 'src/matching.gateway';
 import {
   MatchCriteriaDto,
   MatchDataDto,
-  MatchRequestMsgDto,
+  MatchRequestDto,
 } from '@repo/dtos/match';
 import { MATCH_TIMEOUT } from 'src/constants/queue';
 
@@ -28,8 +28,8 @@ export class MatchEngineService {
    * @returns
    */
 
-  async generateMatch(matchRequest: MatchRequestMsgDto) {
-    const { userId, category, complexity } = matchRequest;
+  async generateMatch(matchRequest: MatchRequestDto) {
+    const { userId, category, complexity, match_req_id } = matchRequest;
 
     const matchedData = await this.matchRedis.findPotentialMatch({
       category,
@@ -95,12 +95,12 @@ export class MatchEngineService {
         `No match found for user ${userId}, adding to matching queue`,
       );
       // No match found, add the match to redis
-      const matchid = await this.matchRedis.addMatchRequest(matchRequest);
-      if (!matchid) {
+      const match_req_id = await this.matchRedis.addMatchRequest(matchRequest);
+      if (!match_req_id) {
         throw new Error('Failed to add match request');
       }
       await this.matchEngineProduceExpiry.enqueueMatchExpiryRequest(
-        matchid,
+        match_req_id,
         MATCH_TIMEOUT,
       );
     }

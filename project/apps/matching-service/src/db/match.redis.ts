@@ -54,34 +54,32 @@ export class MatchRedis {
   }
 
   /**
-   * Adds a match request to redis. The match request is stored in a hash with the matchId as the key.
-   * The matchId is also added to the sorted set for each selected category in the match request.
+   * Adds a match request to redis. The match request is stored in a hash with the match_req_Id as the key.
+   * The match_req_Id is also added to the sorted set for each selected category in the match request.
    * @param matchRequest The match request to add to redis
    * @returns
    */
 
   async addMatchRequest(
-    matchRequest: MatchRequestMsgDto,
+    matchRequest: MatchRequestDto,
   ): Promise<string | null> {
-    const matchId: string = uuidv4();
-    const { category, complexity } = matchRequest;
-    const timestamp = Date.now();
+    const { userId, category, complexity, match_req_id, timestamp } = matchRequest;
 
     // Store match requst details to redis in a hash
-    const hashKey = `${MATCH_REQUEST}-${matchId}`;
+    const hashKey = `${MATCH_REQUEST}-${match_req_id}`;
     const pipeline = this.redisClient.multi();
 
     pipeline.hset(hashKey, {
-      userId: matchRequest.userId,
+      userId: userId,
       complexity: complexity,
       category: JSON.stringify(category),
       timestamp: timestamp.toString(),
     });
 
-    // Add matchId to the sorted set for each category
+    // Add match_req_id to the sorted set for each category
     for (const cat of category) {
       const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
-      pipeline.zadd(sortedSetKey, timestamp, matchId);
+      pipeline.zadd(sortedSetKey, timestamp, match_req_id);
     }
 
     try {
@@ -91,16 +89,16 @@ export class MatchRedis {
       return null;
     }
 
-    return matchId;
+    return match_req_id;
   }
 
   /**
    * Fetches a match request from redis
-   * @param matchId The matchId to fetch
+   * @param match_req_id The matchReqId to fetch
    * @returns The match request if found, otherwise null
    */
-  async getMatchRequest(matchId: string): Promise<MatchRequestDto | null> {
-    const hashKey = `${MATCH_REQUEST}-${matchId}`;
+  async getMatchRequest(match_req_Id: string): Promise<MatchRequestDto | null> {
+    const hashKey = `${MATCH_REQUEST}-${match_req_Id}`;
     this.logger.debug(`Hash key: ${hashKey}`);
     try {
       const data = await this.redisClient.hgetall(hashKey);
@@ -108,7 +106,8 @@ export class MatchRedis {
       if (!data || Object.keys(data).length === 0) return null;
 
       return {
-        userId: data.userId as string,
+        match_req_id: match_req_Id,
+        userId: data.userId,
         complexity: data.complexity as COMPLEXITY,
         category: JSON.parse(data.category) as CATEGORY[],
         timestamp: parseInt(data.timestamp, 10),
@@ -121,21 +120,21 @@ export class MatchRedis {
 
   /**
    * Removes a match request from redis that includes its match request hash key and
-   * all the associated matchId in the respective sorted set(s)
-   * @param matchId The matchId to remove
+   * all the associated match_req_Id in the respective sorted set(s)
+   * @param match_req_Id The match_req_Id to remove
    * @returns
    */
-  async removeMatchRequest(matchId: string): Promise<MatchRequestDto | null> {
-    this.logger.log(`Removing Match Request: ${matchId}`);
-    const hashKey = `${MATCH_REQUEST}-${matchId}`;
-    const matchRequest = await this.getMatchRequest(matchId);
+  async removeMatchRequest(match_req_Id: string): Promise<MatchRequestDto | null> {
+    this.logger.log(`Removing Match Request: ${match_req_Id}`);
+    const hashKey = `${MATCH_REQUEST}-${match_req_Id}`;
+    const matchRequest = await this.getMatchRequest(match_req_Id);
     if (!matchRequest) return null;
     const { category, complexity } = matchRequest;
     const pipeline = this.redisClient.multi();
 
     for (const cat of category) {
       const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
-      pipeline.zrem(sortedSetKey, matchId);
+      pipeline.zrem(sortedSetKey, match_req_Id);
     }
 
     pipeline.del(hashKey);
@@ -151,8 +150,8 @@ export class MatchRedis {
 
   /**
    * Finds a potential match in redis based on one of the selected categories and complexity
-   * 1. Fetches all the matching matchIds from the sorted set for each category
-   * 2. Checks if the matchId is in the cancelled list
+   * 1. Fetches all the matching match_req_Ids from the sorted set for each category
+   * 2. Checks if the match_req_Id is in the cancelled list
    * 3. Sort the list of potential matches by earliest timestamp and choose the oldest request
    * 4. Removes the match request from redis
    * @param criteria Match requester's selected categories and complexity
@@ -178,22 +177,22 @@ export class MatchRedis {
     const fetchPromises = responses.map(async ([err, res], index) => {
       if (err) {
         this.logger.error(
-          `Error fetching matchId(s) from category ${category[index]}:`,
+          `Error fetching match_req_Id(s) from category ${category[index]}:`,
           err,
         );
         return null;
       }
-      const matchId: string = Array.isArray(res) ? res[0] : null;
-      if (!matchId) return null;
+      const match_req_Id: string = Array.isArray(res) ? res[0] : null;
+      if (!match_req_Id) return null;
 
-      const matchRequest = await this.getMatchRequest(matchId);
+      const matchRequest = await this.getMatchRequest(match_req_Id);
 
-      // Also need to check if the matchId is in the cancelled list
-      const cancelledKey = `${MATCH_CANCELLED_KEY}-${matchId}`;
+      // Also need to check if the match_req_Id is in the cancelled list
+      const cancelledKey = `${MATCH_CANCELLED_KEY}-${match_req_Id}`;
       const isCancelled = await this.redisClient.get(cancelledKey);
 
       if (matchRequest && !isCancelled) {
-        return { matchId, matchRequest };
+        return matchRequest;
       }
       return null;
     });
@@ -206,36 +205,45 @@ export class MatchRedis {
 
     // sort by earliest first
     validResults.sort(
-      (a, b) => a.matchRequest.timestamp - b.matchRequest.timestamp,
+      (a, b) => a.timestamp - b.timestamp,
     );
     const oldestMatch = validResults[0];
 
-    await this.removeMatchRequest(oldestMatch.matchId);
+    const match_id = uuidv4();
+
+    await this.removeMatchRequest(oldestMatch.match_req_id);
 
     return {
-      userId: oldestMatch.matchRequest.userId,
-      category: oldestMatch.matchRequest.category,
-      matchId: oldestMatch.matchId,
+      userId: oldestMatch.userId,
+      category: oldestMatch.category,
+      matchId: match_id,
     };
   }
 
   /**
-   * Adds a matchId to the cancelled list in redis
-   * @param matchId The matchId to add to the cancelled list
+   * Adds a match_req_Id to the cancelled list in redis
+   * @param match_req_Id The match_req_Id to add to the cancelled list
+   * @returns Object indicating success or failure
    */
 
-  async addToCancelledMatchList(matchId: string) {
+  async addToCancelledMatchList(match_req_Id: string) {
     try {
-      const key = `${MATCH_CANCELLED_KEY}-${matchId}`;
+      const key = `${MATCH_CANCELLED_KEY}-${match_req_Id}`;
 
-      await this.redisClient.set(key, matchId);
+      await this.redisClient.set(key, match_req_Id);
 
-      // we can be certain that a matchId would have either been matched or expired within 1 hour
-      await this.redisClient.expire(key, MATCH_EXPIRY_TTL); // 1 hour
+      // we can be certain that a match_req_Id would have either been matched or expired within 1 hour
+      await this.redisClient.expire(key, MATCH_EXPIRY_TTL);
 
-      this.logger.log(`Match ${matchId} added to cancelled list`);
+      this.logger.log(`Match ${match_req_Id} added to cancelled list`);
     } catch (error) {
       this.logger.error(`Error adding match to cancelled list: ${error}`);
+      return {
+        success: false,
+      }
+    }
+    return {
+      success: true,
     }
   }
 }

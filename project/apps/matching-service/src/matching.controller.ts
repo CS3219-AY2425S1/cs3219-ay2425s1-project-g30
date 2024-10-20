@@ -19,8 +19,8 @@ export class MatchingController {
   }
 
   @MessagePattern({ cmd: 'cancel_match' })
-  async cancelMatch(@Payload() matchCancel: MatchCancelDto) {
-    return await this.matchCancelService.cancelMatchRequest(matchCancel);
+  async cancelMatch(@Payload() match_req_id: string) {
+    return await this.matchCancelService.cancelMatchRequest(match_req_id);
   }
 
   @MessagePattern({ cmd: 'get_match' })
