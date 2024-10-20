@@ -8,6 +8,10 @@ export const createMatch = async (
   return await apiCall('post', '/matches', queryParams);
 };
 
+export const cancelMatch = async (match_req_id: string): Promise<any> => {
+  return await apiCall('post', '/matches/cancel', { match_req_id });
+};
+
 export const getMatchById = async (id: string): Promise<any> => {
   return await apiCall('get', `/matches/${id}`);
 };

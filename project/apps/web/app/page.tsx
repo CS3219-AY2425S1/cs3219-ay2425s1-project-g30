@@ -3,19 +3,20 @@
 import { MatchRequestMsgDto } from '@repo/dtos/match';
 import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';  // Updated to handle routing
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import CardWaterfall from '@/components/match/CardWaterfall';
 import MatchingForm from '@/components/match/MatchingForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { createMatch } from '@/lib/api/match';
+import { cancelMatch, createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 
 const Dashboard = () => {
-  const { isSearching, startSearch, stopSearch, socket } = useSocketStore(); // Removed toast message logic
+  const { isSearching, startSearch, stopSearch, socket } = useSocketStore();
   const [timer, setTimer] = useState(0);
+  const [matchReqId, setMatchReqId] = useState<string | null>(null);
   const intervalRef = useRef<number | null>(null);
   const { toast } = useToast();
   const router = useRouter();
@@ -25,12 +26,37 @@ const Dashboard = () => {
     onMutate: () => {
       startSearch();
     },
+    onSuccess: (data) => {
+      setMatchReqId(data.match_req_id);
+    },
     onError: (error: any) => {
       stopSearch();
       toast({
         variant: 'error',
         title: 'Error',
         description: error.message,
+      });
+    },
+  });
+
+  const cancelMatchMutation = useMutation({
+    mutationFn: (match_req_id: string) => cancelMatch(match_req_id),
+    onSuccess: () => {
+      toast({
+        title: 'Canceled',
+        description: 'Your match request has been successfully canceled.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: 'error',
+        title: 'Error',
+        description: `Failed to cancel match: ${error.message}`,
+      });
+      toast({
+        variant: 'error',
+        title: 'Error',
+        description: `Failed to cancel match: ${error.message}`,
       });
     },
   });
@@ -53,13 +79,16 @@ const Dashboard = () => {
       intervalRef.current = null;
     }
 
+    if (matchReqId) {
+      cancelMatchMutation.mutate(matchReqId);
+    }
     stopSearch();
   };
 
   useEffect(() => {
     if (!socket) return;
 
-    const handleMatchFound = (message: any) => {
+    const handleMatchFound = (message: string) => {
       console.log('Match found:', message);
       stopSearch();
       toast({
@@ -67,7 +96,8 @@ const Dashboard = () => {
         title: 'Match Found',
         description: 'Your match was successful.',
       });
-      router.push(`/match/${message.id}`);
+
+      router.push(`/match/${message}`);
     };
 
     const handleMatchInvalid = (message: string) => {
@@ -101,6 +131,20 @@ const Dashboard = () => {
       socket.off('match_request_expired', handleMatchRequestExpired);
     };
   }, [socket, stopSearch, toast, router]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (matchReqId) {
+        cancelMatchMutation.mutate(matchReqId);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [matchReqId, cancelMatchMutation]);
 
   // Cleanup timer on unmount
   useEffect(() => {
