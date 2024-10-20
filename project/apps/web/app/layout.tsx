@@ -47,7 +47,7 @@ const LayoutWithSidebarAndTopbar = ({
       {renderSidebarAndTopbar && !isMatching && (
         <>
           <Topbar user={user} signOut={signOut} />
-          <Sidebar user={user} signOut={signOut}/>
+          <Sidebar user={user} signOut={signOut} />
         </>
       )}
       <main
