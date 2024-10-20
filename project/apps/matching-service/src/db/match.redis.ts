@@ -9,7 +9,7 @@ import {
   MatchRequestMsgDto,
 } from '@repo/dtos/match';
 import Redis from 'ioredis';
-import { MATCH_EXPIRY_TTL } from 'src/constants/queue';
+import { MATCH_CANCEL_TTL } from 'src/constants/queue';
 import {
   MATCH_CANCELLED_KEY,
   MATCH_CATEGORY,
@@ -233,7 +233,7 @@ export class MatchRedis {
       await this.redisClient.set(key, match_req_Id);
 
       // we can be certain that a match_req_Id would have either been matched or expired within 1 hour
-      await this.redisClient.expire(key, MATCH_EXPIRY_TTL);
+      await this.redisClient.expire(key, MATCH_CANCEL_TTL);
 
       this.logger.log(`Match ${match_req_Id} added to cancelled list`);
     } catch (error) {
