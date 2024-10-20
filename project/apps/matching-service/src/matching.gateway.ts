@@ -15,7 +15,7 @@ import {
   WEBSOCKET_RETRY_DELAY,
 } from './constants/websocket';
 
-enum MatchEvent {
+export enum MatchEvent {
   'MATCH_FOUND' = 'match_found',
   'MATCH_REQUEST_EXPIRED' = 'match_request_expired',
   'MATCH_INVALID' = 'match_invalid',
@@ -30,11 +30,7 @@ enum MatchEvent {
 export class MatchingGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer()
-  server: Server;
-
-  @WebSocketServer()
-  server2: Server;
+  @WebSocketServer() server: Server;
 
   private readonly logger = new Logger(MatchingGateway.name);
   private readonly instanceId;
@@ -85,6 +81,7 @@ export class MatchingGateway
         userId: data.id,
         socketId: client.id,
       });
+      console.log(client.id);
     } catch (error) {
       this.logger.log(error);
       client.disconnect();
@@ -109,13 +106,17 @@ export class MatchingGateway
     attempt?: number;
   }) {
     try {
+      this.logger.debug('here1 ');
       const socketId = await this.matchRedis.getSocketByUserId(userId);
+      this.logger.debug('here2');
       if (!socketId) {
         throw new Error(`Socket not found for user ${userId}`);
       }
-      const socket = this.server.to(socketId);
+      console.log(this.server);
+      this.logger.debug(this.server);
+      const socket = this.server.to(socketId).emit(event, message);
 
-      socket.emit(event, message);
+      // socket.emit(event, message);
       this.logger.debug(`Message sent to socket ${socketId} on event ${event}`);
     } catch (error) {
       this.logger.error(
