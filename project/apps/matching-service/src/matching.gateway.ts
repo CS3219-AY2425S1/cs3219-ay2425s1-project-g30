@@ -154,8 +154,7 @@ export class MatchingGateway
     userId: string;
     message: string;
   }) {
-    const socketId = await this.matchRedis.getSocketByUserId(userId);
-    if (socketId) {
+    if (userId) {
       this.sendMessageToClient({
         userId,
         message,
@@ -171,8 +170,7 @@ export class MatchingGateway
     userId: string;
     message: string;
   }) {
-    const socketId = await this.matchRedis.getSocketByUserId(userId);
-    if (socketId) {
+    if (userId) {
       this.sendMessageToClient({
         userId,
         message,
