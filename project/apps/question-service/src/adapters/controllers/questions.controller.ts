@@ -5,10 +5,7 @@ import {
   QuestionFiltersDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
-import {
-  MatchCriteriaDto,
-} from '@repo/dtos/match';
-
+import { MatchCriteriaDto } from '@repo/dtos/match';
 
 import { QuestionsService } from 'src/domain/ports/questions.service';
 @Controller()
