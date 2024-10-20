@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { MatchExpiryProducer } from './matchEngine.produceExpiry';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
@@ -29,12 +29,13 @@ export class MatchEngineService {
    */
 
   async generateMatch(matchRequest: MatchRequestDto) {
-    const { userId, category, complexity, match_req_id } = matchRequest;
+    const { userId, category, complexity } = matchRequest;
 
-    const matchedData = await this.matchRedis.findPotentialMatch({
+    const matchedData = await this.matchRedis.findPotentialMatch(
+      userId,
       category,
       complexity,
-    });
+    );
 
     if (matchedData) {
       this.logger.log(

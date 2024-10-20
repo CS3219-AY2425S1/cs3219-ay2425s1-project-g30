@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MatchRequestService } from 'src/matchRequest/matchRequest.service';
 import { MatchCancelService } from './matchCancel/matchCancel.service';
-import { MatchCancelDto, MatchRequestMsgDto } from '@repo/dtos/match';
+import { MatchRequestMsgDto } from '@repo/dtos/match';
 import { MatchService } from './matching.service';
 
 @Controller()

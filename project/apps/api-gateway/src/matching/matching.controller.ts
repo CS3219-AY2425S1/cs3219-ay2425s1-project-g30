@@ -15,9 +15,12 @@ export class MatchingController {
 
   @Post('cancel')
   async cancelMatch(@Body() match_req_id: string) {
-    return this.matchingServiceClient.send({ cmd: 'cancel_match' }, match_req_id);
+    return this.matchingServiceClient.send(
+      { cmd: 'cancel_match' },
+      match_req_id,
+    );
   }
-  
+
   @Get(':id')
   async getMatchById(@Param('id') match_id: string) {
     return this.matchingServiceClient.send({ cmd: 'get_match' }, match_id);

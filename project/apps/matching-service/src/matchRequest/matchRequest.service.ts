@@ -35,7 +35,7 @@ export class MatchRequestService {
     };
 
     this.logger.debug(`Enqueuing match request: ${JSON.stringify(matchReq)}`);
-    
+
     await this.channelWrapper
       .sendToQueue(MATCH_QUEUE, JSON.stringify(matchReq))
       .then(() => {

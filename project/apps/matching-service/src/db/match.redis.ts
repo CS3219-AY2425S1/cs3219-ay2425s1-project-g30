@@ -3,11 +3,7 @@ import {
   CATEGORY,
   COMPLEXITY,
 } from '@repo/dtos/generated/enums/questions.enums';
-import {
-  MatchCriteriaDto,
-  MatchRequestDto,
-  MatchRequestMsgDto,
-} from '@repo/dtos/match';
+import { MatchRequestDto } from '@repo/dtos/match';
 import Redis from 'ioredis';
 import { MATCH_CANCEL_TTL } from 'src/constants/queue';
 import {
@@ -60,10 +56,9 @@ export class MatchRedis {
    * @returns
    */
 
-  async addMatchRequest(
-    matchRequest: MatchRequestDto,
-  ): Promise<string | null> {
-    const { userId, category, complexity, match_req_id, timestamp } = matchRequest;
+  async addMatchRequest(matchRequest: MatchRequestDto): Promise<string | null> {
+    const { userId, category, complexity, match_req_id, timestamp } =
+      matchRequest;
 
     // Store match requst details to redis in a hash
     const hashKey = `${MATCH_REQUEST}-${match_req_id}`;
@@ -124,7 +119,9 @@ export class MatchRedis {
    * @param match_req_Id The match_req_Id to remove
    * @returns
    */
-  async removeMatchRequest(match_req_Id: string): Promise<MatchRequestDto | null> {
+  async removeMatchRequest(
+    match_req_Id: string,
+  ): Promise<MatchRequestDto | null> {
     this.logger.log(`Removing Match Request: ${match_req_Id}`);
     const hashKey = `${MATCH_REQUEST}-${match_req_Id}`;
     const matchRequest = await this.getMatchRequest(match_req_Id);
@@ -159,13 +156,13 @@ export class MatchRedis {
    */
 
   async findPotentialMatch(
-    criteria: MatchCriteriaDto,
+    userId: string,
+    categories: CATEGORY[],
+    complexity: COMPLEXITY,
   ): Promise<{ userId: string; category: CATEGORY[]; matchId: string } | null> {
-    const { category, complexity } = criteria;
-
     const pipeline = this.redisClient.pipeline();
 
-    category.forEach((cat) => {
+    categories.forEach((cat) => {
       const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
       pipeline.zrange(sortedSetKey, 0, 0);
     });
@@ -177,7 +174,7 @@ export class MatchRedis {
     const fetchPromises = responses.map(async ([err, res], index) => {
       if (err) {
         this.logger.error(
-          `Error fetching match_req_Id(s) from category ${category[index]}:`,
+          `Error fetching match_req_Id(s) from category ${categories[index]}:`,
           err,
         );
         return null;
@@ -186,6 +183,7 @@ export class MatchRedis {
       if (!match_req_Id) return null;
 
       const matchRequest = await this.getMatchRequest(match_req_Id);
+      if (!matchRequest || matchRequest.userId === userId) return null;
 
       // Also need to check if the match_req_Id is in the cancelled list
       const cancelledKey = `${MATCH_CANCELLED_KEY}-${match_req_Id}`;
@@ -204,9 +202,7 @@ export class MatchRedis {
     if (validResults.length === 0) return null; // No matches found
 
     // sort by earliest first
-    validResults.sort(
-      (a, b) => a.timestamp - b.timestamp,
-    );
+    validResults.sort((a, b) => a.timestamp - b.timestamp);
     const oldestMatch = validResults[0];
 
     const match_id = uuidv4();
@@ -240,10 +236,10 @@ export class MatchRedis {
       this.logger.error(`Error adding match to cancelled list: ${error}`);
       return {
         success: false,
-      }
+      };
     }
     return {
       success: true,
-    }
+    };
   }
 }

@@ -12,8 +12,6 @@ export const getMatchById = async (id: string): Promise<any> => {
   return await apiCall('get', `/matches/${id}`);
 };
 
-export const getMatchesByUserId = async (
-  id: string,
-): Promise<any[]> => {
+export const getMatchesByUserId = async (id: string): Promise<any[]> => {
   return await apiCall('get', `/matches/user/${id}`);
 };
