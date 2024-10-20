@@ -9,6 +9,7 @@ services:
       - backend
     environment:
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      NEXT_PUBLIC_MATCH_SOCKET_URL: ${NEXT_PUBLIC_MATCH_SOCKET_URL}
       NODE_ENV: production
   api-gateway:
     build:
@@ -69,6 +70,7 @@ services:
       dockerfile: ./apps/matching-service/Dockerfile
     ports:
       - 3004:3004
+      - 8080:8080  # Expose WebSocket port
     networks:
       - backend
     environment:
