@@ -98,15 +98,18 @@ export class MatchingGateway
     event: MatchEvent;
     attempt?: number;
   }) {
+
+    // if (!this.server) {
+    //   this.logger.error('WebSocket server is not initialized yet.');
+    //   return;
+    // }
+
     try {
       const socketId = await this.matchRedis.getSocketByUserId(userId);
       if (!socketId) {
         throw new Error(`Socket not found for user ${userId}`);
       }
-      const socket = this.server.sockets.sockets.get(socketId);
-      if (!socket || !socket.connected) {
-        throw new Error(`Socket ${socketId} is no longer connected`);
-      }
+      const socket = this.server.to(socketId);
 
       socket.emit(event, message);
       this.logger.debug(`Message sent to socket ${socketId} on event ${event}`);

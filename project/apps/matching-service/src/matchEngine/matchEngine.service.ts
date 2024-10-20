@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { MatchExpiryProducer } from './matchEngine.produceExpiry';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
