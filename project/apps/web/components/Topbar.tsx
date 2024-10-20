@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-
 interface TopBarProps {
   user: UserDataDto | null;
 }

@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
-import { EnvService } from 'src/env/env.service';
+// import { EnvService } from 'src/env/env.service';
 import { MatchEngineService } from './matchEngine.service';
 import { MatchRequestDto, matchRequestSchema } from '@repo/dtos/match';
 
