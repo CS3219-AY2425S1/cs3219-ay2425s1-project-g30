@@ -137,7 +137,7 @@ const ProfilePageContent = () => {
                           >
                             Save
                           </Button>
-                          <Button 
+                          <Button
                             onClick={handleCancelUsername}
                             disabled={confirmLoading}
                           >
@@ -185,7 +185,7 @@ const ProfilePageContent = () => {
                           >
                             Save
                           </Button>
-                          <Button 
+                          <Button
                             onClick={handleCancelEmail}
                             disabled={confirmLoading}
                           >

@@ -1,6 +1,5 @@
 'use client';
 
-import { UserDataDto } from '@repo/dtos/users';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HomeIcon, ListIcon, UserRound, LogOut } from 'lucide-react';
 import Link from 'next/link';
@@ -10,11 +9,10 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
-  user: UserDataDto | null;
   signOut: () => void;
 }
 
-const Sidebar = ({ user, signOut }: SidebarProps) => {
+const Sidebar = ({ signOut }: SidebarProps) => {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
@@ -49,9 +47,6 @@ const Sidebar = ({ user, signOut }: SidebarProps) => {
     >
       <nav className="flex flex-col space-y-2 m-2 overflow-hidden">
         {navItems.map((item) => {
-          if (item.name == 'Profile' && !user) {
-            return;
-          }
           return (
             <motion.div
               key={item.name}
@@ -81,29 +76,27 @@ const Sidebar = ({ user, signOut }: SidebarProps) => {
         })}
       </nav>
 
-      {user && (
-        <motion.div
-          onClick={handleLogout}
-          className="flex items-center justify-start mx-2 py-2 px-2 rounded-md cursor-pointer hover:bg-gray-100 transition-all duration-300"
-        >
-          <div className="ml-1.5">
-            <LogOut className="w-5 h-5" />
-          </div>
-          <AnimatePresence>
-            {isHovered && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.3 }}
-                className="ml-3 text-sm font-medium whitespace-nowrap"
-              >
-                Logout
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      )}
+      <motion.div
+        onClick={handleLogout}
+        className="flex items-center justify-start mx-2 py-2 px-2 rounded-md cursor-pointer hover:bg-gray-100 transition-all duration-300"
+      >
+        <div className="ml-1.5">
+          <LogOut className="w-5 h-5" />
+        </div>
+        <AnimatePresence>
+          {isHovered && (
+            <motion.span
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.3 }}
+              className="ml-3 text-sm font-medium whitespace-nowrap"
+            >
+              Logout
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </motion.aside>
   );
 };

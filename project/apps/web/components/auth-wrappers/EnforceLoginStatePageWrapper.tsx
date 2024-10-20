@@ -13,6 +13,7 @@ interface EnforceLoginStatePageWrapperProps {
    * `SIGN_IN` route if not provided.
    */
   redirectTo?: string;
+  enabled?: boolean;
 }
 
 const Redirect = ({ redirectTo }: EnforceLoginStatePageWrapperProps) => {
@@ -36,11 +37,12 @@ const Redirect = ({ redirectTo }: EnforceLoginStatePageWrapperProps) => {
  */
 export const EnforceLoginStatePageWrapper = ({
   redirectTo = SIGN_IN,
+  enabled = true,
   children,
 }: PropsWithChildren<EnforceLoginStatePageWrapperProps>): React.ReactElement => {
   const user = useAuthStore.use.user();
 
-  const { connect, disconnect } = useSocketStore();
+  const { connect, disconnect, isConnected } = useSocketStore();
 
   useEffect(() => {
     if (user) {
@@ -51,7 +53,7 @@ export const EnforceLoginStatePageWrapper = ({
     };
   }, [connect, disconnect, user]);
 
-  if (user) {
+  if ((user && isConnected) || !enabled) {
     return <>{children}</>;
   }
 

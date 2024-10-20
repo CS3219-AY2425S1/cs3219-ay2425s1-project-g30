@@ -6,7 +6,6 @@ interface ProfileLayoutProps {
 }
 
 const ProfileLayout = ({ children }: ProfileLayoutProps) => {
-  // enforce login here
   return children;
 };
 
