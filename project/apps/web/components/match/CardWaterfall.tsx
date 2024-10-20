@@ -3,8 +3,9 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-import QuestionCard from '@/components/dashboard/QuestionCard';
 import { dummyQuestions } from '@/constants/dummyQuestions';
+
+import QuestionCard from './QuestionCard';
 
 interface CardWaterfallProps {
   animationDuration?: number;

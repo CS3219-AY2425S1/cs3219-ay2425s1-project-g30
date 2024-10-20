@@ -9,12 +9,11 @@ import { Suspense, useState } from 'react';
 
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { ActionModals } from '@/components/question/ActionModals';
+import QuestionSkeleton from '@/components/question/QuestionSkeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
-
-import QuestionSkeleton from './components/QuestionSkeleton';
 
 interface QuestionPageProps {
   params: {

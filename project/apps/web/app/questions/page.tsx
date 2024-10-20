@@ -6,6 +6,9 @@ import { Plus } from 'lucide-react';
 import { Suspense, useState } from 'react';
 
 import { ActionModals } from '@/components/question/ActionModals';
+import CreateModal from '@/components/question/CreateModal';
+import { QuestionTable } from '@/components/question/question-table/QuestionTable';
+import QuestionsSkeleton from '@/components/question/QuestionsSkeleton';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import {
@@ -14,10 +17,6 @@ import {
 } from '@/contexts/QuestionsStateContext';
 import { useToast } from '@/hooks/use-toast';
 import { createQuestion } from '@/lib/api/question';
-
-import CreateModal from './components/CreateModal';
-import { QuestionTable } from './components/question-table/QuestionTable';
-import QuestionsSkeleton from './components/QuestionsSkeleton';
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();

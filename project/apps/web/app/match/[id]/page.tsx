@@ -4,12 +4,11 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense, useEffect } from 'react';
 
+import MatchSkeleton from '@/components/match/MatchSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/useAuthStore';
 import useMatchStore from '@/stores/useMatchStore';
-
-import MatchSkeleton from './components/MatchSkeleton';
 
 const MatchPageContent = () => {
   const { setIsMatching } = useMatchStore();

@@ -6,8 +6,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import CardWaterfall from '@/components/dashboard/CardWaterfall';
-import MatchingForm from '@/components/dashboard/MatchingForm';
+import CardWaterfall from '@/components/match/CardWaterfall';
+import MatchingForm from '@/components/match/MatchingForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { createMatch } from '@/lib/api/match';
