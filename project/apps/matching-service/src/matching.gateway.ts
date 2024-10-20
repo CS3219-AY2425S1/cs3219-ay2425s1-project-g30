@@ -46,6 +46,7 @@ export class MatchingGateway
 
     // Disconnect Client if no cookie provided
     if (!cookie) {
+      this.logger.log('No cookie provided');
       client.disconnect();
       return;
     }
@@ -54,6 +55,7 @@ export class MatchingGateway
     const accessToken = cookies['access_token'];
     // Disconnect client if no token provided
     if (!accessToken) {
+      this.logger.log('No token provided');
       client.disconnect();
       return;
     }
@@ -77,7 +79,7 @@ export class MatchingGateway
       });
       console.log(client.id);
     } catch (error) {
-      this.logger.log(error);
+      this.logger.log(`Error verifying token: ${error.message}`);
       client.disconnect();
     }
     // Check if token is valid
