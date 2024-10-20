@@ -103,10 +103,6 @@ export class MatchSupabase {
         filters,
       ),
     );
-
-    if (!selectedQuestionId) {
-      throw new Error('No questions found for match');
-    }
     return selectedQuestionId;
   }
 }
