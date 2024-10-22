@@ -26,7 +26,7 @@ const Home = () => {
   };
 
   return (
-    <div className="container mx-auto flex justify-between h-full overflow-hidden">
+    <div className="container flex justify-between h-full mx-auto overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           className="flex w-full justify-between items-center"

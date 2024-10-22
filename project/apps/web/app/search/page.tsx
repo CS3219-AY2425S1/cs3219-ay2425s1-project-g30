@@ -16,8 +16,14 @@ const Search = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const matchDataParam = searchParams.get('matchData');
-  const { isSearching, startSearch, stopSearch, connect, disconnect, socket } =
-    useSocketStore();
+
+  const isSearching = useSocketStore((state) => state.isSearching);
+  const startSearch = useSocketStore((state) => state.startSearch);
+  const stopSearch = useSocketStore((state) => state.stopSearch);
+  const connect = useSocketStore((state) => state.connect);
+  const disconnect = useSocketStore((state) => state.disconnect);
+  const socket = useSocketStore((state) => state.socket);
+
   const previousIsSearching = useRef(isSearching);
   const intervalRef = useRef<number | null>(null);
   const [timer, setTimer] = useState(0);

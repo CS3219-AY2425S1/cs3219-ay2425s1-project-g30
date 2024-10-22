@@ -14,6 +14,7 @@ import {
   WEBSOCKET_RETRY_ATTEMPTS,
   WEBSOCKET_RETRY_DELAY,
 } from './constants/websocket';
+import { MatchCancelService } from './matchCancel/matchCancel.service';
 
 export enum MatchEvent {
   'MATCH_FOUND' = 'match_found',
@@ -37,7 +38,16 @@ export class MatchingGateway
   constructor(
     @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
     private readonly matchRedis: MatchRedis,
+    private readonly matchCancelService: MatchCancelService,
   ) {}
+
+  afterInit(server: Server) {
+    if (!server) {
+      this.logger.error("WebSocket gateway's server is null");
+      return;
+    }
+    this.logger.log('WebSocket gateway initialized');
+  }
 
   async handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
@@ -56,6 +66,7 @@ export class MatchingGateway
     // Disconnect client if no token provided
     if (!accessToken) {
       this.logger.log('No token provided');
+      await this.disconnectCleanup(client.id);
       client.disconnect();
       return;
     }
@@ -71,23 +82,34 @@ export class MatchingGateway
       }
 
       // TODO: Implement refresh token logic
-
       // Map socket id to user id in redis
       await this.matchRedis.setUserToSocket({
         userId: data.id,
         socketId: client.id,
       });
-      console.log(client.id);
     } catch (error) {
       this.logger.log(`Error verifying token: ${error.message}`);
+      await this.disconnectCleanup(client.id);
       client.disconnect();
     }
-    // Check if token is valid
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-    this.matchRedis.removeUserBySocketId(client.id);
+    await this.disconnectCleanup(client.id);
+  }
+
+  async disconnectCleanup(client_id: string) {
+    const user_id = await this.matchRedis.removeUserBySocketId(client_id);
+    if (!user_id) {
+      return;
+    }
+    // Get the Match Request ID of the user if it exists
+    const match_req_id = await this.matchRedis.getUserMatchMapping(user_id);
+    if (match_req_id) {
+      // Cancel the match req upon disconnect
+      await this.matchCancelService.cancelMatchRequest({ match_req_id });
+    }
   }
 
   async sendMessageToClient({

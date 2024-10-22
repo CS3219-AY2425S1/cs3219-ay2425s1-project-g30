@@ -33,7 +33,7 @@ const LayoutWithSidebarAndTopbar = ({
   children: React.ReactNode;
 }) => {
   const pathname = usePathname();
-  const { isSearching } = useSocketStore();
+  const isSearching = useSocketStore((state) => state.isSearching);
   const user = useAuthStore.use.user();
   const signOut = useAuthStore.use.signOut();
 

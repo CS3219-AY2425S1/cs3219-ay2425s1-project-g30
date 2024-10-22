@@ -10,6 +10,7 @@ import {
   MATCH_CANCELLED_KEY,
   MATCH_CATEGORY,
   MATCH_REQUEST,
+  MATCH_USER,
   REDIS_CLIENT,
 } from 'src/constants/redis';
 import { SOCKET_USER_KEY, USER_SOCKET_KEY } from 'src/constants/websocket';
@@ -42,6 +43,7 @@ export class MatchRedis {
       await this.redisClient.del(userSocketKey);
     }
     await this.redisClient.del(socketUserKey);
+    return userId;
   }
 
   async getSocketByUserId(userId: string) {
@@ -79,6 +81,8 @@ export class MatchRedis {
 
     try {
       await pipeline.exec();
+      // Add user match_req_id mapping
+      await this.addUserMatchMapaping(userId, match_req_id);
       this.logger.log(`Match request added for id: ${match_req_id}`);
     } catch (error) {
       this.logger.error(`Error adding match request: ${error}`);
@@ -90,7 +94,7 @@ export class MatchRedis {
 
   /**
    * Fetches a match request from redis
-   * @param match_req_id The matchReqId to fetch
+   * @param match_req_id The match_req_id to fetch
    * @returns The match request if found, otherwise null
    */
   async getMatchRequest(match_req_Id: string): Promise<MatchRequestDto | null> {
@@ -98,7 +102,6 @@ export class MatchRedis {
     this.logger.debug(`Hash key: ${hashKey}`);
     try {
       const data = await this.redisClient.hgetall(hashKey);
-      this.logger.log(data);
       if (!data || Object.keys(data).length === 0) return null;
 
       return {
@@ -150,6 +153,9 @@ export class MatchRedis {
       } else {
         this.logger.log(`Match request ${match_req_Id} removed`);
       }
+
+      // Remove user match mapping
+      await this.removeUserMatchMapping(matchRequest.userId);
 
       return matchRequest;
     } catch (error) {
@@ -259,6 +265,7 @@ export class MatchRedis {
 
   /**
    * Adds a match_req_Id to the cancelled list in redis
+   * We do not remove the match request as it might not exist in redis yet.
    * @param match_req_Id The match_req_Id to add to the cancelled list
    * @returns Object indicating success or failure
    */
@@ -282,5 +289,45 @@ export class MatchRedis {
     return {
       success: true,
     };
+  }
+
+  /**
+   * Adds a match_req_Id to the user match map in redis
+   * @param userId The userId to map
+   * @param match_req_id The match_req_id to map
+   */
+
+  async addUserMatchMapaping(userId: string, match_req_id: string) {
+    try {
+      const key = `${MATCH_USER}-${userId}`;
+      await this.redisClient.set(key, match_req_id);
+      this.logger.log(`Added user-match mapping for ${userId}`);
+    } catch (error) {
+      this.logger.error(`Error setting userId to matchId: ${error}`);
+    }
+  }
+
+  /**
+   * Removes a user match mapping
+   * @param userId The userId to map
+   */
+
+  async removeUserMatchMapping(userId: string) {
+    try {
+      const key = `${MATCH_USER}-${userId}`;
+      await this.redisClient.del(key);
+      this.logger.log(`Removed user-match mapping for ${userId}`);
+    } catch (error) {
+      this.logger.error(`Error setting userId to matchId: ${error}`);
+    }
+  }
+
+  async getUserMatchMapping(userId: string) {
+    try {
+      const key = `${MATCH_USER}-${userId}`;
+      return await this.redisClient.get(key);
+    } catch (error) {
+      this.logger.error(`Error getting matchId from userId: ${error}`);
+    }
   }
 }

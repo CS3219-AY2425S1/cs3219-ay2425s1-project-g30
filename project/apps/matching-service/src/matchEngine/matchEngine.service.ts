@@ -37,61 +37,7 @@ export class MatchEngineService {
       complexity,
     );
 
-    if (matchedData) {
-      this.logger.log(
-        `Match found for user ${userId} and ${matchedData.userId}`,
-      );
-
-      // Find the overlapping categories between both users
-      const overlappingCategories = category.filter((value) =>
-        matchedData.category.includes(value),
-      );
-
-      const filters: MatchCriteriaDto = {
-        category: overlappingCategories,
-        complexity: complexity,
-      };
-
-      const selectedQuestion =
-        await this.matchSupabase.getRandomQuestion(filters);
-
-      if (selectedQuestion === '') {
-        this.logger.warn(
-          `No suitable questions found for match ${matchedData.matchId}`,
-        );
-        this.matchGateway.sendMatchInvalid({
-          userId: userId,
-          message: 'No suitable questions found for match',
-        });
-        return;
-      }
-      const matchData: MatchDataDto = {
-        user1_id: userId,
-        user2_id: matchedData.userId,
-        complexity: complexity,
-        category: category,
-        id: matchedData.matchId,
-        question_id: selectedQuestion,
-      };
-
-      this.logger.debug(
-        `Saving match data to DB: ${JSON.stringify(matchData)}`,
-      );
-
-      // Send match found message containg matchId to both users
-      this.matchGateway.sendMatchFound({
-        userId: userId,
-        message: matchedData.matchId,
-      });
-
-      this.matchGateway.sendMatchFound({
-        userId: matchedData.userId,
-        message: matchedData.matchId,
-      });
-      await this.matchSupabase.saveMatch(matchData);
-
-      // TODO: Call Collaboration service to intiialize a new collaboration session
-    } else {
+    if (!matchedData) {
       this.logger.log(
         `No immediate match found for user ${userId}, adding to matching queue`,
       );
@@ -104,6 +50,57 @@ export class MatchEngineService {
         match_req_id,
         MATCH_TIMEOUT,
       );
+      return;
     }
+
+    this.logger.log(`Match found for user ${userId} and ${matchedData.userId}`);
+
+    // Find the overlapping categories between both users
+    const overlappingCategories = category.filter((value) =>
+      matchedData.category.includes(value),
+    );
+
+    const filters: MatchCriteriaDto = {
+      category: overlappingCategories,
+      complexity: complexity,
+    };
+
+    const selectedQuestion =
+      await this.matchSupabase.getRandomQuestion(filters);
+
+    if (selectedQuestion === '') {
+      this.logger.warn(
+        `No suitable questions found for match ${matchedData.matchId}`,
+      );
+      this.matchGateway.sendMatchInvalid({
+        userId: userId,
+        message: 'No suitable questions found for match',
+      });
+      return;
+    }
+    const matchData: MatchDataDto = {
+      user1_id: userId,
+      user2_id: matchedData.userId,
+      complexity: complexity,
+      category: category,
+      id: matchedData.matchId,
+      question_id: selectedQuestion,
+    };
+
+    this.logger.debug(`Saving match data to DB: ${JSON.stringify(matchData)}`);
+
+    // Send match found message containg matchId to both users
+    this.matchGateway.sendMatchFound({
+      userId: userId,
+      message: matchedData.matchId,
+    });
+
+    this.matchGateway.sendMatchFound({
+      userId: matchedData.userId,
+      message: matchedData.matchId,
+    });
+    await this.matchSupabase.saveMatch(matchData);
+
+    // TODO: Call Collaboration service to intiialize a new collaboration session
   }
 }
