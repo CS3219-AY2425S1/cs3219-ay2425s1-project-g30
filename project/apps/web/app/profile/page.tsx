@@ -13,7 +13,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { QUERY_KEYS } from '@/constants/queryKeys';
@@ -100,61 +99,61 @@ const ProfilePageContent = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-xl font-semibold">User Profile</h1>
-      <div className="flex shadow-xl border rounded-3xl space-x-20 p-8 my-8">
-        <Avatar className="w-64 h-64">
+    <div className="container mx-auto p-6">
+      <div className="flex justify-start items-center my-5">
+        <h1 className="text-xl font-semibold">Profile</h1>
+      </div>
+      <div className="flex flex-row shadow-md border border-gray-200 rounded-lg gap-8 p-8 my-8">
+        <Avatar className="w-16 h-16">
           <AvatarImage />
-          <AvatarFallback className="text-6xl">
+          <AvatarFallback className="text-xl">
             {user?.username[0]}
           </AvatarFallback>
         </Avatar>
         <Form {...form}>
-          <form className="flex flex-col justify-center space-y-8 w-1/2">
+          <form className="flex flex-col justify-center gap-6 my-3">
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center space-x-4">
-                    <FormLabel className="w-36 text-base">Username</FormLabel>
-                    <FormControl className="flex-grow">
+                <FormItem className="flex flex-row items-center gap-6">
+                  <FormLabel className="flex text-base min-w-20">
+                    Username
+                  </FormLabel>
+                  <div className="flex flex-row justify-center gap-3">
+                    <FormControl>
                       <Input
                         defaultValue={user?.username}
                         disabled={!isEditingUsername}
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
-                    <div className="flex space-x-2 w-28">
-                      {isEditingUsername ? (
-                        <>
-                          <Button
-                            type="button"
-                            disabled={confirmLoading}
-                            className="bg-blue-500 hover:bg-blue-700 text-white"
-                            onClick={() => handleUpdate('username')}
-                          >
-                            Save
-                          </Button>
-                          <Button
-                            onClick={handleCancelUsername}
-                            disabled={confirmLoading}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
+                    {isEditingUsername ? (
+                      <>
                         <Button
                           type="button"
                           disabled={confirmLoading}
-                          className="bg-blue-500 hover:bg-blue-700 text-white"
-                          onClick={() => setIsEditingUsername(true)}
+                          onClick={() => handleUpdate('username')}
                         >
-                          Edit
+                          Save
                         </Button>
-                      )}
-                    </div>
+                        <Button
+                          onClick={handleCancelUsername}
+                          variant="outline"
+                          disabled={confirmLoading}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        type="button"
+                        disabled={confirmLoading}
+                        onClick={() => setIsEditingUsername(true)}
+                      >
+                        Edit
+                      </Button>
+                    )}
                   </div>
                 </FormItem>
               )}
@@ -163,46 +162,42 @@ const ProfilePageContent = () => {
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center space-x-4">
-                    <FormLabel className="w-36 text-base">Email</FormLabel>
-                    <FormControl className="flex-grow">
+                <FormItem className="flex flex-row items-center gap-6">
+                  <FormLabel className="text-base min-w-20">Email</FormLabel>
+                  <div className="flex flex-row justify-center gap-3">
+                    <FormControl>
                       <Input
                         defaultValue={user?.email}
                         disabled={!isEditingEmail}
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
-                    <div className="flex space-x-2 w-28">
-                      {isEditingEmail ? (
-                        <>
-                          <Button
-                            type="button"
-                            disabled={confirmLoading}
-                            className="bg-blue-500 hover:bg-blue-700 text-white"
-                            onClick={() => handleUpdate('email')}
-                          >
-                            Save
-                          </Button>
-                          <Button
-                            onClick={handleCancelEmail}
-                            disabled={confirmLoading}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
+                    {isEditingEmail ? (
+                      <>
                         <Button
                           type="button"
                           disabled={confirmLoading}
-                          className="bg-blue-500 hover:bg-blue-700 text-white"
-                          onClick={() => setIsEditingEmail(true)}
+                          onClick={() => handleUpdate('email')}
                         >
-                          Edit
+                          Save
                         </Button>
-                      )}
-                    </div>
+                        <Button
+                          onClick={handleCancelEmail}
+                          variant="outline"
+                          disabled={confirmLoading}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        type="button"
+                        disabled={confirmLoading}
+                        onClick={() => setIsEditingEmail(true)}
+                      >
+                        Edit
+                      </Button>
+                    )}
                   </div>
                 </FormItem>
               )}
@@ -210,28 +205,26 @@ const ProfilePageContent = () => {
             <FormField
               name="password"
               render={() => (
-                <FormItem>
-                  <div className="flex items-center">
-                    <FormLabel className="w-28 text-base">Password</FormLabel>
-                    <Button
-                      type="button"
-                      disabled={confirmLoading}
-                      className="w-min bg-blue-500 hover:bg-blue-700"
-                      onClick={() => setChangePasswordModalOpen(true)}
-                    >
-                      Change Password
-                    </Button>
-                  </div>
+                <FormItem className="flex flex-row items-center gap-6">
+                  <FormLabel className="text-base min-w-20">Password</FormLabel>
+                  <Button
+                    type="button"
+                    className="min-w-[174px]"
+                    disabled={confirmLoading}
+                    onClick={() => setChangePasswordModalOpen(true)}
+                  >
+                    Change Password
+                  </Button>
                 </FormItem>
               )}
             />
             <Button
               type="button"
               disabled={confirmLoading}
-              className="w-1/3 bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+              className="max-w-[144px] bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
               onClick={() => setDeleteModalOpen(true)}
             >
-              Delete Profile
+              Delete Account
             </Button>
           </form>
         </Form>

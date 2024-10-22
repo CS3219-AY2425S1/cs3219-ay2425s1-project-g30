@@ -1,29 +1,40 @@
+'use client';
+
 import { Skeleton } from '@/components/ui/skeleton';
 
-const ProfileSkeleton = () => (
-  <div className="container mx-auto p-4">
-    {/* Profile Header */}
-    <div className="flex items-center my-4">
-      <Skeleton className="h-10 w-32" />
-    </div>
-
-    {/* Profile Details */}
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <div className="flex items-center mb-4 gap-4">
-        <Skeleton className="h-8 w-24" />
-        <Skeleton className="h-8 w-48" />
+const ProfileSkeleton = () => {
+  return (
+    <div className="container mx-auto p-6">
+      <div className="flex justify-start items-center my-5">
+        <Skeleton className="h-6 w-32" />
       </div>
-      <Skeleton className="h-6 w-full mb-4" />
-      <Skeleton className="h-6 w-full mb-4" />
-      <Skeleton className="h-6 w-5/6 mb-6" />
+      <div className="flex flex-row shadow-md border border-gray-200 rounded-lg gap-8 p-8 my-8">
+        {/* Picture */}
+        <Skeleton className="w-16 h-16 rounded-full" />
+        <div className="flex flex-col justify-center gap-6 my-3 w-full">
+          {/* Username */}
+          <div className="flex flex-row items-center gap-6">
+            <Skeleton className="w-20 h-6" />
+            <Skeleton className="w-64 h-10" />
+            <Skeleton className="w-16 h-10" />
+          </div>
+          {/* Email */}
+          <div className="flex flex-row items-center gap-6">
+            <Skeleton className="w-20 h-6" />
+            <Skeleton className="w-64 h-10" />
+            <Skeleton className="w-16 h-10" />
+          </div>
+          {/* Password */}
+          <div className="flex flex-row items-center gap-6">
+            <Skeleton className="w-20 h-6" />
+            <Skeleton className="w-40 h-10" />
+          </div>
+          {/* Delete */}
+          <Skeleton className="w-32 h-10" />
+        </div>
+      </div>
     </div>
-
-    {/* Action Buttons */}
-    <div className="flex gap-4 mt-6">
-      <Skeleton className="h-10 w-32" />
-      <Skeleton className="h-10 w-32" />
-    </div>
-  </div>
-);
+  );
+};
 
 export default ProfileSkeleton;

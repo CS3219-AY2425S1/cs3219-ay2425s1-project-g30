@@ -66,7 +66,6 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
     }
   }, [open, form]);
 
-  // Function to display the label with an asterisk for required fields
   const renderLabelWithAsterisk = (label: string) => (
     <span>
       {label} <span className="text-red-500">*</span>
@@ -90,7 +89,7 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
               control={form.control}
               name="q_title"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-2">
                   <FormLabel className="text-black">
                     {renderLabelWithAsterisk('Title')}
                   </FormLabel>
@@ -107,7 +106,7 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
               control={form.control}
               name="q_desc"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-2">
                   <FormLabel className="text-black">
                     {renderLabelWithAsterisk('Description')}
                   </FormLabel>
@@ -129,7 +128,7 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
               control={form.control}
               name="q_complexity"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-2">
                   <FormLabel className="text-black">
                     {renderLabelWithAsterisk('Complexity')}
                   </FormLabel>
@@ -157,7 +156,7 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
               control={form.control}
               name="q_category"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-2">
                   <FormLabel className="text-black">
                     {renderLabelWithAsterisk('Categories')}
                   </FormLabel>

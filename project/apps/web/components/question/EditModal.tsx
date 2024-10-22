@@ -84,6 +84,12 @@ const EditModal = ({
     }
   }, [open, form, initialValues]);
 
+  const renderLabelWithAsterisk = (label: string) => (
+    <span>
+      {label} <span className="text-red-500">*</span>
+    </span>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent aria-describedby={undefined}>
@@ -101,8 +107,10 @@ const EditModal = ({
               control={form.control}
               name="q_title"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-black">Title</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-black">
+                    {renderLabelWithAsterisk('Title')}
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter title" {...field} />
                   </FormControl>
@@ -116,8 +124,10 @@ const EditModal = ({
               control={form.control}
               name="q_desc"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-black">Description</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-black">
+                    {renderLabelWithAsterisk('Description')}
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       className="resize-y max-h-64"
@@ -136,8 +146,10 @@ const EditModal = ({
               control={form.control}
               name="q_complexity"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-black">Complexity</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-black">
+                    {renderLabelWithAsterisk('Complexity')}
+                  </FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
@@ -162,8 +174,10 @@ const EditModal = ({
               control={form.control}
               name="q_category"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-black">Categories</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-black">
+                    {renderLabelWithAsterisk('Categories')}
+                  </FormLabel>
                   <FormControl>
                     <div className="flex flex-wrap gap-2">
                       {CATEGORIES.map((cat) => (
