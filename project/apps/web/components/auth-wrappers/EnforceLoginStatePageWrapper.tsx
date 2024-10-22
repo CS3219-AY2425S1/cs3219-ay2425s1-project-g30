@@ -5,7 +5,8 @@ import { type PropsWithChildren, useEffect, useMemo } from 'react';
 
 import { SIGN_IN } from '@/lib/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
-import useSocketStore from '@/stores/useSocketStore';
+
+import DefaultSkeleton from '../DefaultSkeleton';
 
 interface EnforceLoginStatePageWrapperProps {
   /**
@@ -28,7 +29,7 @@ const Redirect = ({ redirectTo }: EnforceLoginStatePageWrapperProps) => {
     void router.replace(`${redirectTo}?callbackUrl=${redirectUrl}`);
   }, [router, redirectTo, redirectUrl]);
 
-  return <div>Loading...</div>;
+  return <DefaultSkeleton />;
 };
 
 /**
@@ -44,18 +45,7 @@ export const EnforceLoginStatePageWrapper = ({
 }: PropsWithChildren<EnforceLoginStatePageWrapperProps>): React.ReactElement => {
   const user = useAuthStore.use.user();
 
-  const { connect, disconnect, isConnected } = useSocketStore();
-
-  useEffect(() => {
-    if (user) {
-      connect();
-    }
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect, user]);
-
-  if ((user && isConnected) || !enabled) {
+  if (user || !enabled) {
     return <>{children}</>;
   }
 

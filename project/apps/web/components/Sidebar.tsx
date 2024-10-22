@@ -18,7 +18,7 @@ const Sidebar = ({ signOut }: SidebarProps) => {
   const router = useRouter();
 
   const navItems = [
-    { name: 'Dashboard', href: '/', icon: <HomeIcon className="w-5 h-5" /> },
+    { name: 'Home', href: '/', icon: <HomeIcon className="w-5 h-5" /> },
     {
       name: 'Question',
       href: '/questions',

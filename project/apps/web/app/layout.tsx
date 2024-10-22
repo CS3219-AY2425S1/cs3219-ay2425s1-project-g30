@@ -37,11 +37,9 @@ const LayoutWithSidebarAndTopbar = ({
   const user = useAuthStore.use.user();
   const signOut = useAuthStore.use.signOut();
 
-  const excludePaths = ['/login'];
-
   // TODO: validate match path
   const renderSidebarAndTopbar =
-    !excludePaths.includes(pathname) && !pathname.startsWith('/match/');
+    !pathname.startsWith('/match/') && !pathname.startsWith('/login');
 
   return (
     <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
@@ -67,26 +65,21 @@ const RootLayout = ({
 }>) => {
   const pathname = usePathname();
   const fetchUser = useAuthStore.use.fetchUser();
-  const { connect, disconnect } = useSocketStore();
-  const excludeLoginStatePaths = ['/login'];
-  const shouldEnforceLoginState = !excludeLoginStatePaths.includes(pathname);
+  const shouldEnforceLoginState = !pathname.startsWith('/login');
 
   // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
     const initializeUser = async () => {
+      if (!shouldEnforceLoginState) return;
+
       try {
         await fetchUser();
-        connect();
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
     };
     initializeUser();
-
-    return () => {
-      disconnect();
-    };
-  }, [fetchUser, connect, disconnect]);
+  }, [fetchUser]);
 
   return (
     <html lang="en" className={inter.className}>
