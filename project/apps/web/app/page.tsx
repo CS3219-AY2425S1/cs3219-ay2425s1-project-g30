@@ -165,17 +165,17 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto flex justify-between h-full overflow-hidden">
+    <div className="container flex justify-between h-full mx-auto overflow-hidden">
       <AnimatePresence mode="wait">
         {isSearching ? (
           <motion.div
-            className="flex flex-col gap-4 items-center justify-center w-full"
+            className="flex flex-col items-center justify-center w-full gap-4"
             key="searching"
             {...fadeAnimation}
           >
             <div className="flex flex-row">
-              <div className="text-lg font-medium mr-2">Searching...</div>
-              <div className="text-gray-600 font-medium text-lg">
+              <div className="mr-2 text-lg font-medium">Searching...</div>
+              <div className="text-lg font-medium text-gray-600">
                 ({timer}s)
               </div>
             </div>
@@ -185,14 +185,14 @@ const Dashboard = () => {
           </motion.div>
         ) : (
           <motion.div
-            className="flex w-full justify-between items-center"
+            className="flex items-center justify-between w-full"
             key="form-and-results"
             {...fadeAnimation}
           >
-            <div className="flex w-2/5 justify-center items-center">
+            <div className="flex items-center justify-center w-2/5">
               <MatchingForm onMatch={handleCreateMatch} />
             </div>
-            <CardWaterfall className="ml-20 w-3/5" />
+            <CardWaterfall className="w-3/5 ml-20" />
           </motion.div>
         )}
       </AnimatePresence>
