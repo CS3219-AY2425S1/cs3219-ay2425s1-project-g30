@@ -19,7 +19,7 @@ const Topbar = ({ user }: TopBarProps) => {
     <header className="fixed top-0 left-0 right-0 bg-white text-black p-4 shadow z-50">
       <div className="px-4 flex justify-between items-center">
         <Link href="/" passHref>
-          <h1 className="text-lg font-medium cursor-pointer">PeerPrep</h1>
+          <h1 className="text-lg font-medium cursor-pointer">LastMinPrep</h1>
         </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
