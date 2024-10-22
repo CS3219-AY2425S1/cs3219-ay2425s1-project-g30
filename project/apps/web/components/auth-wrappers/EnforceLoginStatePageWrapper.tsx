@@ -24,7 +24,9 @@ const Redirect = ({ redirectTo }: EnforceLoginStatePageWrapperProps) => {
     return encodeURIComponent(`${pathname}${search}${hash}`);
   }, []);
 
-  void router.replace(`${redirectTo}?callbackUrl=${redirectUrl}`);
+  useEffect(() => {
+    void router.replace(`${redirectTo}?callbackUrl=${redirectUrl}`);
+  }, [router, redirectTo, redirectUrl]);
 
   return <div>Loading...</div>;
 };
