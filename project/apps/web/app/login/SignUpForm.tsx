@@ -20,7 +20,15 @@ import { useZodForm } from '@/lib/form';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export function SignUpForm() {
-  const form = useZodForm({ schema: signUpSchema });
+  const form = useZodForm({
+    schema: signUpSchema,
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const signUp = useAuthStore.use.signUp();
