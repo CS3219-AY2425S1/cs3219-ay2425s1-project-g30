@@ -33,7 +33,7 @@ const LayoutWithSidebarAndTopbar = ({
   children: React.ReactNode;
 }) => {
   const pathname = usePathname();
-  const { isSearching } = useSocketStore();
+  const isSearching = useSocketStore((state) => state.isSearching);
   const user = useAuthStore.use.user();
   const signOut = useAuthStore.use.signOut();
 
@@ -67,7 +67,8 @@ const RootLayout = ({
 }>) => {
   const pathname = usePathname();
   const fetchUser = useAuthStore.use.fetchUser();
-  const { connect, disconnect } = useSocketStore();
+  const connect = useSocketStore((state) => state.connect);
+  const disconnect = useSocketStore((state) => state.disconnect);
   const excludeLoginStatePaths = ['/login'];
   const shouldEnforceLoginState = !excludeLoginStatePaths.includes(pathname);
 

@@ -14,7 +14,11 @@ import { cancelMatch, createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 
 const Dashboard = () => {
-  const { isSearching, startSearch, stopSearch, socket } = useSocketStore();
+  const isSearching = useSocketStore((state) => state.isSearching);
+  const startSearch = useSocketStore((state) => state.startSearch);
+  const stopSearch = useSocketStore((state) => state.stopSearch);
+  const socket = useSocketStore((state) => state.socket);
+
   const [timer, setTimer] = useState(0);
   const [matchReqId, setMatchReqId] = useState<string | null>(null);
   const intervalRef = useRef<number | null>(null);

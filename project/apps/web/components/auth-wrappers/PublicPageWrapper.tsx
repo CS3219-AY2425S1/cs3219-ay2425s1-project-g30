@@ -44,7 +44,7 @@ export const PublicPageWrapper = ({
 
   if (user && redirect.strict) {
     return (
-      <div className="flex w-full h-full items-center justify-center">
+      <div className="flex items-center justify-center w-full h-full">
         Loading...
       </div>
     );
