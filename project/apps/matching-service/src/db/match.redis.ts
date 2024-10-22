@@ -156,7 +156,7 @@ export class MatchRedis {
       }
 
       // Remove user match mapping
-      await this.removeUserMatchMapaping(matchRequest.userId);
+      await this.removeUserMatchMapping(matchRequest.userId);
 
       return matchRequest;
     } catch (error) {
@@ -312,7 +312,7 @@ export class MatchRedis {
    * @param userId The userId to map
    */
 
-  async removeUserMatchMapaping(userId: string) {
+  async removeUserMatchMapping(userId: string) {
     try {
       const key = `${MATCH_USER}-${userId}`;
       await this.redisClient.del(key);
