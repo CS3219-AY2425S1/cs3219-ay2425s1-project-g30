@@ -102,7 +102,6 @@ export class MatchRedis {
     this.logger.debug(`Hash key: ${hashKey}`);
     try {
       const data = await this.redisClient.hgetall(hashKey);
-      this.logger.log(data);
       if (!data || Object.keys(data).length === 0) return null;
 
       return {
@@ -302,6 +301,7 @@ export class MatchRedis {
     try {
       const key = `${MATCH_USER}-${userId}`;
       await this.redisClient.set(key, match_req_id);
+      this.logger.log(`Added user-match mapping for ${userId}`);
     } catch (error) {
       this.logger.error(`Error setting userId to matchId: ${error}`);
     }
@@ -316,6 +316,7 @@ export class MatchRedis {
     try {
       const key = `${MATCH_USER}-${userId}`;
       await this.redisClient.del(key);
+      this.logger.log(`Removed user-match mapping for ${userId}`);
     } catch (error) {
       this.logger.error(`Error setting userId to matchId: ${error}`);
     }

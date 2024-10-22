@@ -41,6 +41,14 @@ export class MatchingGateway
     private readonly matchCancelService: MatchCancelService,
   ) {}
 
+  afterInit(server: Server) {
+    if (!server) {
+      this.logger.error("WebSocket gateway's server is null");
+      return;
+    }
+    this.logger.log('WebSocket gateway initialized');
+  }
+
   async handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
 
