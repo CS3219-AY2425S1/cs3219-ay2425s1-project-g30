@@ -58,7 +58,7 @@ export function SignUpForm() {
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Username</FormLabel>
               <FormControl>
                 <Input {...field} />
@@ -71,7 +71,7 @@ export function SignUpForm() {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input {...field} />
@@ -84,7 +84,7 @@ export function SignUpForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input type="password" {...field} />
@@ -97,7 +97,7 @@ export function SignUpForm() {
           control={form.control}
           name="confirmPassword"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
                 <Input type="password" {...field} />
