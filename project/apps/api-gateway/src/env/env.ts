@@ -7,6 +7,7 @@ export const envSchema = z.object({
   QUESTION_SERVICE_HOST: z.string().default('localhost'),
   AUTH_SERVICE_HOST: z.string().default('localhost'),
   USER_SERVICE_HOST: z.string().default('localhost'),
+  COLLABORATION_SERVICE_HOST: z.string().default('localhost'),
 });
 
 export type Env = z.infer<typeof envSchema>;
