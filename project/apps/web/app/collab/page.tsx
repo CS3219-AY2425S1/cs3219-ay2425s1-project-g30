@@ -1,7 +1,7 @@
 'use client';
 
-import Editor, { Monaco, useMonaco } from '@monaco-editor/react';
-import { useEffect, useRef } from 'react';
+import  Editor, { Monaco, useMonaco } from '@monaco-editor/react';
+import { useEffect } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
@@ -20,13 +20,11 @@ export default function CollabPage() {
           'nextjs-monaco-demo',
           ydoc,
         );
-        // send a readiness check to partykit
-        // provider.ws?.send("it's happening!");
+
         // get the text from the monaco editor
         const yText = ydoc.getText('monaco');
         // // get the monaco editor
         const editor = monaco.editor.getEditors()[0];
-        console.log(provider);
         // create the monaco binding to the yjs doc
         if (editor) {
           new MonacoBinding(
