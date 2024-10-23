@@ -12,7 +12,6 @@ import Topbar from '@/components/Topbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toaster } from '@/components/ui/toaster';
 import { useAuthStore } from '@/stores/useAuthStore';
-import useSocketStore from '@/stores/useSocketStore';
 
 import './globals.css';
 
@@ -33,24 +32,24 @@ const LayoutWithSidebarAndTopbar = ({
   children: React.ReactNode;
 }) => {
   const pathname = usePathname();
-  const isSearching = useSocketStore((state) => state.isSearching);
   const user = useAuthStore.use.user();
   const signOut = useAuthStore.use.signOut();
 
-  // TODO: validate match path
   const renderSidebarAndTopbar =
-    !pathname.startsWith('/match/') && !pathname.startsWith('/login');
+    !pathname.startsWith('/match') &&
+    !pathname.startsWith('/login') &&
+    !pathname.startsWith('/search');
 
   return (
     <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
-      {renderSidebarAndTopbar && !isSearching && (
+      {renderSidebarAndTopbar && (
         <>
           <Topbar user={user} />
           <Sidebar signOut={signOut} />
         </>
       )}
       <main
-        className={`flex-1 transition-all duration-500 ease-in-out ${renderSidebarAndTopbar && !isSearching ? 'ml-20 mt-16' : 'mt-0 ml-0'} overflow-auto`}
+        className={`flex-1 transition-all duration-500 ease-in-out ${renderSidebarAndTopbar ? 'ml-20 mt-16' : 'mt-0 ml-0'} overflow-auto`}
       >
         {children}
       </main>
