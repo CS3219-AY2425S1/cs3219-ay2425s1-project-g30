@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { useZodForm } from '@/lib/form';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
 
 interface MatchingFormProps {
   onMatch: (matchRequest: MatchRequestMsgDto) => void;
@@ -55,12 +56,6 @@ const MatchingForm = ({ onMatch }: MatchingFormProps) => {
       onMatch(matchRequest);
     }
   };
-
-  const renderLabelWithAsterisk = (label: string) => (
-    <span>
-      {label} <span className="text-red-500">*</span>
-    </span>
-  );
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 w-full max-w-md">

@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useZodForm } from '@/lib/form';
+import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
 
 interface EditModalProps {
   open: boolean;
@@ -83,12 +84,6 @@ const EditModal = ({
       form.clearErrors();
     }
   }, [open, form, initialValues]);
-
-  const renderLabelWithAsterisk = (label: string) => (
-    <span>
-      {label} <span className="text-red-500">*</span>
-    </span>
-  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

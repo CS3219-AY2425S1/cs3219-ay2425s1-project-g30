@@ -27,6 +27,7 @@
     "@tanstack/react-table": "^8.20.5",
     "@types/socket.io-client": "^3.0.0",
     "@uidotdev/usehooks": "^2.4.0",
+    "audio-context-timers": "^5.0.120",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

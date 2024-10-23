@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useZodForm } from '@/lib/form';
+import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
 
 interface CreateModalProps {
   open: boolean;
@@ -65,12 +66,6 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
       form.clearErrors();
     }
   }, [open, form]);
-
-  const renderLabelWithAsterisk = (label: string) => (
-    <span>
-      {label} <span className="text-red-500">*</span>
-    </span>
-  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
