@@ -82,7 +82,7 @@ export default function ChangePasswordModal({
               control={form.control}
               name="newPassword"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-2">
                   <FormLabel>New password</FormLabel>
                   <FormControl>
                     <Input
@@ -101,7 +101,7 @@ export default function ChangePasswordModal({
               control={form.control}
               name="confirmNewPassword"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-2">
                   <FormLabel>Confirm new password</FormLabel>
                   <FormControl>
                     <Input

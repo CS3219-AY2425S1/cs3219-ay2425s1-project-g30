@@ -16,7 +16,6 @@ const MatchLayout = ({ children }: MatchLayoutProps) => {
     transition: { duration: 0.5 },
   };
 
-  // enforce login here
   return (
     <AnimatePresence mode="wait">
       <motion.div key="match-layout" {...animationProps}>

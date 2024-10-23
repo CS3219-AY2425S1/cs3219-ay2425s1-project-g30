@@ -46,47 +46,53 @@ export class MatchingGateway
       this.logger.error("WebSocket gateway's server is null");
       return;
     }
+    // bind middleware to authenticate socket connections
+    server.use(this.authenticateSocket.bind(this));
+
     this.logger.log('WebSocket gateway initialized');
   }
 
-  async handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
-
-    const cookie = client.handshake.headers.cookie;
-
-    // Disconnect Client if no cookie provided
+  // Authenticate the socket connection using the access token
+  private async authenticateSocket(socket: Socket, next: (err?: any) => void) {
+    const cookie = socket.handshake.headers.cookie;
     if (!cookie) {
       this.logger.log('No cookie provided');
-      client.disconnect();
-      return;
+      return next(new Error('No cookie provided'));
     }
 
     const cookies = parse(cookie);
     const accessToken = cookies['access_token'];
-    // Disconnect client if no token provided
     if (!accessToken) {
       this.logger.log('No token provided');
-      await this.disconnectCleanup(client.id);
-      client.disconnect();
-      return;
+      return next(new Error('No token provided'));
     }
+
     try {
       const data = await firstValueFrom(
         this.authServiceClient.send({ cmd: 'verify' }, accessToken),
       );
-
       if (!data) {
-        this.logger.log('User Data not found');
-        client.disconnect();
-        return;
+        this.logger.log('User data not found');
+        return next(new Error('User data not found'));
       }
+      socket.data.user = data;
+      next();
+    } catch (error) {
+      this.logger.log(`Error verifying token: ${error.message}`);
+      return next(new Error('Error verifying token'));
+    }
+  }
 
-      // TODO: Implement refresh token logic
+  async handleConnection(client: Socket) {
+    this.logger.log(`Client connected: ${client.id}`);
+    try {
+      const data = client.data.user;
       // Map socket id to user id in redis
       await this.matchRedis.setUserToSocket({
         userId: data.id,
         socketId: client.id,
       });
+      this.logger.log('Client socket set in redis');
     } catch (error) {
       this.logger.log(`Error verifying token: ${error.message}`);
       await this.disconnectCleanup(client.id);

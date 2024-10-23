@@ -20,7 +20,13 @@ import { useZodForm } from '@/lib/form';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export function SignInForm() {
-  const form = useZodForm({ schema: signInSchema });
+  const form = useZodForm({
+    schema: signInSchema,
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const signIn = useAuthStore.use.signIn();
@@ -30,7 +36,7 @@ export function SignInForm() {
     mutationFn: (values: SignInDto) => signIn(values),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
-      await router.push('/questions');
+      await router.push('/');
     },
     onError(error) {
       toast({
@@ -50,7 +56,7 @@ export function SignInForm() {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input {...field} />
@@ -63,7 +69,7 @@ export function SignInForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input type="password" {...field} />
