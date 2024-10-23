@@ -2,7 +2,6 @@
 
 import { Inter, Roboto } from 'next/font/google';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
 
 import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
@@ -63,29 +62,14 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   const pathname = usePathname();
-  const fetchUser = useAuthStore.use.fetchUser();
-  const shouldEnforceLoginState = !pathname.startsWith('/login');
-
-  // Fetch user data on initial render, ensures logged in user data is available
-  useEffect(() => {
-    const initializeUser = async () => {
-      if (!shouldEnforceLoginState) return;
-
-      try {
-        await fetchUser();
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      }
-    };
-    initializeUser();
-  }, [fetchUser]);
+  const isLoginPage = pathname.startsWith('/login');
 
   return (
     <html lang="en" className={inter.className}>
       <body className={roboto.className}>
         <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
           <ReactQueryProvider>
-            <EnforceLoginStatePageWrapper enabled={shouldEnforceLoginState}>
+            <EnforceLoginStatePageWrapper requireLogin={!isLoginPage}>
               <LayoutWithSidebarAndTopbar>
                 {children}
               </LayoutWithSidebarAndTopbar>

@@ -22,7 +22,6 @@ export class MatchSupabase {
   ) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
     const supabaseKey = this.envService.get('SUPABASE_KEY');
-    console.log(supabaseKey);
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase URL and key must be provided');
     }
