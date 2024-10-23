@@ -9,6 +9,7 @@ import { EnvService } from './env/env.service';
 import { MatchingController } from './matching/matching.controller';
 import { QuestionsController } from './questions/questions.controller';
 import { UsersController } from './users/users.controller';
+import { CollaborationController } from './collaboration/collaboration.controller';
 
 @Module({
   imports: [
@@ -95,6 +96,21 @@ import { UsersController } from './users/users.controller';
         }),
         inject: [EnvService],
       },
+      {
+        imports: [EnvModule],
+        name: 'COLLABORATION_SERVICE',
+        useFactory: async (envService: EnvService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('COLLABORATION_SERVICE_HOST'),
+            port: 3005,
+          },
+        }),
+        inject: [EnvService],
+      },
     ]),
   ],
   controllers: [
@@ -102,6 +118,7 @@ import { UsersController } from './users/users.controller';
     UsersController,
     AuthController,
     MatchingController,
+    CollaborationController,
   ],
 })
 export class ApiGatewayModule {}
