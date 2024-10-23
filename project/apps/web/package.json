@@ -46,7 +46,7 @@
     "tailwindcss": "^3.4.13",
     "tailwindcss-animate": "^1.0.7",
     "y-monaco": "^0.1.6",
-    "y-websocket": "^2.0.4",
+    "y-partykit": "^0.0.32",
     "yjs": "^13.6.20",
     "zod": "^3.23.8",
     "zustand": "^5.0.0"
