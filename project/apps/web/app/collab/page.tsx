@@ -1,6 +1,6 @@
 'use client';
 
-import  Editor, { Monaco, useMonaco } from '@monaco-editor/react';
+import Editor, { Monaco, useMonaco } from '@monaco-editor/react';
 import { useEffect } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import YPartyKitProvider from 'y-partykit/provider';
@@ -16,7 +16,7 @@ export default function CollabPage() {
         const ydoc = new Y.Doc();
         // establish partykit as your websocket provider
         const provider = new YPartyKitProvider(
-          'ws://localhost:1234',
+          'http://localhost:1999',
           'nextjs-monaco-demo',
           ydoc,
         );
