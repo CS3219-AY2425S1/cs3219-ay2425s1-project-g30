@@ -21,6 +21,7 @@ const Search = () => {
   const { elapsedTime, resetTimer } = useAudioContextTimer(1000);
 
   const connect = useSocketStore((state) => state.connect);
+  const isConnected = useSocketStore((state) => state.isConnected);
   const disconnect = useSocketStore((state) => state.disconnect);
   const socket = useSocketStore((state) => state.socket);
 
@@ -149,14 +150,15 @@ const Search = () => {
         router.push('/');
         return;
       }
-
-      const matchData: MatchRequestMsgDto = JSON.parse(matchDataParam);
-      handleCreateMatch(matchData);
+      if (isConnected) {
+        const matchData: MatchRequestMsgDto = JSON.parse(matchDataParam);
+        handleCreateMatch(matchData);
+      }
     } else {
       console.log('No match data params found');
       router.push('/');
     }
-  }, [matchDataParam, handleCreateMatch]);
+  }, [matchDataParam, handleCreateMatch, isConnected]);
 
   const fadeAnimation = {
     initial: { opacity: 0 },
