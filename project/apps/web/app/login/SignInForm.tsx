@@ -2,7 +2,7 @@
 
 import { signInSchema, SignInDto } from '@repo/dtos/auth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,12 +31,13 @@ export function SignInForm() {
   const queryClient = useQueryClient();
   const signIn = useAuthStore.use.signIn();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const mutation = useMutation({
     mutationFn: (values: SignInDto) => signIn(values),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
-      await router.push('/');
+      await router.push(searchParams.get('callbackUrl') || '/');
     },
     onError(error) {
       toast({

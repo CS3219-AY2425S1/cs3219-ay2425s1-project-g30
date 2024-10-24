@@ -31,8 +31,12 @@ export const useAuthStoreBase = create<AuthState>()(
         set({ user: null });
       },
       fetchUser: async () => {
-        const userData = await me();
-        set({ user: userData });
+        try {
+          set({ user: await me() });
+        } catch {
+          // If user is not authenticated or tokens expired
+          set({ user: null });
+        }
       },
     }),
     {

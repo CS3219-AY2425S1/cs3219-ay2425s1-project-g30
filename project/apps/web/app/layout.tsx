@@ -2,6 +2,7 @@
 
 import { Inter, Roboto } from 'next/font/google';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
 import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
@@ -62,7 +63,21 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   const pathname = usePathname();
+  const fetchUser = useAuthStore.use.fetchUser();
   const isLoginPage = pathname.startsWith('/login');
+
+  useEffect(() => {
+    if (isLoginPage) return;
+
+    const initialiseUser = async () => {
+      try {
+        await fetchUser();
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+    initialiseUser();
+  }, [fetchUser]);
 
   return (
     <html lang="en" className={inter.className}>
