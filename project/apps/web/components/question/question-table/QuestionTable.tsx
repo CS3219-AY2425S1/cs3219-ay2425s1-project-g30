@@ -23,15 +23,15 @@ import {
   DataTable,
 } from '@/components/data-table/DataTable';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import { useQuestionsState } from '@/contexts/QuestionsStateContext';
 import useDebounce from '@/hooks/useDebounce';
 import { fetchQuestions } from '@/lib/api/question';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 import { columns } from './columns';
 import { QuestionTableToolbar } from './QuestionTableToolbar';
 
 export function QuestionTable() {
-  const { confirmLoading, setConfirmLoading } = useQuestionsState();
+  const { confirmLoading, setConfirmLoading } = useQuestionsStore();
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
