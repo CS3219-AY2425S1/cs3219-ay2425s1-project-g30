@@ -1,5 +1,6 @@
 'use client';
 
+import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { Monaco, useMonaco } from '@monaco-editor/react';
 import { useEffect } from 'react';
 import { MonacoBinding } from 'y-monaco';
@@ -15,11 +16,11 @@ export default function CollabPage() {
         // create a yew yjs doc
         const ydoc = new Y.Doc();
         // establish partykit as your websocket provider
-        const provider = new YPartyKitProvider(
-          'http://localhost:1999',
-          'nextjs-monaco-demo',
-          ydoc,
-        );
+        const provider = new HocuspocusProvider({
+          url: 'http://localhost:1234',
+          name: 'nextjs-monaco-demo',
+          document: ydoc,
+        });
 
         // get the text from the monaco editor
         const yText = ydoc.getText('monaco');

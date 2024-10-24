@@ -11,6 +11,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@hocuspocus/provider": "^2.13.7",
     "@hookform/resolvers": "^3.9.0",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-avatar": "^1.1.0",
@@ -46,7 +47,6 @@
     "tailwindcss": "^3.4.13",
     "tailwindcss-animate": "^1.0.7",
     "y-monaco": "^0.1.6",
-    "y-partykit": "^0.0.32",
     "yjs": "^13.6.20",
     "zod": "^3.23.8",
     "zustand": "^5.0.0"
