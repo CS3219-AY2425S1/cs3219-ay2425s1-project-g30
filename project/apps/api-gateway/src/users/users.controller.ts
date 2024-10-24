@@ -126,8 +126,6 @@ export class UsersController {
       ),
     );
 
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
