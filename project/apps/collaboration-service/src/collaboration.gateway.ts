@@ -1,52 +1,22 @@
-import { Logger, Req } from '@nestjs/common';
-import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  OnGatewayInit,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { Hocuspocus } from '@hocuspocus/server';
 
-import { Server, Socket } from 'socket.io';
-
-import { Server as HocuspocusServer } from '@hocuspocus/server';
-import { Request } from 'express';
-
-export const server = HocuspocusServer.configure({
-  name: 'collaboration-service-hocuspocus',
-  port: 1234,
-  timeout: 30000,
-  debounce: 5000,
-  maxDebounce: 30000,
-  quiet: true,
-});
-
-@WebSocketGateway(8081, {
-  cors: {
-    origin: 'http://localhost:3000',
-    credentials: true,
-  },
-})
-export class CollaborationGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
-{
-  @WebSocketServer() _server: Server;
-
+@Injectable()
+export class CollaborationGateway implements OnModuleInit {
   private readonly logger = new Logger(CollaborationGateway.name);
+  private instanceId;
 
-  constructor() {}
-
-  afterInit() {
-    const test = server.getConnectionsCount();
-    this.logger.log(`Connections: ${test}`);
+  constructor() {
+    this.instanceId = Math.random().toString(36).substring(7);
+    this.logger.debug(`Instance ID: ${this.instanceId}`);
   }
 
-  handleConnection(client: Socket, @Req() request: Request) {
-    this.logger.log(`Client connected: ${client.id}`);
-    server.handleConnection(client, request);
-  }
+  private readonly hocuspocusServer = new Hocuspocus({
+    port: 1234,
+  });
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+  onModuleInit() {
+    this.hocuspocusServer.listen();
+    this.logger.log('Hocuspocus server started on port 1234');
   }
 }
