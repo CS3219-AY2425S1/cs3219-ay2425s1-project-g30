@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
 
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
@@ -167,7 +168,14 @@ const Search = () => {
     exit: { opacity: 0 },
     transition: { duration: 0.5 },
   };
-
+  if (!isConnected) {
+    return (
+      <div className="flex items-center justify-center h-full gap-2 align-middle">
+        Connecting...
+        <LoadingSpinner />
+      </div>
+    );
+  }
   return (
     <div className="container flex justify-between h-full mx-auto overflow-hidden">
       <AnimatePresence mode="wait">
