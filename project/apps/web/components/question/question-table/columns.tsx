@@ -72,7 +72,7 @@ export const columns: ColumnDef<QuestionDto>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex flex-wrap gap-2 max-w-md">
+        <div className="flex flex-wrap max-w-md gap-2">
           {row.original.q_category.map((category) => (
             <Badge key={category} variant="secondary" className="mr-2">
               {category}
