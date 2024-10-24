@@ -37,7 +37,7 @@ const Redirect = ({ requireLogin }: EnforceLoginStatePageWrapperProps) => {
  * Page wrapper that renders children only if either user authenticated + requireLogin or user unauthenticated + !requireLogin.
  * Otherwise, the user will be redirected.
  *
- * @note 🚨 There is no authentication being performed by this component. This component is merely a wrapper that checks for the presence of the login flag in localStorage. This means that a user could add the flag and bypass the check. Any page children that require authentication should also perform authentication checks in that page itself!
+ * @note 🚨 There is no authentication being performed by this component. This component is merely a wrapper that checks authentication state and redirects if needed. Any page children that require authentication should also perform authentication checks in that page itself!
  */
 export const EnforceLoginStatePageWrapper = ({
   requireLogin,
