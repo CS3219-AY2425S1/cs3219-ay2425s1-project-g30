@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { WsAdapter } from '@nestjs/platform-ws';
 
-import { EnvService } from './env/env.service';
+// import { EnvService } from './env/env.service';
 import { CollaborationModule } from './collaboration.module';
 
 async function bootstrap() {
@@ -38,8 +37,6 @@ async function bootstrap() {
       },
     },
   );
-
-  // app.useWebSocketAdapter(new WsAdapter());
 
   await app.listen();
   console.log(`Collaboration Service is listening on ${host}:3005`);

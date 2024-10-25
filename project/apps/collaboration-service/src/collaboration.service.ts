@@ -1,5 +1,5 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable, Logger } from '@nestjs/common';
+// import { ClientProxy } from '@nestjs/microservices';
 
 import { CollabCreateDto } from '@repo/dtos/collab';
 

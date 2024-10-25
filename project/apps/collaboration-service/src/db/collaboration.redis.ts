@@ -26,6 +26,8 @@ export class CollaborationRedis {
   }
 
   async getCollab(userId: string): Promise<CollabRoomDto | null> {
+    this.logger.debug(`Getting collab room for user: ${userId}`);
+
     throw new Error('Method not implemented.');
   }
 }
