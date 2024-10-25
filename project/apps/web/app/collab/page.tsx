@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
 
+import { env } from '@/env.mjs';
+
 export default function CollabPage() {
   const monaco = useMonaco();
 
@@ -15,7 +17,7 @@ export default function CollabPage() {
         const ydoc = new Y.Doc();
 
         const provider = new HocuspocusProvider({
-          url: 'http://localhost:1234',
+          url: env.NEXT_PUBLIC_COLLAB_SOCKET_URL,
           name: 'nextjs-monaco-demo',
           document: ydoc,
         });
