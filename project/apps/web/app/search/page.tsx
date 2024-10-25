@@ -5,10 +5,11 @@ import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useStopwatch } from 'react-timer-hook';
 
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
-import { useAudioContextTimer } from '@/hooks/useAudioContextTimer';
 import { cancelMatch, createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
@@ -18,7 +19,8 @@ const Search = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const matchDataParam = searchParams.get('matchData');
-  const { elapsedTime, resetTimer } = useAudioContextTimer(1000);
+
+  const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
@@ -68,18 +70,18 @@ const Search = () => {
   const handleCreateMatch = useCallback(
     (newMatch: MatchRequestMsgDto) => {
       if (!isCreateMutatingRef.current) {
-        resetTimer();
+        reset();
         isCreateMutatingRef.current = true;
         createMutation.mutate(newMatch);
       }
     },
 
-    [createMutation.mutate, resetTimer],
+    [createMutation.mutate, reset],
   );
 
   const stopMatching = () => {
     if (!isCancelMutatingRef.current && matchReqId) {
-      resetTimer();
+      reset();
       isCancelMutatingRef.current = true;
       const cancelMatchReq: MatchCancelDto = { match_req_id: matchReqId };
       cancelMatchMutation.mutate(cancelMatchReq);
@@ -166,19 +168,26 @@ const Search = () => {
     exit: { opacity: 0 },
     transition: { duration: 0.5 },
   };
-
+  if (!isConnected) {
+    return (
+      <div className="flex items-center justify-center h-full gap-2 align-middle">
+        Connecting...
+        <LoadingSpinner />
+      </div>
+    );
+  }
   return (
-    <div className="container mx-auto flex justify-between h-full overflow-hidden">
+    <div className="container flex justify-between h-full mx-auto overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
-          className="flex flex-col gap-4 items-center justify-center w-full"
+          className="flex flex-col items-center justify-center w-full gap-4"
           key="searching"
           {...fadeAnimation}
         >
           <div className="flex flex-row">
-            <div className="text-lg font-medium mr-2">Searching...</div>
-            <div className="text-gray-600 font-medium text-lg">
-              ({elapsedTime}s)
+            <div className="mr-2 text-lg font-medium">Searching...</div>
+            <div className="text-lg font-medium text-gray-600">
+              ({totalSeconds}s)
             </div>
           </div>
           <Button variant="default" onClick={stopMatching}>

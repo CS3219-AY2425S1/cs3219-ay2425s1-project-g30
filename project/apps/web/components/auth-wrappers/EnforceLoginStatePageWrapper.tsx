@@ -3,51 +3,52 @@
 import { useRouter } from 'next/navigation';
 import { type PropsWithChildren, useEffect, useMemo } from 'react';
 
-import { SIGN_IN } from '@/lib/routes';
+import { LANDING, SIGN_IN } from '@/lib/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 import DefaultSkeleton from '../DefaultSkeleton';
 
 interface EnforceLoginStatePageWrapperProps {
-  /**
-   * Route to redirect to when user is not authenticated. Defaults to
-   * `SIGN_IN` route if not provided.
-   */
-  redirectTo?: string;
-  enabled?: boolean;
+  requireLogin: boolean;
 }
 
-const Redirect = ({ redirectTo }: EnforceLoginStatePageWrapperProps) => {
+const Redirect = ({ requireLogin }: EnforceLoginStatePageWrapperProps) => {
   const router = useRouter();
-  const redirectUrl = useMemo(() => {
+  const redirectUrlForLogin = useMemo(() => {
     if (typeof window === 'undefined') return encodeURIComponent('/');
     const { pathname, search, hash } = window.location;
     return encodeURIComponent(`${pathname}${search}${hash}`);
   }, []);
 
   useEffect(() => {
-    void router.replace(`${redirectTo}?callbackUrl=${redirectUrl}`);
-  }, [router, redirectTo, redirectUrl]);
+    if (requireLogin) {
+      // Redirect to SIGN_IN if not authenticated
+      router.replace(`${SIGN_IN}?callbackUrl=${redirectUrlForLogin}`);
+    } else {
+      // Redirect to LANDING if already authenticated
+      router.replace(LANDING);
+    }
+  }, [requireLogin, redirectUrlForLogin, router]);
 
   return <DefaultSkeleton />;
 };
 
 /**
- * Page wrapper that renders children only if the login state localStorage flag has been set.
- * Otherwise, will redirect to the route passed into the `redirectTo` prop.
+ * Page wrapper that renders children only if either user authenticated + requireLogin or user unauthenticated + !requireLogin.
+ * Otherwise, the user will be redirected.
  *
- * @note 🚨 There is no authentication being performed by this component. This component is merely a wrapper that checks for the presence of the login flag in localStorage. This means that a user could add the flag and bypass the check. Any page children that require authentication should also perform authentication checks in that page itself!
+ * @note 🚨 There is no authentication being performed by this component. This component is merely a wrapper that checks authentication state and redirects if needed. Any page children that require authentication should also perform authentication checks in that page itself!
  */
 export const EnforceLoginStatePageWrapper = ({
-  redirectTo = SIGN_IN,
-  enabled = true,
+  requireLogin,
   children,
 }: PropsWithChildren<EnforceLoginStatePageWrapperProps>): React.ReactElement => {
   const user = useAuthStore.use.user();
 
-  if (user || !enabled) {
+  // Valid conditions for rendering children
+  if ((user && requireLogin) || (!user && !requireLogin)) {
     return <>{children}</>;
   }
 
-  return <Redirect redirectTo={redirectTo} />;
+  return <Redirect requireLogin={requireLogin} />;
 };

@@ -64,20 +64,19 @@ const RootLayout = ({
 }>) => {
   const pathname = usePathname();
   const fetchUser = useAuthStore.use.fetchUser();
-  const shouldEnforceLoginState = !pathname.startsWith('/login');
+  const isLoginPage = pathname.startsWith('/login');
 
-  // Fetch user data on initial render, ensures logged in user data is available
   useEffect(() => {
-    const initializeUser = async () => {
-      if (!shouldEnforceLoginState) return;
+    if (isLoginPage) return;
 
+    const initialiseUser = async () => {
       try {
         await fetchUser();
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
     };
-    initializeUser();
+    initialiseUser();
   }, [fetchUser]);
 
   return (
@@ -85,7 +84,7 @@ const RootLayout = ({
       <body className={roboto.className}>
         <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
           <ReactQueryProvider>
-            <EnforceLoginStatePageWrapper enabled={shouldEnforceLoginState}>
+            <EnforceLoginStatePageWrapper requireLogin={!isLoginPage}>
               <LayoutWithSidebarAndTopbar>
                 {children}
               </LayoutWithSidebarAndTopbar>
