@@ -11,12 +11,7 @@ import { CollaborationRedis } from './db/collaboration.redis';
 export class CollaborationService {
   private readonly logger = new Logger(CollaborationService.name);
 
-  constructor(
-    @Inject('QUESTION_SERVICE')
-    private readonly questionService: ClientProxy,
-
-    private readonly redisClient: CollaborationRedis,
-  ) {}
+  constructor(private readonly redisClient: CollaborationRedis) {}
 
   async createCollab(collabData: CollabCreateDto) {
     this.logger.debug(`Creating collaboration: ${JSON.stringify(collabData)}`);

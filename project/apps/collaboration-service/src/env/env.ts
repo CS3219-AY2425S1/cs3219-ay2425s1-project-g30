@@ -5,6 +5,8 @@ export const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   COLLABORATION_SERVICE_HOST: z.string().default('localhost'),
+  REDIS_HOST: z.string().default('localhost'),
+  REDIS_PORT: z.coerce.number().default(6379),
 });
 
 export type Env = z.infer<typeof envSchema>;
