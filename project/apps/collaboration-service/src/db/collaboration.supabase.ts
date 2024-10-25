@@ -10,11 +10,7 @@ export class MatchSupabase {
 
   private readonly COLLABORATION_TABLE = 'collaboration';
 
-  constructor(
-    private envService: EnvService,
-    @Inject('QUESTION_SERVICE')
-    private readonly questionServiceClient: ClientProxy,
-  ) {
+  constructor(private envService: EnvService) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
     const supabaseKey = this.envService.get('SUPABASE_KEY');
     if (!supabaseUrl || !supabaseKey) {
