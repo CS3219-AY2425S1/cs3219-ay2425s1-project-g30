@@ -1,10 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-// import { ClientProxy } from '@nestjs/microservices';
-
+import { RpcException } from '@nestjs/microservices';
 import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
 
-import { CollaborationRepository } from './collaboration.repository';
-import { RpcException } from '@nestjs/microservices';
+import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
 @Injectable()
 export class CollaborationService {

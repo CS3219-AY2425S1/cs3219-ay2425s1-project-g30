@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { CollaborationController } from './adapters/controllers/collaboration.controller';
+import { CollaborationController } from 'src/adapters/controllers/collaboration.controller';
 import { CollaborationGateway } from './collaboration.gateway';
-import { CollaborationService } from './domain/ports/collaboration.service';
+import { CollaborationService } from 'src/domain/ports/collaboration.service';
 import { envSchema } from './env/env';
 import { EnvModule } from './env/env.module';
 

@@ -1,9 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-
 import { CollabCreateDto } from '@repo/dtos/collab';
 
-import { CollaborationService } from '../../domain/ports/collaboration.service';
+import { CollaborationService } from 'src/domain/ports/collaboration.service';
 
 @Controller()
 export class CollaborationController {
