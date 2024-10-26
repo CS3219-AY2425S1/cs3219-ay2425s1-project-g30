@@ -5,7 +5,7 @@ import { EnvService } from 'src/env/env.service';
 // import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class MatchSupabase {
+export class CollaborationSupabase {
   private supabase: SupabaseClient;
 
   private readonly COLLABORATION_TABLE = 'collaboration';
