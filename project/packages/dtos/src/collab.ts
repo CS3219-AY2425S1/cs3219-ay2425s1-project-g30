@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { questionSchema } from "./questions";
 
 export const collabCreateSchema = z.object({
   user1_id: z.string().uuid(),
@@ -10,13 +9,12 @@ export const collabCreateSchema = z.object({
   question_id: z.string().uuid(), // chosen question id
 });
 
-export const collabRoomSchema = z.object({
-  room_id: z.string(),
+export const collabSchema = z.object({
+  id: z.string().uuid(),
   user1_id: z.string().uuid(),
   user2_id: z.string().uuid(),
-
-  question: questionSchema,
+  question_id: z.string().uuid(),
 });
 
 export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
-export type CollabRoomDto = z.infer<typeof collabRoomSchema>;
+export type CollabDto = z.infer<typeof collabSchema>;
