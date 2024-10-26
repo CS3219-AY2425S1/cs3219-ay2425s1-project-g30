@@ -8,6 +8,7 @@ const client = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().default('Peer Prep'),
   NEXT_PUBLIC_API_BASE_URL: z.string().default('http://localhost:4000'),
   NEXT_PUBLIC_MATCH_SOCKET_URL: z.string().default('http://localhost:8080'),
+  NEXT_PUBLIC_COLLAB_SOCKET_URL: z.string().default('http://localhost:1234'),
 });
 
 /**
