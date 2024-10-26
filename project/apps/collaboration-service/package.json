@@ -27,7 +27,6 @@
     "@nestjs/platform-express": "^10.0.0",
     "@repo/dtos": "workspace:*",
     "@supabase/supabase-js": "^2.45.4",
-    "ioredis": "^5.4.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
