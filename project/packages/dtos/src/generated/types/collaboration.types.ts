@@ -9,7 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never;
+      collaboration: {
+        Row: {
+          ended_at: string | null;
+          id: string;
+          question_id: string | null;
+          started_at: string | null;
+          user1_id: string | null;
+          user2_id: string | null;
+        };
+        Insert: {
+          ended_at?: string | null;
+          id?: string;
+          question_id?: string | null;
+          started_at?: string | null;
+          user1_id?: string | null;
+          user2_id?: string | null;
+        };
+        Update: {
+          ended_at?: string | null;
+          id?: string;
+          question_id?: string | null;
+          started_at?: string | null;
+          user1_id?: string | null;
+          user2_id?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
