@@ -2,7 +2,7 @@ import { Session } from "@supabase/auth-js";
 import { z } from "zod";
 import { Tables } from "./generated/types/auth.types";
 import { collectionMetadataSchema } from "./metadata";
-import { emailSchema, passwordSchema } from "./auth";
+import { emailSchema, passwordSchema, usernameSchema } from "./auth";
 
 export type UserDataDto = Tables<"profiles">;
 
@@ -35,7 +35,7 @@ export const userFiltersSchema = z.object({
 export const updateUserSchema = z.object({
   id: z.string().uuid(),
   email: emailSchema,
-  username: z.string().min(4),
+  username: usernameSchema,
 });
 
 export const changePasswordSchema = z

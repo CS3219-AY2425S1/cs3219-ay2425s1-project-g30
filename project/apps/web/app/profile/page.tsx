@@ -30,21 +30,24 @@ const ProfilePageContent = () => {
   const { toast } = useToast();
 
   const mutation = useMutation({
-    mutationFn: (updatedUser: UpdateUserDto) => updateUser(updatedUser),
+    mutationFn: (data: {
+      updatedUser: UpdateUserDto;
+      field: 'username' | 'email';
+    }) => updateUser(data.updatedUser),
     onMutate: () => setConfirmLoading(true),
-    onSuccess: async (userData, updatedData) => {
-      updatedData.username == userData.username
+    onSuccess: async (updatedUserData, data) => {
+      data.field == 'username'
         ? setIsEditingUsername(false)
         : setIsEditingEmail(false);
       toast({
         variant: 'success',
         title: 'Success',
-        description: 'User updated successfully',
+        description: `User's ${data.field} updated successfully`,
       });
     },
     onSettled: () => {
-      setConfirmLoading(false);
       fetchUser();
+      setConfirmLoading(false);
     },
     onError: (error) => {
       toast({
@@ -55,8 +58,11 @@ const ProfilePageContent = () => {
     },
   });
 
-  async function handleUpdate(updatedData: UpdateUserDto) {
-    mutation.mutate(updatedData);
+  async function handleUpdate(
+    updatedUser: UpdateUserDto,
+    field: 'username' | 'email',
+  ) {
+    mutation.mutate({ updatedUser, field });
   }
 
   return (
@@ -90,7 +96,7 @@ const ProfilePageContent = () => {
             <Button
               type="button"
               disabled={confirmLoading}
-              className="max-w-[144px] bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+              className="max-w-[144px] my-3 bg-white border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
               onClick={() => setDeleteModalOpen(true)}
             >
               Delete Account

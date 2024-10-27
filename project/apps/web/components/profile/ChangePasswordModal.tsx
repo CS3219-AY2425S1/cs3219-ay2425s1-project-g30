@@ -32,6 +32,7 @@ export default function ChangePasswordModal({
   onSubmit,
   userId,
 }: ChangePasswordModalProps) {
+  const confirmLoading = useProfileStore.use.confirmLoading();
   const isChangePasswordModalOpen =
     useProfileStore.use.isChangePasswordModalOpen();
   const setChangePasswordModalOpen =
@@ -65,7 +66,7 @@ export default function ChangePasswordModal({
       form.reset();
       form.clearErrors();
     }
-  }, [open, form, userId]);
+  }, [isChangePasswordModalOpen, form, userId]);
 
   return (
     <Dialog
@@ -125,12 +126,16 @@ export default function ChangePasswordModal({
                 type="button"
                 variant="outline"
                 onClick={() => setChangePasswordModalOpen(false)}
+                disabled={confirmLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={Object.keys(form.formState.errors).length !== 0}
+                disabled={
+                  Object.keys(form.formState.errors).length !== 0 ||
+                  confirmLoading
+                }
               >
                 Change Password
               </Button>
