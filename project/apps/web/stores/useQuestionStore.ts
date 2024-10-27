@@ -8,6 +8,8 @@ interface QuestionsState {
   setSelectedQuestion: (value: QuestionDto | null) => void;
   confirmLoading: boolean;
   setConfirmLoading: (value: boolean) => void;
+  isCreateModalOpen: boolean;
+  setCreateModalOpen: (value: boolean) => void;
   isEditModalOpen: boolean;
   setEditModalOpen: (value: boolean) => void;
   isDeleteModalOpen: boolean;
@@ -15,11 +17,13 @@ interface QuestionsState {
 }
 
 export const useQuestionsStoreBase = create<QuestionsState>((set) => ({
+  selectedQuestion: null,
+  isCreateModalOpen: false,
   isEditModalOpen: false,
   isDeleteModalOpen: false,
   confirmLoading: false,
-  selectedQuestion: null,
   setSelectedQuestion: (value) => set({ selectedQuestion: value }),
+  setCreateModalOpen: (value) => set({ isCreateModalOpen: value }),
   setEditModalOpen: (value) => set({ isEditModalOpen: value }),
   setDeleteModalOpen: (value) => set({ isDeleteModalOpen: value }),
   setConfirmLoading: (value) => set({ confirmLoading: value }),

@@ -11,26 +11,22 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useZodForm } from '@/lib/form';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 interface ProfileDetailsProps {
   user: UserDataDto;
-  isEditingUsername: boolean;
-  setIsEditingUsername: (value: boolean) => void;
-  isEditingEmail: boolean;
-  setIsEditingEmail: (value: boolean) => void;
-  confirmLoading: boolean;
   onUpdate: (updatedData: UpdateUserDto) => void;
 }
 
 export default function ProfileDetails({
   user,
-  isEditingUsername,
-  setIsEditingUsername,
-  isEditingEmail,
-  setIsEditingEmail,
-  confirmLoading,
   onUpdate,
 }: ProfileDetailsProps) {
+  const isEditingUsername = useProfileStore.use.isEditingUsername();
+  const setIsEditingUsername = useProfileStore.use.setIsEditingUsername();
+  const isEditingEmail = useProfileStore.use.isEditingEmail();
+  const setIsEditingEmail = useProfileStore.use.setIsEditingEmail();
+  const confirmLoading = useProfileStore.use.confirmLoading();
   const form = useZodForm({
     schema: updateUserSchema,
     defaultValues: {

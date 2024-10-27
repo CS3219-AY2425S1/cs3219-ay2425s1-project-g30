@@ -3,7 +3,7 @@
 import { CreateQuestionDto } from '@repo/dtos/questions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 
 import { ActionModals } from '@/components/question/ActionModals';
 import CreateModal from '@/components/question/CreateModal';
@@ -17,16 +17,11 @@ import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const {
-    confirmLoading,
-    setConfirmLoading,
-    selectedQuestion,
-    isEditModalOpen,
-    isDeleteModalOpen,
-    setEditModalOpen,
-    setDeleteModalOpen,
-  } = useQuestionsStore();
+  const selectedQuestion = useQuestionsStore.use.selectedQuestion();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
+  const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
+  const setCreateModalOpen = useQuestionsStore.use.setCreateModalOpen();
+
   const { toast } = useToast();
 
   const createMutation = useMutation({
@@ -72,21 +67,9 @@ const QuestionRepositoryContent = () => {
       {/* Table */}
       <QuestionTable />
 
-      <CreateModal
-        open={isCreateModalOpen}
-        setOpen={setCreateModalOpen}
-        onCreate={handleCreateQuestion}
-      />
+      <CreateModal onCreate={handleCreateQuestion} />
       {selectedQuestion && (
-        <ActionModals
-          id={selectedQuestion.id}
-          question={selectedQuestion}
-          setConfirmLoading={setConfirmLoading}
-          isEditModalOpen={isEditModalOpen}
-          setEditModalOpen={setEditModalOpen}
-          isDeleteModalOpen={isDeleteModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
-        />
+        <ActionModals id={selectedQuestion.id} question={selectedQuestion} />
       )}
     </div>
   );

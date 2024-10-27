@@ -9,24 +9,18 @@ import DeleteModal from '@/components/profile/DeleteModal';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { changePassword, deleteUser } from '@/lib/api/users';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 interface ActionModalsProps {
   user: UserDataDto;
-  setConfirmLoading: (val: boolean) => void;
-  isChangePasswordModalOpen: boolean;
-  setChangePasswordModalOpen: (val: boolean) => void;
-  isDeleteModalOpen: boolean;
-  setDeleteModalOpen: (val: boolean) => void;
 }
 
-export const ActionModals = ({
-  user,
-  setConfirmLoading,
-  isChangePasswordModalOpen,
-  setChangePasswordModalOpen,
-  isDeleteModalOpen,
-  setDeleteModalOpen,
-}: ActionModalsProps) => {
+export const ActionModals = ({ user }: ActionModalsProps) => {
+  const setConfirmLoading = useProfileStore.use.setConfirmLoading();
+  const setChangePasswordModalOpen =
+    useProfileStore.use.setChangePasswordModalOpen();
+  const setDeleteModalOpen = useProfileStore.use.setDeleteModalOpen();
+
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -95,21 +89,11 @@ export const ActionModals = ({
   return (
     <>
       {user && (
-        <ChangePasswordModal
-          open={isChangePasswordModalOpen}
-          setOpen={setChangePasswordModalOpen}
-          onSubmit={handleChangePassword}
-          userId={user.id}
-        />
+        <ChangePasswordModal onSubmit={handleChangePassword} userId={user.id} />
       )}
 
       {user && (
-        <DeleteModal
-          open={isDeleteModalOpen}
-          setOpen={setDeleteModalOpen}
-          onDelete={handleDeleteUser}
-          username={user.username}
-        />
+        <DeleteModal onDelete={handleDeleteUser} username={user.username} />
       )}
     </>
   );

@@ -34,15 +34,16 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useZodForm } from '@/lib/form';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
 
 interface CreateModalProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
   onCreate: (data: CreateQuestionDto) => void;
 }
 
-const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
+const CreateModal = ({ onCreate }: CreateModalProps) => {
+  const isCreateModalOpen = useQuestionsStore.use.isCreateModalOpen();
+  const setCreateModalOpen = useQuestionsStore.use.setCreateModalOpen();
   const form = useZodForm({
     schema: createQuestionSchema,
     defaultValues: {
@@ -68,7 +69,7 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
   }, [open, form]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isCreateModalOpen} onOpenChange={setCreateModalOpen}>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create New Question</DialogTitle>
@@ -186,7 +187,7 @@ const CreateModal = ({ open, setOpen, onCreate }: CreateModalProps) => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => setCreateModalOpen(false)}
               >
                 Cancel
               </Button>

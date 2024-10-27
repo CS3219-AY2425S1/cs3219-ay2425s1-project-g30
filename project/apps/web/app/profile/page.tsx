@@ -19,19 +19,15 @@ const ProfilePageContent = () => {
   const user = useAuthStore.use.user();
   if (!user) return;
   const fetchUser = useAuthStore.use.fetchUser();
+  const confirmLoading = useProfileStore.use.confirmLoading();
+  const setConfirmLoading = useProfileStore.use.setConfirmLoading();
+  const setIsEditingUsername = useProfileStore.use.setIsEditingUsername();
+  const setIsEditingEmail = useProfileStore.use.setIsEditingEmail();
+  const setChangePasswordModalOpen =
+    useProfileStore.use.setChangePasswordModalOpen();
+  const setDeleteModalOpen = useProfileStore.use.setDeleteModalOpen();
+
   const { toast } = useToast();
-  const {
-    isEditingUsername,
-    setIsEditingUsername,
-    isEditingEmail,
-    setIsEditingEmail,
-    confirmLoading,
-    setConfirmLoading,
-    isChangePasswordModalOpen,
-    isDeleteModalOpen,
-    setChangePasswordModalOpen,
-    setDeleteModalOpen,
-  } = useProfileStore();
 
   const mutation = useMutation({
     mutationFn: (updatedUser: UpdateUserDto) => updateUser(updatedUser),
@@ -77,15 +73,7 @@ const ProfilePageContent = () => {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-3 items-left">
-            <ProfileDetails
-              user={user}
-              isEditingUsername={isEditingUsername}
-              setIsEditingUsername={setIsEditingUsername}
-              isEditingEmail={isEditingEmail}
-              setIsEditingEmail={setIsEditingEmail}
-              confirmLoading={confirmLoading}
-              onUpdate={handleUpdate}
-            />
+            <ProfileDetails user={user} onUpdate={handleUpdate} />
             <div className="flex flex-row items-center gap-6">
               <p className="text-base font-medium min-w-20 text-bold">
                 Password
@@ -110,16 +98,7 @@ const ProfilePageContent = () => {
           </div>
         </div>
       </div>
-      {user && (
-        <ActionModals
-          user={user}
-          setConfirmLoading={setConfirmLoading}
-          isChangePasswordModalOpen={isChangePasswordModalOpen}
-          setChangePasswordModalOpen={setChangePasswordModalOpen}
-          isDeleteModalOpen={isDeleteModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
-        />
-      )}
+      {user && <ActionModals user={user} />}
     </div>
   );
 };
