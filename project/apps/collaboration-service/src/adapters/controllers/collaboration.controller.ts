@@ -1,9 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-
 import { CollabCreateDto } from '@repo/dtos/collab';
 
-import { CollaborationService } from './collaboration.service';
+import { CollaborationService } from 'src/domain/ports/collaboration.service';
 
 @Controller()
 export class CollaborationController {
@@ -19,9 +18,9 @@ export class CollaborationController {
     return await this.collaborationService.createCollab(collabData);
   }
 
-  @MessagePattern({ cmd: 'get_collab' })
+  @MessagePattern({ cmd: 'get_active_collab' })
   async getCollab(@Payload() userId: string) {
-    return await this.collaborationService.getCollab(userId);
+    return await this.collaborationService.getActiveCollab(userId);
   }
 
   @MessagePattern({ cmd: 'verify_collab' })
@@ -29,8 +28,8 @@ export class CollaborationController {
     return await this.collaborationService.verifyCollab(collabId);
   }
 
-  @MessagePattern({ cmd: 'end_collab' })
-  async endCollab(@Payload() collabId: string) {
-    return await this.collaborationService.endCollab(collabId);
-  }
+  // @MessagePattern({ cmd: 'end_collab' })
+  // async endCollab(@Payload() collabId: string) {
+  //   return await this.collaborationService.endCollab(collabId);
+  // }
 }

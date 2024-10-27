@@ -9,5 +9,10 @@
       "projectId": "kamxbsekjfdzemvoevgz",
       "schema": "public",
       "fileName": "auth.types.ts"
+    },
+    {
+      "projectId": "ebsbkkiwgplgouxksyig",
+      "schema": "public",
+      "fileName": "collaboration.types.ts"
     }
 ]

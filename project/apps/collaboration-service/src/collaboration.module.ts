@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { CollaborationController } from './collaboration.controller';
+import { CollaborationController } from 'src/adapters/controllers/collaboration.controller';
 import { CollaborationGateway } from './collaboration.gateway';
-import { CollaborationService } from './collaboration.service';
+import { CollaborationService } from 'src/domain/ports/collaboration.service';
 import { envSchema } from './env/env';
 import { EnvModule } from './env/env.module';
-import { CollaborationRedis } from './db/collaboration.redis';
-import { RedisModule } from 'redis/redis.module';
 
 @Module({
   imports: [
@@ -26,9 +24,8 @@ import { RedisModule } from 'redis/redis.module';
       },
     }),
     EnvModule,
-    RedisModule,
   ],
   controllers: [CollaborationController],
-  providers: [CollaborationService, CollaborationGateway, CollaborationRedis],
+  providers: [CollaborationService, CollaborationGateway],
 })
 export class CollaborationModule {}
