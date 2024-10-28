@@ -52,7 +52,6 @@ export class CollaborationService {
     try {
       const activeCollabs = await this.collabRepository.findActive(userId);
 
-      // we are assuming only one active collaboration per user for now
       this.logger.log(`Found active collaborations for user ${userId}`);
 
       return activeCollabs;
