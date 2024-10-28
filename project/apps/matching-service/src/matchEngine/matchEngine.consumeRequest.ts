@@ -32,7 +32,7 @@ export class MatchEngineConsumer implements OnModuleInit {
     });
 
     connection.on('disconnect', (params) => {
-      this.logger.error('Disconnected from RabbitMQ', params.err);
+      this.logger.warn('Disconnected from RabbitMQ', params.err);
     });
 
     connection.on('error', (error) => {

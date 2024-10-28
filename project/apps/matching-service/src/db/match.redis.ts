@@ -19,7 +19,24 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class MatchRedis {
   private readonly logger = new Logger(MatchRedis.name);
-  constructor(@Inject(REDIS_CLIENT) private redisClient: Redis) {}
+  constructor(@Inject(REDIS_CLIENT) private redisClient: Redis) {
+    // Listen for connection events
+    this.redisClient.on('connect', () => {
+      this.logger.log('Redis connection established.');
+    });
+
+    this.redisClient.on('ready', () => {
+      this.logger.log('Redis connection is ready.');
+    });
+
+    this.redisClient.on('error', (err) => {
+      this.logger.error('Redis connection error:', err);
+    });
+
+    this.redisClient.on('end', () => {
+      this.logger.warn('Redis connection closed.');
+    });
+  }
 
   async setUserToSocket({
     userId,
