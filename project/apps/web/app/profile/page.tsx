@@ -13,7 +13,7 @@ import { updateUser } from '@/lib/api/users';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 
-import ProfileSkeleton from '../../components/profile/ProfileSkeleton';
+import ProfileSkeleton from '@/components/profile/ProfileSkeleton';
 
 const ProfilePageContent = () => {
   const user = useAuthStore.use.user();
