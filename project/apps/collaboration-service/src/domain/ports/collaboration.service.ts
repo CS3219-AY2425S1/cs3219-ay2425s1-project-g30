@@ -42,23 +42,20 @@ export class CollaborationService {
   }
 
   /**
-   * Retrieves the active collaboration for a given user.
+   * Retrieves the active collaborations for a given user.
    *
-   * @param userId - The ID of the user whose active collaboration is to be retrieved.
-   * @returns A promise that resolves to the active collaboration data transfer object (CollabDto).
+   * @param userId - The ID of the user whose active collaborations is to be retrieved.
+   * @returns A promise that resolves to the active collaboration data transfer objects (CollabDto[]).
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
-  async getActiveCollab(userId: string): Promise<CollabDto> {
+  async getActiveCollabs(userId: string): Promise<CollabDto[]> {
     try {
-      const collabs = await this.collabRepository.findActive(userId);
+      const activeCollabs = await this.collabRepository.findActive(userId);
 
       // we are assuming only one active collaboration per user for now
-      const activeCollab = collabs[0];
-      this.logger.log(
-        `Found active collaboration ${activeCollab.id} for user ${userId}`,
-      );
+      this.logger.log(`Found active collaborations for user ${userId}`);
 
-      return activeCollab;
+      return activeCollabs;
     } catch (error) {
       this.handleError('get collaborations', error);
     }

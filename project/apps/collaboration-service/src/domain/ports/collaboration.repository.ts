@@ -19,7 +19,15 @@ export abstract class CollaborationRepository {
    * @param id - The unique identifier of the collaboration to be found.
    * @returns A promise that resolves to the found collaboration data transfer object, or null if not found.
    */
-  abstract findById(id: string): Promise<CollabDto>;
+  abstract findById(id: string): Promise<CollabDto | null>;
+
+  /**
+   * Finds a collaboration entry by its unique match identifier.
+   *
+   * @param matchId - The unique match identifier of the collaboration to be found.
+   * @returns A promise that resolves to the found collaboration data transfer object, or null if not found.
+   */
+  abstract findByMatchId(matchId: string): Promise<CollabDto | null>;
 
   abstract findActive(userId: string): Promise<CollabDto[]>;
 }

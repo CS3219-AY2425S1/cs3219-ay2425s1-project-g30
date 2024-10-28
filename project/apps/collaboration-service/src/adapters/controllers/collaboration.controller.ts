@@ -18,9 +18,9 @@ export class CollaborationController {
     return await this.collaborationService.createCollab(collabData);
   }
 
-  @MessagePattern({ cmd: 'get_active_collab' })
+  @MessagePattern({ cmd: 'get_active_collabs' })
   async getCollab(@Payload() userId: string) {
-    return await this.collaborationService.getActiveCollab(userId);
+    return await this.collaborationService.getActiveCollabs(userId);
   }
 
   @MessagePattern({ cmd: 'verify_collab' })
