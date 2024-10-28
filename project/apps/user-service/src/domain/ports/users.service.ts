@@ -98,33 +98,17 @@ export class UsersService {
           `The email or username is already in use by another user`,
         );
       }
-
+      
       const user = await this.usersRepository.updateById(updateUserDto);
+      if (updateUserDto.role) {
+        await this.usersRepository.updatePrivilegeById(updateUserDto.id);
+      }
 
       this.logger.log(`updated user with id ${user.id}`);
 
       return user;
     } catch (error) {
       this.handleError('update user', error);
-    }
-  }
-
-  /**
-   * Updates a user's privilege by their unique identifier.
-   *
-   * @param {string} id - The unique identifier of the user.
-   * @returns {Promise<UserDataDto>} A promise that resolves to the updated user data transfer object.
-   * @throws Will throw an error if the user's privilege cannot be updated.
-   */
-  async updatePrivilegeById(id: string): Promise<UserDataDto> {
-    try {
-      const user = await this.usersRepository.updatePrivilegeById(id);
-
-      this.logger.log(`updated user privilege for user with id ${user.id}`);
-
-      return user;
-    } catch (error) {
-      this.handleError('update user privilege by id', error);
     }
   }
 

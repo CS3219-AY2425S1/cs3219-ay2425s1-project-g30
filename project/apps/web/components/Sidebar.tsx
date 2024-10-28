@@ -1,18 +1,20 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { HomeIcon, ListIcon, UserRound, LogOut } from 'lucide-react';
+import { HomeIcon, ListIcon, UserRound, UsersRound, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface SidebarProps {
   signOut: () => void;
 }
 
 const Sidebar = ({ signOut }: SidebarProps) => {
+  const user = useAuthStore.use.user();
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
@@ -29,6 +31,11 @@ const Sidebar = ({ signOut }: SidebarProps) => {
       href: '/profile',
       icon: <UserRound className="w-5 h-5" />,
     },
+    {
+      name: 'Manage Users',
+      href: '/manage-users',
+      icon: <UsersRound className="w-5 h-5" />,
+    }
   ];
 
   const handleLogout = () => {
@@ -42,11 +49,15 @@ const Sidebar = ({ signOut }: SidebarProps) => {
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       initial={{ width: 80 }}
-      animate={{ width: isHovered ? 160 : 80 }}
+      animate={{ width: isHovered ? 180 : 80 }}
       transition={{ duration: 0.2 }}
     >
-      <nav className="flex flex-col space-y-2 m-2 overflow-hidden">
+      <nav className="flex flex-col m-2 space-y-2 overflow-hidden">
         {navItems.map((item) => {
+          if (user?.role != 'Admin' && item.name == 'Manage Users') {
+            return;
+          }
+          
           return (
             <motion.div
               key={item.name}
@@ -78,7 +89,7 @@ const Sidebar = ({ signOut }: SidebarProps) => {
 
       <motion.div
         onClick={handleLogout}
-        className="flex items-center justify-start mx-2 py-2 px-2 rounded-md cursor-pointer hover:bg-gray-100 transition-all duration-300"
+        className="flex items-center justify-start px-2 py-2 mx-2 transition-all duration-300 rounded-md cursor-pointer hover:bg-gray-100"
       >
         <div className="ml-1.5">
           <LogOut className="w-5 h-5" />

@@ -52,7 +52,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserById(@Req() req: Request, @Param('id') id: string) {
+  async getUserById(@Param('id') id: string) {
     return this.usersServiceClient.send({ cmd: 'get_user' }, id);
   }
 
@@ -73,17 +73,11 @@ export class UsersController {
       this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
 
-    if (userData.role != ROLE.Admin && userData.id != id) {
+    if (userData.role != ROLE.Admin && (userData.id != id || userData.role)) {
       throw new ForbiddenException('Access denied.');
     }
 
     return this.usersServiceClient.send({ cmd: 'update_user' }, updateUserDto);
-  }
-
-  @Patch(':id')
-  @Roles(ROLE.Admin)
-  async updateUserPrivilegeById(@Param('id') id: string) {
-    return this.usersServiceClient.send({ cmd: 'update_privilege' }, id);
   }
 
   @Patch('password/:id')

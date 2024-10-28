@@ -3,8 +3,10 @@ import { z } from "zod";
 import { Tables } from "./generated/types/auth.types";
 import { collectionMetadataSchema } from "./metadata";
 import { emailSchema, passwordSchema, usernameSchema } from "./auth";
+import { ROLE } from "./generated/enums/auth.enums";
 
 export type UserDataDto = Tables<"profiles">;
+const rolesEnum = z.nativeEnum(ROLE);
 
 export type UserSessionDto = { userData: UserDataDto; session: Session };
 
@@ -21,21 +23,28 @@ export const userCollectionSchema = z.object({
   users: z.array(userSchema),
 });
 
+export const sortUsersQuerySchema = z.object({
+  field: z.string(),
+  order: z.enum(["asc", "desc"]),
+});
+
 export const userFiltersSchema = z.object({
-  email: emailSchema,
-  username: z.string().optional(),
+  email: emailSchema.optional(),
+  username: usernameSchema.optional(),
+  roles: z.array(rolesEnum).optional(),
   // includeDeleted: z.coerce.boolean().optional(),
 
   offset: z.coerce.number().int().nonnegative().optional(),
   limit: z.coerce.number().int().positive().optional(),
 
-  // sort: z.array(sortUserSchema).optional(),
+  sort: z.array(sortUsersQuerySchema).optional(),
 });
 
 export const updateUserSchema = z.object({
   id: z.string().uuid(),
   email: emailSchema,
   username: usernameSchema,
+  role: z.string().optional(),
 });
 
 export const changePasswordSchema = z
@@ -59,3 +68,4 @@ export type UserCollectionDto = z.infer<typeof userCollectionSchema>;
 export type UserFiltersDto = z.infer<typeof userFiltersSchema>;
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;
 export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;
+export type SortUsersQueryDto = z.infer<typeof sortUsersQuerySchema>;
