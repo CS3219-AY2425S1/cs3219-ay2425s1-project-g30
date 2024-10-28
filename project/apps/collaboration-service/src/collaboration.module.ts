@@ -6,6 +6,8 @@ import { CollaborationGateway } from './collaboration.gateway';
 import { CollaborationService } from 'src/domain/ports/collaboration.service';
 import { envSchema } from './env/env';
 import { EnvModule } from './env/env.module';
+import { CollaborationRepository } from './domain/ports/collaboration.repository';
+import { CollaborationSupabase } from './adapters/db/collaboration.supabase';
 
 @Module({
   imports: [
@@ -26,6 +28,10 @@ import { EnvModule } from './env/env.module';
     EnvModule,
   ],
   controllers: [CollaborationController],
-  providers: [CollaborationService, CollaborationGateway],
+  providers: [
+    CollaborationService,
+    CollaborationGateway,
+    { provide: CollaborationRepository, useClass: CollaborationSupabase },
+  ],
 })
 export class CollaborationModule {}
