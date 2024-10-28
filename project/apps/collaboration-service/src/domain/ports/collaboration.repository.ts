@@ -1,4 +1,9 @@
-import { CollabCreateDto, CollabDto, CollabInfoDto, CollabQuestionDto } from '@repo/dtos/collab';
+import {
+  CollabCreateDto,
+  CollabDto,
+  CollabInfoDto,
+  CollabQuestionDto,
+} from '@repo/dtos/collab';
 
 /**
  * Abstract class representing a repository for managing collaborations.
@@ -43,7 +48,7 @@ export abstract class CollaborationRepository {
    * @returns A promise that resolves to true if the user is a collaborator, or false otherwise.
    */
   abstract verifyCollaborator(id: string, userId: string): Promise<boolean>;
-  
+
   /**
    * Fetches a document by its unique identifier. Used by the Hocuspocus server to retrieve the state of a document.
    * @param id - The unique identifier of the collaboration entry containing the document to be fetched.
@@ -57,7 +62,7 @@ export abstract class CollaborationRepository {
    * @param state - The new state of the document to be stored.
    */
   abstract storeDocumentById(id: string, state: any): Promise<void>;
-  
+
   /**
    * Retrieves a random question from the question database that matches the given filters.
    * @param filters - The filters to apply when selecting a question.

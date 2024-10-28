@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { EnvService } from 'src/env/env.service';
-import {
-  matchDataSchema,
-  MatchDataDto,
-} from '@repo/dtos/match';
+import { matchDataSchema, MatchDataDto } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchSupabase {
@@ -12,9 +9,7 @@ export class MatchSupabase {
 
   private readonly MATCHES_TABLE = 'matches';
 
-  constructor(
-    private envService: EnvService,
-  ) {
+  constructor(private envService: EnvService) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
     const supabaseKey = this.envService.get('SUPABASE_KEY');
     if (!supabaseUrl || !supabaseKey) {

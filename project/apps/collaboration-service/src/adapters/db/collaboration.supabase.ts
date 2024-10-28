@@ -1,5 +1,10 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { CollabCreateDto, CollabDto, CollabInfoDto, CollabQuestionDto } from '@repo/dtos/collab';
+import {
+  CollabCreateDto,
+  CollabDto,
+  CollabInfoDto,
+  CollabQuestionDto,
+} from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { Database } from '@repo/dtos/generated/types/collaboration.types';
@@ -15,7 +20,8 @@ export class CollaborationSupabase implements CollaborationRepository {
 
   private readonly COLLABORATION_TABLE = 'collaboration';
 
-  constructor(private envService: EnvService,
+  constructor(
+    private envService: EnvService,
     @Inject('QUESTION_SERVICE')
     private readonly questionServiceClient: ClientProxy,
   ) {
@@ -175,7 +181,7 @@ export class CollaborationSupabase implements CollaborationRepository {
         collab.question_id,
       ),
     );
-    
+
     if (!selectedQuestionData) {
       throw new Error(`Question with id ${collab.question_id} not found`);
     }
@@ -187,9 +193,8 @@ export class CollaborationSupabase implements CollaborationRepository {
       user2_id: collab.user2_id,
       match_id: collab.match_id,
       question: selectedQuestionData,
-    }
+    };
 
     return collabInfoData;
   }
-
 }

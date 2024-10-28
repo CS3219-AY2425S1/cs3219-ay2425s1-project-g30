@@ -3,11 +3,8 @@ import { MatchExpiryProducer } from './matchEngine.produceExpiry';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
 import { MatchingGateway } from 'src/matching.gateway';
-import {
-  MatchDataDto,
-  MatchRequestDto,
-} from '@repo/dtos/match';
-import { CollabDto, CollabRequestDto } from '@repo/dtos/collab';
+import { MatchDataDto, MatchRequestDto } from '@repo/dtos/match';
+import { CollabRequestDto } from '@repo/dtos/collab';
 import { MATCH_TIMEOUT } from 'src/constants/queue';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';

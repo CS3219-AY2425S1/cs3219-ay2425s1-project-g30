@@ -9,8 +9,7 @@ export class CollaborationController {
   ) {}
 
   @Get('get/:id')
-  async getQuestionById(@Param('id') id: string) {
+  async getCollaborationInfoById(@Param('id') id: string) {
     return this.collaborationServiceClient.send({ cmd: 'get_collab_info' }, id);
   }
-  
 }

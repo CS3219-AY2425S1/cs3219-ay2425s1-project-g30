@@ -1,6 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { CollabCreateDto, CollabDto, CollabInfoDto, CollabQuestionDto, CollabRequestDto } from '@repo/dtos/collab';
+import {
+  CollabCreateDto,
+  CollabDto,
+  CollabInfoDto,
+  CollabQuestionDto,
+  CollabRequestDto,
+} from '@repo/dtos/collab';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
 @Injectable()
@@ -36,12 +42,14 @@ export class CollaborationService {
         category: collabReqData.category,
         complexity: collabReqData.complexity,
       };
-  
+
       const selectedQuestionId =
         await this.collabRepository.getRandomQuestion(filters);
-  
+
       if (selectedQuestionId === '') {
-        new Error(`No suitable questions found for match id ${collabReqData.match_id}`);
+        new Error(
+          `No suitable questions found for match id ${collabReqData.match_id}`,
+        );
       }
 
       const collabCreateData: CollabCreateDto = {
@@ -53,7 +61,8 @@ export class CollaborationService {
         question_id: selectedQuestionId,
       };
 
-      const createdCollab = await this.collabRepository.create(collabCreateData);
+      const createdCollab =
+        await this.collabRepository.create(collabCreateData);
 
       if (!createdCollab) {
         throw new Error('Failed to create collaboration');
