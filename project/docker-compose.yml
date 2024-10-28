@@ -25,6 +25,7 @@ services:
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
+      COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
       NODE_ENV: production
   question-service:
     build:
@@ -83,6 +84,20 @@ services:
       RABBITMQ_URL: ${RABBITMQ_URL}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      NODE_ENV: production
+  collaboration-service:
+    build:
+      context: .
+      dockerfile: ./apps/collaboration-service/Dockerfile
+    ports:
+      - 3005:3005
+      - 1234:1234  # Expose WebSocket port
+    networks:
+      - backend
+    environment:
+      COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST} 
+      SUPABASE_URL: ${COLLABORATION_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${COLLABORATION_SERVICE_SUPABASE_KEY}
       NODE_ENV: production
   rabbitmq:
     build:

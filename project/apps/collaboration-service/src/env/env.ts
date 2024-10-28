@@ -8,9 +8,6 @@ export const envSchema = z.object({
 
   SUPABASE_URL: z.string().min(1),
   SUPABASE_KEY: z.string().min(1),
-
-  REDIS_HOST: z.string().default('localhost'),
-  REDIS_PORT: z.coerce.number().default(6379),
 });
 
 export type Env = z.infer<typeof envSchema>;
