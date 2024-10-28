@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -8,7 +8,6 @@ import { EnvService } from 'src/env/env.service';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
-  private readonly logger = new Logger(CollaborationSupabase.name);
   private supabase: SupabaseClient;
 
   private readonly COLLABORATION_TABLE = 'collaboration';
