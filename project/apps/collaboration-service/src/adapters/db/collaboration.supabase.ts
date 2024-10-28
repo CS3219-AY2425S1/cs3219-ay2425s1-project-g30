@@ -3,8 +3,6 @@ import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 import { EnvService } from 'src/env/env.service';
-// import { firstValueFrom } from 'rxjs';
-// import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {

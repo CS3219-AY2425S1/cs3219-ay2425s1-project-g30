@@ -13,26 +13,29 @@ export type Database = {
         Row: {
           ended_at: string | null;
           id: string;
-          question_id: string | null;
+          match_id: string;
+          question_id: string;
           started_at: string | null;
-          user1_id: string | null;
-          user2_id: string | null;
+          user1_id: string;
+          user2_id: string;
         };
         Insert: {
           ended_at?: string | null;
           id?: string;
-          question_id?: string | null;
+          match_id: string;
+          question_id: string;
           started_at?: string | null;
-          user1_id?: string | null;
-          user2_id?: string | null;
+          user1_id: string;
+          user2_id: string;
         };
         Update: {
           ended_at?: string | null;
           id?: string;
-          question_id?: string | null;
+          match_id?: string;
+          question_id?: string;
           started_at?: string | null;
-          user1_id?: string | null;
-          user2_id?: string | null;
+          user1_id?: string;
+          user2_id?: string;
         };
         Relationships: [];
       };
