@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       collaboration: {
         Row: {
+          document: string | null;
           ended_at: string | null;
           id: string;
           match_id: string;
@@ -20,6 +21,7 @@ export type Database = {
           user2_id: string;
         };
         Insert: {
+          document?: string | null;
           ended_at?: string | null;
           id?: string;
           match_id: string;
@@ -29,6 +31,7 @@ export type Database = {
           user2_id: string;
         };
         Update: {
+          document?: string | null;
           ended_at?: string | null;
           id?: string;
           match_id?: string;
