@@ -69,14 +69,14 @@ import { MatchService } from './matching.service';
       },
       {
         imports: [EnvModule],
-        name: 'COLLAB_SERVICE',
+        name: 'COLLABORATION_SERVICE',
         useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
             host:
               envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : envService.get('COLLAB_SERVICE_HOST'),
+                : envService.get('COLLABORATION_SERVICE_HOST'),
             port: 3005,
           },
         }),

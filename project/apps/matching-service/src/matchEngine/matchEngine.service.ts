@@ -21,7 +21,7 @@ export class MatchEngineService {
     private readonly matchRedis: MatchRedis,
     private readonly matchSupabase: MatchSupabase,
     private readonly matchGateway: MatchingGateway,
-    @Inject('COLLAB_SERVICE')
+    @Inject('COLLABORATION_SERVICE')
     private readonly collabServiceClient: ClientProxy,
   ) {}
 
