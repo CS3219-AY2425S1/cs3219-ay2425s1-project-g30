@@ -7,7 +7,6 @@ export const envSchema = z.object({
     .default('development'),
 
   MATCHING_SERVICE_HOST: z.string().default('localhost'),
-  QUESTION_SERVICE_HOST: z.string().default('localhost'),
   AUTH_SERVICE_HOST: z.string().default('localhost'),
   COLLABORATION_SERVICE_HOST: z.string().default('localhost'),
   RABBITMQ_URL: z.string().default('amqp://localhost:5672'),

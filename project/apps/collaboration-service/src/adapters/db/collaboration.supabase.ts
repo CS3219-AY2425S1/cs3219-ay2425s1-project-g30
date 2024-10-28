@@ -1,10 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { CollabCreateDto, CollabDto, CollabInfoDto, CollabQuestionDto } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { Database } from '@repo/dtos/generated/types/collaboration.types';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 import { EnvService } from 'src/env/env.service';
+import { firstValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
+import { QuestionDto } from '@repo/dtos/questions';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
@@ -12,7 +15,10 @@ export class CollaborationSupabase implements CollaborationRepository {
 
   private readonly COLLABORATION_TABLE = 'collaboration';
 
-  constructor(private envService: EnvService) {
+  constructor(private envService: EnvService,
+    @Inject('QUESTION_SERVICE')
+    private readonly questionServiceClient: ClientProxy,
+  ) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
     const supabaseKey = this.envService.get('SUPABASE_KEY');
     if (!supabaseUrl || !supabaseKey) {
@@ -144,4 +150,46 @@ export class CollaborationSupabase implements CollaborationRepository {
       return Buffer.from(doc, 'base64');
     }
   };
+
+  async getRandomQuestion(filters: CollabQuestionDto): Promise<string> {
+    // Call the question service to get a random question based on the filters
+    const selectedQuestionId = await firstValueFrom(
+      this.questionServiceClient.send<string>(
+        { cmd: 'get_random_question' },
+        filters,
+      ),
+    );
+    return selectedQuestionId;
+  }
+
+  async fetchCollabInfo(collabId: string): Promise<CollabInfoDto> {
+    const collab = await this.findById(collabId);
+
+    if (!collab) {
+      throw new Error(`Collaboration with id ${collabId} not found`);
+    }
+
+    const selectedQuestionData = await firstValueFrom(
+      this.questionServiceClient.send<QuestionDto>(
+        { cmd: 'get_question' },
+        collab.question_id,
+      ),
+    );
+    
+    if (!selectedQuestionData) {
+      throw new Error(`Question with id ${collab.question_id} not found`);
+    }
+
+    const collabInfoData: CollabInfoDto = {
+      complexity: collab.complexity,
+      category: collab.category,
+      user1_id: collab.user1_id,
+      user2_id: collab.user2_id,
+      match_id: collab.match_id,
+      question: selectedQuestionData,
+    }
+
+    return collabInfoData;
+  }
+
 }

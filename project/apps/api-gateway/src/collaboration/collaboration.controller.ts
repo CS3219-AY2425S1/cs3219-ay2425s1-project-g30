@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Param } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('collaboration')
@@ -8,5 +8,9 @@ export class CollaborationController {
     private readonly collaborationServiceClient: ClientProxy,
   ) {}
 
-  // TODO: Add route handling methods
+  @Get('get/:id')
+  async getQuestionById(@Param('id') id: string) {
+    return this.collaborationServiceClient.send({ cmd: 'get_collab_info' }, id);
+  }
+  
 }
