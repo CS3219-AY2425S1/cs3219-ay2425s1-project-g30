@@ -23,18 +23,18 @@ const CATEGORIES = Object.values(CATEGORY).map((value) => ({
   value,
 }));
 
-interface DataTableToolbarProps<TData> {
+interface QuestionTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
 export function QuestionTableToolbar<TData>({
   table,
-}: DataTableToolbarProps<TData>) {
+}: QuestionTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+      <div className="flex items-center flex-1 space-x-2">
         <Input
           placeholder="Filter questions..."
           value={(table.getColumn('q_title')?.getFilterValue() as string) ?? ''}
@@ -66,7 +66,7 @@ export function QuestionTableToolbar<TData>({
             className="h-8 px-2 lg:px-3"
           >
             Reset
-            <Cross2Icon className="ml-2 h-4 w-4" />
+            <Cross2Icon className="w-4 h-4 ml-2" />
           </Button>
         )}
       </div>

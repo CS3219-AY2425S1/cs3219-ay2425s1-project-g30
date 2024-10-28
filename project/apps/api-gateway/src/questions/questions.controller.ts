@@ -16,9 +16,9 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from 'src/auth/auth.guard';
-// import { RolesGuard } from 'src/roles/roles.guard';
-// import { Roles } from 'src/roles/roles.decorator';
-// import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
+import { RolesGuard } from 'src/roles/roles.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
 import {
   CreateQuestionDto,
   createQuestionSchema,
@@ -30,7 +30,7 @@ import {
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 
 @Controller('questions')
-@UseGuards(AuthGuard) // add role guard once authorisation is implemented
+@UseGuards(AuthGuard, RolesGuard) // add role guard once authorisation is implemented
 export class QuestionsController {
   constructor(
     @Inject('QUESTION_SERVICE')
@@ -49,7 +49,7 @@ export class QuestionsController {
   }
 
   @Post()
-  // @Roles(ROLE.Admin) // comment out since we don't have authorisation for now
+  @Roles(ROLE.Admin)
   @UsePipes(new ZodValidationPipe(createQuestionSchema))
   async createQuestion(@Body() createQuestionDto: CreateQuestionDto) {
     return this.questionsServiceClient.send(
@@ -59,7 +59,7 @@ export class QuestionsController {
   }
 
   @Put(':id')
-  // @Roles(ROLE.Admin) // comment out since we don't have authorisation for now
+  @Roles(ROLE.Admin)
   async updateQuestion(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateQuestionSchema)) // validation on the body only
@@ -75,7 +75,7 @@ export class QuestionsController {
   }
 
   @Delete(':id')
-  // @Roles(ROLE.Admin) // comment out since we don't have authorisation for now
+  @Roles(ROLE.Admin)
   async deleteQuestion(@Param('id') id: string) {
     return this.questionsServiceClient.send({ cmd: 'delete_question' }, id);
   }

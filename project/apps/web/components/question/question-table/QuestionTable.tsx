@@ -31,7 +31,8 @@ import { columns } from './columns';
 import { QuestionTableToolbar } from './QuestionTableToolbar';
 
 export function QuestionTable() {
-  const { confirmLoading, setConfirmLoading } = useQuestionsStore();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
+  const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,

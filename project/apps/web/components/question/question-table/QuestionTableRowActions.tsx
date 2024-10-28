@@ -13,16 +13,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
-interface DataTableRowActionsProps<TData> {
+interface QuestionTableRowActionsProps<TData> {
   row: Row<TData>;
 }
 
-export function DataTableRowActions<TData>({
+export function QuestionTableRowActions<TData>({
   row,
-}: DataTableRowActionsProps<TData>) {
-  const { setEditModalOpen, setDeleteModalOpen, setSelectedQuestion } =
-    useQuestionsStore();
+}: QuestionTableRowActionsProps<TData>) {
+  const user = useAuthStore.use.user();
+  const setEditModalOpen = useQuestionsStore.use.setEditModalOpen();
+  const setDeleteModalOpen = useQuestionsStore.use.setDeleteModalOpen();
+  const setSelectedQuestion = useQuestionsStore.use.setSelectedQuestion();
+  
   const question = row.original as QuestionDto;
   const handleOpenEdit = () => {
     setSelectedQuestion(question);
@@ -35,25 +39,27 @@ export function DataTableRowActions<TData>({
   };
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-          >
-            <DotsHorizontalIcon className="w-4 h-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem className="gap-2" onSelect={handleOpenEdit}>
-            <Pencil className="w-4 h-4" /> Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem className="gap-2" onSelect={handleOpenDelete}>
-            <Trash2 className="w-4 h-4" /> Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {user?.role === 'Admin' && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+            >
+              <DotsHorizontalIcon className="w-4 h-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem className="gap-2" onSelect={handleOpenEdit}>
+              <Pencil className="w-4 h-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-2" onSelect={handleOpenDelete}>
+              <Trash2 className="w-4 h-4" /> Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </>
   );
 }

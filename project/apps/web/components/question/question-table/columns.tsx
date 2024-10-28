@@ -12,7 +12,7 @@ import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHe
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { Badge } from '@/components/ui/badge';
 
-import { DataTableRowActions } from './QuestionTableRowActions';
+import { QuestionTableRowActions } from './QuestionTableRowActions';
 
 // Complexity sorting order
 const complexityOrder: { [key in COMPLEXITY]: number } = {
@@ -94,6 +94,6 @@ export const columns: ColumnDef<QuestionDto>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <QuestionTableRowActions row={row} />,
   },
 ];
