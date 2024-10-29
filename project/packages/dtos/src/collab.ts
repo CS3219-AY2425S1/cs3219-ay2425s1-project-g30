@@ -16,6 +16,18 @@ export const collabQuestionSchema = z.object({
     }),
 });
 
+// Optional TODO: Do we want to also keep track of the number of question the user has done?
+export const collaboratorSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string(),
+});
+
+export const collabInfoSchema = z.object({
+  collab_user1: collaboratorSchema,
+  collab_user2: collaboratorSchema,
+  question: questionSchema,
+});
+
 export const collabRequestSchema = collabQuestionSchema.extend({
   user1_id: z.string().uuid(),
   user2_id: z.string().uuid(),
@@ -30,10 +42,7 @@ export const collabSchema = collabCreateSchema.extend({
   id: z.string().uuid(),
 });
 
-export const collabInfoSchema = collabRequestSchema.extend({
-  question: questionSchema,
-});
-
+export type CollabUserDto = z.infer<typeof collaboratorSchema>;
 export type CollabInfoDto = z.infer<typeof collabInfoSchema>;
 export type CollabRequestDto = z.infer<typeof collabRequestSchema>;
 export type CollabQuestionDto = z.infer<typeof collabQuestionSchema>;

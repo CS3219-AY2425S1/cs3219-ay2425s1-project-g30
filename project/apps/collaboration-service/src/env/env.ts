@@ -7,6 +7,7 @@ export const envSchema = z.object({
   COLLABORATION_SERVICE_HOST: z.string().default('localhost'),
   QUESTION_SERVICE_HOST: z.string().default('localhost'),
   AUTH_SERVICE_HOST: z.string().default('localhost'),
+  USER_SERVICE_HOST: z.string().default('localhost'),
 
   HOCUSPOCUS_PORT: z.number().default(1234),
 

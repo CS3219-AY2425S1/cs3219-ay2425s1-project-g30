@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CollabCreateDto,
   CollabDto,
@@ -13,6 +18,7 @@ import { EnvService } from 'src/env/env.service';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { QuestionDto } from '@repo/dtos/questions';
+import { UserDataDto } from '@repo/dtos/users';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
@@ -24,6 +30,8 @@ export class CollaborationSupabase implements CollaborationRepository {
     private envService: EnvService,
     @Inject('QUESTION_SERVICE')
     private readonly questionServiceClient: ClientProxy,
+    @Inject('USER_SERVICE')
+    private readonly userServiceClient: ClientProxy,
   ) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
     const supabaseKey = this.envService.get('SUPABASE_KEY');
@@ -36,11 +44,12 @@ export class CollaborationSupabase implements CollaborationRepository {
   async findById(id: string): Promise<CollabDto | null> {
     const { data, error } = await this.supabase
       .from(this.COLLABORATION_TABLE)
-      .select()
+      .select('*')
       .eq('id', id)
       .maybeSingle<CollabDto>();
-
+    console.log(data);
     if (error) {
+      console.log(error);
       throw error;
     }
 
@@ -169,32 +178,65 @@ export class CollaborationSupabase implements CollaborationRepository {
   }
 
   async fetchCollabInfo(collabId: string): Promise<CollabInfoDto> {
+    console.log(`Fetching collaboration info for collab ${collabId}`);
     const collab = await this.findById(collabId);
-
+    console.log(collab);
     if (!collab) {
       throw new Error(`Collaboration with id ${collabId} not found`);
     }
 
-    const selectedQuestionData = await firstValueFrom(
-      this.questionServiceClient.send<QuestionDto>(
-        { cmd: 'get_question' },
-        collab.question_id,
-      ),
-    );
+    const { question_id, user1_id, user2_id } = collab;
+    try {
+      const [selectedQuestionData, user1Data, user2Data] = await Promise.all([
+        firstValueFrom(
+          this.questionServiceClient.send<QuestionDto>(
+            { cmd: 'get_question' },
+            question_id,
+          ),
+        ),
+        firstValueFrom(
+          this.userServiceClient.send<UserDataDto>(
+            { cmd: 'get_user' },
+            user1_id,
+          ),
+        ),
+        firstValueFrom(
+          this.userServiceClient.send<UserDataDto>(
+            { cmd: 'get_user' },
+            user2_id,
+          ),
+        ),
+      ]);
 
-    if (!selectedQuestionData) {
-      throw new Error(`Question with id ${collab.question_id} not found`);
+      if (!selectedQuestionData) {
+        throw new NotFoundException(
+          `Question with id ${question_id} not found`,
+        );
+      }
+
+      if (!user1Data) {
+        throw new NotFoundException(`User with id ${user1_id} not found`);
+      }
+
+      if (!user2Data) {
+        throw new NotFoundException(`User with id ${user2_id} not found`);
+      }
+
+      const collabInfoData: CollabInfoDto = {
+        collab_user1: {
+          id: user1Data.id,
+          username: user1Data.username,
+        },
+        collab_user2: {
+          id: user2Data.id,
+          username: user2Data.username,
+        },
+        question: selectedQuestionData,
+      };
+
+      return collabInfoData;
+    } catch (error) {
+      throw new Error(`Failed to fetch collaboration info: ${error}`);
     }
-
-    const collabInfoData: CollabInfoDto = {
-      complexity: collab.complexity,
-      category: collab.category,
-      user1_id: collab.user1_id,
-      user2_id: collab.user2_id,
-      match_id: collab.match_id,
-      question: selectedQuestionData,
-    };
-
-    return collabInfoData;
   }
 }
