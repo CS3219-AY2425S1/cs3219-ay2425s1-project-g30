@@ -157,9 +157,13 @@ export class UsersController {
     const isDeleted = await firstValueFrom(
       this.usersServiceClient.send({ cmd: 'delete_user' }, id),
     );
-    await this.authServiceClient.send({ cmd: 'signout' }, {});
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+
+    // Sign out user if they are deleting their own account
+    if (userData.id == id) {
+      await this.authServiceClient.send({ cmd: 'signout' }, {});
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+    }
 
     return res.status(HttpStatus.OK).json(isDeleted);
   }

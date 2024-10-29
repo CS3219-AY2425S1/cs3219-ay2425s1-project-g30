@@ -29,7 +29,7 @@ export class SupabaseUsersRepository implements UsersRepository {
   }
 
   async findAll(filters: UserFiltersDto): Promise<UserCollectionDto> {
-    const { email, username, offset, limit } = filters;
+    const { email, username, offset, limit, sort } = filters;
 
     let queryBuilder = this.supabase
       .from(this.PROFILES_TABLE)
@@ -45,6 +45,14 @@ export class SupabaseUsersRepository implements UsersRepository {
       }
       if (orFilter.length > 0) {
         queryBuilder = queryBuilder.or(orFilter.join(','));
+      }
+    }
+
+    if (sort) {
+      for (const s of sort) {
+        queryBuilder = queryBuilder.order(s.field, {
+          ascending: s.order === 'asc',
+        });
       }
     }
 
