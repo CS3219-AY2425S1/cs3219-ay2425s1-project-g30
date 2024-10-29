@@ -1,5 +1,11 @@
 'use client';
 
+import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
+import {
+  SortUsersQueryDto,
+  UserCollectionDto,
+  UserFiltersDto,
+} from '@repo/dtos/users';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
@@ -15,12 +21,10 @@ import {
 } from '@/components/data-table/DataTable';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import useDebounce from '@/hooks/useDebounce';
+import { fetchUsers } from '@/lib/api/users';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
 
 import { columns } from './columns';
-import { SortUsersQueryDto, UserCollectionDto, UserFiltersDto } from '@repo/dtos/users';
-import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
-import { fetchUsers } from '@/lib/api/users';
 import { UsersTableToolbar } from './UsersTableToolbar';
 
 export function UsersTable() {
@@ -63,22 +67,16 @@ export function UsersTable() {
   }, [pagination, sorting, debouncedColumnFilters, setConfirmLoading]);
 
   const { data } = useSuspenseQuery<UserCollectionDto>({
-    queryKey: [
-      QUERY_KEYS.Users,
-      pagination,
-      sorting,
-      debouncedColumnFilters,
-    ],
+    queryKey: [QUERY_KEYS.Users, pagination, sorting, debouncedColumnFilters],
     queryFn: async () => {
       const username = debouncedColumnFilters.find((f) => f.id === 'username')
         ?.value as string;
-        
+
       const email = debouncedColumnFilters.find((f) => f.id === 'email')
         ?.value as string;
 
-      const roles = debouncedColumnFilters.find(
-        (f) => f.id === 'role',
-      )?.value as ROLE[];
+      const roles = debouncedColumnFilters.find((f) => f.id === 'role')
+        ?.value as ROLE[];
 
       const offset = pagination.pageIndex * pagination.pageSize;
       const limit = pagination.pageSize;

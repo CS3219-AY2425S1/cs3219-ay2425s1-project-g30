@@ -1,23 +1,25 @@
-'use client'
+'use client';
 
 import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
-import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader"
-import { UserDataDto } from "@repo/dtos/users"
-import { ColumnDef, SortingFn } from "@tanstack/react-table"
+import { UserDataDto } from '@repo/dtos/users';
+import { ColumnDef, SortingFn } from '@tanstack/react-table';
+
+import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
 import RoleBadge from '@/components/RoleBadge';
+
 import { UsersTableRowActions } from './UsersTableRowActions';
 
 // User Role sorting order
 const roleOrder: { [key in ROLE]: number } = {
   [ROLE.Admin]: 1,
   [ROLE.User]: 2,
-}
+};
 
 const roleSortingFn: SortingFn<UserDataDto> = (rowA, rowB, columnId) => {
   const valueA = rowA.getValue(columnId) as ROLE;
   const valueB = rowB.getValue(columnId) as ROLE;
   return roleOrder[valueA] - roleOrder[valueB];
-}
+};
 
 export const columns: ColumnDef<UserDataDto>[] = [
   {
@@ -53,6 +55,6 @@ export const columns: ColumnDef<UserDataDto>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <UsersTableRowActions row={row} />
-  }
-]
+    cell: ({ row }) => <UsersTableRowActions row={row} />,
+  },
+];

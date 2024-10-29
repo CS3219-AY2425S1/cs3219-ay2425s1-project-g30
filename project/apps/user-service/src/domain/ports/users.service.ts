@@ -98,7 +98,7 @@ export class UsersService {
           `The email or username is already in use by another user`,
         );
       }
-      
+
       const user = await this.usersRepository.updateById(updateUserDto);
       if (updateUserDto.role) {
         await this.usersRepository.updatePrivilegeById(updateUserDto.id);

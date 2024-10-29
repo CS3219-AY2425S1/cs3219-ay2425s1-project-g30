@@ -1,6 +1,7 @@
 'use client';
 
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { UserDataDto } from '@repo/dtos/users';
 import { Row } from '@tanstack/react-table';
 import { Pencil, Trash2 } from 'lucide-react';
 
@@ -12,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
-import { UserDataDto } from '@repo/dtos/users';
 
 interface UsersTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -24,7 +24,7 @@ export function UsersTableRowActions<TData>({
   const setUpdateModalOpen = useManageUsersStore.use.setUpdateModalOpen();
   const setDeleteModalOpen = useManageUsersStore.use.setDeleteModalOpen();
   const setSelectedUser = useManageUsersStore.use.setSelectedUser();
-  
+
   const user = row.original as UserDataDto;
   const handleOpenEdit = () => {
     setSelectedUser(user);
@@ -35,7 +35,7 @@ export function UsersTableRowActions<TData>({
     setSelectedUser(user);
     setDeleteModalOpen(true);
   };
-  
+
   return (
     <>
       <DropdownMenu>

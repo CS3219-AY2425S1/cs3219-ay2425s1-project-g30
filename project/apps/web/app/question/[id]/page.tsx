@@ -14,8 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
-import { useQuestionsStore } from '@/stores/useQuestionStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 interface QuestionPageProps {
   params: {
@@ -54,7 +54,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
       <div
         className={`bg-white shadow-md rounded-lg p-6 relative ${confirmLoading ? 'opacity-50' : 'opacity-100'}`}
       >
-        { user?.role === 'Admin' && (
+        {user?.role === 'Admin' && (
           <div className="absolute flex gap-2 top-4 right-4">
             <Button
               variant="outline"

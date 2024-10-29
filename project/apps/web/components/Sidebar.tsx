@@ -1,7 +1,13 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { HomeIcon, ListIcon, UserRound, UsersRound, LogOut } from 'lucide-react';
+import {
+  HomeIcon,
+  ListIcon,
+  UserRound,
+  UsersRound,
+  LogOut,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -35,7 +41,7 @@ const Sidebar = ({ signOut }: SidebarProps) => {
       name: 'Manage Users',
       href: '/manage-users',
       icon: <UsersRound className="w-5 h-5" />,
-    }
+    },
   ];
 
   const handleLogout = () => {
@@ -57,7 +63,7 @@ const Sidebar = ({ signOut }: SidebarProps) => {
           if (user?.role != 'Admin' && item.name == 'Manage Users') {
             return;
           }
-          
+
           return (
             <motion.div
               key={item.name}

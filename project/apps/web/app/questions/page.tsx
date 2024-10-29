@@ -13,8 +13,8 @@ import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { createQuestion } from '@/lib/api/question';
-import { useQuestionsStore } from '@/stores/useQuestionStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
@@ -57,16 +57,15 @@ const QuestionRepositoryContent = () => {
       {/* Header */}
       <div className="flex items-center justify-between my-4">
         <h1 className="text-xl font-semibold">Question Repository</h1>
-        { user?.role === 'Admin' && (
-            <Button
-              variant="outline"
-              disabled={confirmLoading}
-              onClick={() => setCreateModalOpen(true)}
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          )
-        }
+        {user?.role === 'Admin' && (
+          <Button
+            variant="outline"
+            disabled={confirmLoading}
+            onClick={() => setCreateModalOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+        )}
       </div>
 
       {/* Table */}

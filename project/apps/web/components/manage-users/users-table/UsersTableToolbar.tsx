@@ -27,7 +27,9 @@ export function UsersTableToolbar<TData>({
       <div className="flex items-center flex-1 space-x-2">
         <Input
           placeholder="Filter users..."
-          value={(table.getColumn('username')?.getFilterValue() as string) ?? ''}
+          value={
+            (table.getColumn('username')?.getFilterValue() as string) ?? ''
+          }
           onChange={(event) =>
             table.getColumn('username')?.setFilterValue(event.target.value)
           }

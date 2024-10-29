@@ -4,12 +4,12 @@ import { UserDataDto, UpdateUserDto } from '@repo/dtos/users';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import UpdateModal from '@/components/manage-users/UpdateModal';
 import DeleteModal from '@/components/manage-users/DeleteModal';
+import UpdateModal from '@/components/manage-users/UpdateModal';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { updateUser, deleteUser } from '@/lib/api/users';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
-import { QUERY_KEYS } from '@/constants/queryKeys';
 
 interface ActionModalsProps {
   user: UserDataDto;
@@ -26,15 +26,14 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
   const { toast } = useToast();
 
   const updateMutation = useMutation({
-    mutationFn: (updatedUser: UpdateUserDto) =>
-      updateUser(updatedUser),
+    mutationFn: (updatedUser: UpdateUserDto) => updateUser(updatedUser),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async (updatedUser) => {
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.Users, updatedUser.id],
       });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Users] });
-      
+
       setUpdateModalOpen(false);
       toast({
         variant: 'success',
@@ -60,7 +59,7 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
         queryKey: [QUERY_KEYS.Users, deletedUserId],
       });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Users] });
-      
+
       setDeleteModalOpen(false);
       router.push('/manage-users');
       toast({
@@ -89,9 +88,7 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
 
   return (
     <>
-      {user && (
-        <UpdateModal onSubmit={handleUpdateUser} initialValues={user} />
-      )}
+      {user && <UpdateModal onSubmit={handleUpdateUser} initialValues={user} />}
 
       {user && (
         <DeleteModal onDelete={handleDeleteUser} username={user.username} />

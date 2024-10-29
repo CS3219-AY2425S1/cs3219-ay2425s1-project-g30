@@ -3,8 +3,8 @@
 import { Suspense } from 'react';
 
 import { ActionModals } from '@/components/manage-users/ActionModals';
-import { UsersTable } from '@/components/manage-users/users-table/UsersTable';
 import ManageUsersSkeleton from '@/components/manage-users/ManageUsersSkeleton';
+import { UsersTable } from '@/components/manage-users/users-table/UsersTable';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
 
 const ManageUsersRepositoryContent = () => {
@@ -19,10 +19,8 @@ const ManageUsersRepositoryContent = () => {
 
       {/* Table */}
       <UsersTable />
-      
-      {selectedUser && (
-        <ActionModals user={selectedUser} />
-      )}
+
+      {selectedUser && <ActionModals user={selectedUser} />}
     </div>
   );
 };

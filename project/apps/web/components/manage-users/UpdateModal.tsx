@@ -1,10 +1,9 @@
 'use client';
 
 import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
-import { UpdateQuestionDto } from '@repo/dtos/questions';
+import { UpdateUserDto, updateUserSchema } from '@repo/dtos/users';
 import { useEffect } from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -29,12 +28,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useZodForm } from '@/lib/form';
-import { useQuestionsStore } from '@/stores/useQuestionStore';
-import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
-import { UpdateUserDto, updateUserSchema } from '@repo/dtos/users';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
+import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
 
 interface UpdateModalProps {
   onSubmit: (data: UpdateUserDto) => void;
@@ -121,7 +117,7 @@ const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
                 </FormItem>
               )}
             />
-            
+
             {/* Roles Dropdown */}
             <FormField
               control={form.control}

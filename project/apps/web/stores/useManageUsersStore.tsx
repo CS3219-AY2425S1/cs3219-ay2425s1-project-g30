@@ -1,7 +1,7 @@
+import { UserDataDto } from '@repo/dtos/users';
 import { create } from 'zustand';
 
 import { createSelectors } from '@/lib/zustand';
-import { UserDataDto } from '@repo/dtos/users';
 
 interface ManageUsersState {
   selectedUser: UserDataDto | null;
