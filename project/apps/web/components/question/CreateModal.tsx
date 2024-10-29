@@ -44,6 +44,7 @@ interface CreateModalProps {
 const CreateModal = ({ onCreate }: CreateModalProps) => {
   const isCreateModalOpen = useQuestionsStore.use.isCreateModalOpen();
   const setCreateModalOpen = useQuestionsStore.use.setCreateModalOpen();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
   const form = useZodForm({
     schema: createQuestionSchema,
     defaultValues: {
@@ -187,6 +188,7 @@ const CreateModal = ({ onCreate }: CreateModalProps) => {
               <Button
                 type="button"
                 variant="outline"
+                disabled={confirmLoading}
                 onClick={() => setCreateModalOpen(false)}
               >
                 Cancel
@@ -194,7 +196,10 @@ const CreateModal = ({ onCreate }: CreateModalProps) => {
               <Button
                 type="submit"
                 variant="default"
-                disabled={Object.keys(form.formState.errors).length !== 0}
+                disabled={
+                  Object.keys(form.formState.errors).length !== 0 ||
+                  confirmLoading
+                }
               >
                 Create
               </Button>

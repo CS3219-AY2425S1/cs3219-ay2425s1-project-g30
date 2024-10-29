@@ -40,6 +40,7 @@ interface UpdateModalProps {
 const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
   const isUpdateModalOpen = useManageUsersStore.use.isUpdateModalOpen();
   const setUpdateModalOpen = useManageUsersStore.use.setUpdateModalOpen();
+  const confirmLoading = useManageUsersStore.use.confirmLoading();
   const form = useZodForm({
     schema: updateUserSchema,
     defaultValues: {
@@ -64,6 +65,7 @@ const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
       form.reset({
         username: initialValues.username,
         email: initialValues.email,
+        role: initialValues.role,
         id: initialValues.id,
       });
     } else {
@@ -150,6 +152,7 @@ const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
               <Button
                 type="button"
                 variant="outline"
+                disabled={confirmLoading}
                 onClick={() => setUpdateModalOpen(false)}
               >
                 Cancel
@@ -157,7 +160,10 @@ const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
               <Button
                 type="submit"
                 variant="default"
-                disabled={Object.keys(form.formState.errors).length !== 0}
+                disabled={
+                  Object.keys(form.formState.errors).length !== 0 ||
+                  confirmLoading
+                }
               >
                 Confirm
               </Button>
