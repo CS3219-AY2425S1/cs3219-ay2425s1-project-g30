@@ -47,9 +47,7 @@ export class CollaborationSupabase implements CollaborationRepository {
       .select('*')
       .eq('id', id)
       .maybeSingle<CollabDto>();
-    console.log(data);
     if (error) {
-      console.log(error);
       throw error;
     }
 
@@ -178,9 +176,7 @@ export class CollaborationSupabase implements CollaborationRepository {
   }
 
   async fetchCollabInfo(collabId: string): Promise<CollabInfoDto> {
-    console.log(`Fetching collaboration info for collab ${collabId}`);
     const collab = await this.findById(collabId);
-    console.log(collab);
     if (!collab) {
       throw new Error(`Collaboration with id ${collabId} not found`);
     }
