@@ -2,7 +2,7 @@ import { Session } from "@supabase/auth-js";
 import { z } from "zod";
 import { Tables } from "./generated/types/auth.types";
 import { collectionMetadataSchema } from "./metadata";
-import { passwordSchema } from "./auth";
+import { emailSchema, passwordSchema, usernameSchema } from "./auth";
 
 export type UserDataDto = Tables<"profiles">;
 
@@ -22,7 +22,7 @@ export const userCollectionSchema = z.object({
 });
 
 export const userFiltersSchema = z.object({
-  email: z.string().optional(),
+  email: emailSchema,
   username: z.string().optional(),
   // includeDeleted: z.coerce.boolean().optional(),
 
@@ -34,8 +34,8 @@ export const userFiltersSchema = z.object({
 
 export const updateUserSchema = z.object({
   id: z.string().uuid(),
-  email: z.string().optional(),
-  username: z.string().optional(),
+  email: emailSchema,
+  username: usernameSchema,
 });
 
 export const changePasswordSchema = z
@@ -50,7 +50,7 @@ export const changePasswordSchema = z
       ctx.addIssue({
         code: "custom",
         message: "The passwords did not match",
-        path: ["confirmPassword"],
+        path: ["confirmNewPassword"],
       });
     }
   });

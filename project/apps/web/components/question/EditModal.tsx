@@ -34,21 +34,17 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useZodForm } from '@/lib/form';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 import { renderLabelWithAsterisk } from '@/utils/renderLabelWithAsterisk';
 
 interface EditModalProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
   onSubmit: (data: UpdateQuestionDto) => void;
   initialValues: UpdateQuestionDto;
 }
 
-const EditModal = ({
-  open,
-  setOpen,
-  onSubmit,
-  initialValues,
-}: EditModalProps) => {
+const EditModal = ({ onSubmit, initialValues }: EditModalProps) => {
+  const isEditModalOpen = useQuestionsStore.use.isEditModalOpen();
+  const setEditModalOpen = useQuestionsStore.use.setEditModalOpen();
   const form = useZodForm({
     schema: updateQuestionSchema,
     defaultValues: {
@@ -71,7 +67,7 @@ const EditModal = ({
   };
 
   useEffect(() => {
-    if (open) {
+    if (isEditModalOpen) {
       form.reset({
         q_title: initialValues.q_title,
         q_desc: initialValues.q_desc,
@@ -86,7 +82,7 @@ const EditModal = ({
   }, [open, form, initialValues]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Edit Question</DialogTitle>
@@ -204,7 +200,7 @@ const EditModal = ({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => setEditModalOpen(false)}
               >
                 Cancel
               </Button>

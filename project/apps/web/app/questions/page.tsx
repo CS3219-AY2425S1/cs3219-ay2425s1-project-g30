@@ -3,7 +3,7 @@
 import { CreateQuestionDto } from '@repo/dtos/questions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 
 import { ActionModals } from '@/components/question/ActionModals';
 import CreateModal from '@/components/question/CreateModal';
@@ -11,25 +11,17 @@ import { QuestionTable } from '@/components/question/question-table/QuestionTabl
 import QuestionsSkeleton from '@/components/question/QuestionsSkeleton';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import {
-  QuestionsStateProvider,
-  useQuestionsState,
-} from '@/contexts/QuestionsStateContext';
 import { useToast } from '@/hooks/use-toast';
 import { createQuestion } from '@/lib/api/question';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 const QuestionRepositoryContent = () => {
   const queryClient = useQueryClient();
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const {
-    confirmLoading,
-    setConfirmLoading,
-    selectedQuestion,
-    isEditModalOpen,
-    isDeleteModalOpen,
-    setEditModalOpen,
-    setDeleteModalOpen,
-  } = useQuestionsState();
+  const selectedQuestion = useQuestionsStore.use.selectedQuestion();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
+  const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
+  const setCreateModalOpen = useQuestionsStore.use.setCreateModalOpen();
+
   const { toast } = useToast();
 
   const createMutation = useMutation({
@@ -59,37 +51,25 @@ const QuestionRepositoryContent = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container p-6 mx-auto">
       {/* Header */}
-      <div className="flex justify-between items-center my-4">
+      <div className="flex items-center justify-between my-4">
         <h1 className="text-xl font-semibold">Question Repository</h1>
         <Button
           variant="outline"
           disabled={confirmLoading}
           onClick={() => setCreateModalOpen(true)}
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Table */}
       <QuestionTable />
 
-      <CreateModal
-        open={isCreateModalOpen}
-        setOpen={setCreateModalOpen}
-        onCreate={handleCreateQuestion}
-      />
+      <CreateModal onCreate={handleCreateQuestion} />
       {selectedQuestion && (
-        <ActionModals
-          id={selectedQuestion.id}
-          question={selectedQuestion}
-          setConfirmLoading={setConfirmLoading}
-          isEditModalOpen={isEditModalOpen}
-          setEditModalOpen={setEditModalOpen}
-          isDeleteModalOpen={isDeleteModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
-        />
+        <ActionModals id={selectedQuestion.id} question={selectedQuestion} />
       )}
     </div>
   );
@@ -97,11 +77,9 @@ const QuestionRepositoryContent = () => {
 
 const QuestionRepository = () => {
   return (
-    <QuestionsStateProvider>
-      <Suspense fallback={<QuestionsSkeleton />}>
-        <QuestionRepositoryContent />
-      </Suspense>
-    </QuestionsStateProvider>
+    <Suspense fallback={<QuestionsSkeleton />}>
+      <QuestionRepositoryContent />
+    </Suspense>
   );
 };
 

@@ -9,28 +9,20 @@ import EditModal from '@/components/question/EditModal';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { deleteQuestion, updateQuestion } from '@/lib/api/question';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 interface ActionModalsProps {
   id: string;
   question: QuestionDto;
-  setConfirmLoading: (val: boolean) => void;
-  isEditModalOpen: boolean;
-  setEditModalOpen: (val: boolean) => void;
-  isDeleteModalOpen: boolean;
-  setDeleteModalOpen: (val: boolean) => void;
 }
 
-export const ActionModals = ({
-  id,
-  question,
-  setConfirmLoading,
-  isEditModalOpen,
-  setEditModalOpen,
-  isDeleteModalOpen,
-  setDeleteModalOpen,
-}: ActionModalsProps) => {
+export const ActionModals = ({ id, question }: ActionModalsProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+
+  const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
+  const setEditModalOpen = useQuestionsStore.use.setEditModalOpen();
+  const setDeleteModalOpen = useQuestionsStore.use.setDeleteModalOpen();
 
   const { toast } = useToast();
   const updateMutation = useMutation({
@@ -95,18 +87,11 @@ export const ActionModals = ({
   return (
     <>
       {question && (
-        <EditModal
-          open={isEditModalOpen}
-          setOpen={setEditModalOpen}
-          onSubmit={handleEditQuestion}
-          initialValues={question}
-        />
+        <EditModal onSubmit={handleEditQuestion} initialValues={question} />
       )}
 
       {question && (
         <DeleteModal
-          open={isDeleteModalOpen}
-          setOpen={setDeleteModalOpen}
           onDelete={handleDeleteQuestion}
           questionTitle={question.q_title}
         />

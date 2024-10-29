@@ -21,20 +21,23 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useZodForm } from '@/lib/form';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 interface ChangePasswordModalProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
   onSubmit: (data: ChangePasswordDto) => void;
   userId: string;
 }
 
 export default function ChangePasswordModal({
-  open,
-  setOpen,
   onSubmit,
   userId,
 }: ChangePasswordModalProps) {
+  const confirmLoading = useProfileStore.use.confirmLoading();
+  const isChangePasswordModalOpen =
+    useProfileStore.use.isChangePasswordModalOpen();
+  const setChangePasswordModalOpen =
+    useProfileStore.use.setChangePasswordModalOpen();
+
   const form = useZodForm({
     schema: changePasswordSchema,
     defaultValues: {
@@ -53,7 +56,7 @@ export default function ChangePasswordModal({
   };
 
   useEffect(() => {
-    if (open) {
+    if (isChangePasswordModalOpen) {
       form.reset({
         id: userId,
         newPassword: '',
@@ -63,10 +66,13 @@ export default function ChangePasswordModal({
       form.reset();
       form.clearErrors();
     }
-  }, [open, form, userId]);
+  }, [isChangePasswordModalOpen, form, userId]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={isChangePasswordModalOpen}
+      onOpenChange={setChangePasswordModalOpen}
+    >
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
@@ -119,13 +125,17 @@ export default function ChangePasswordModal({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => setChangePasswordModalOpen(false)}
+                disabled={confirmLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={Object.keys(form.formState.errors).length !== 0}
+                disabled={
+                  Object.keys(form.formState.errors).length !== 0 ||
+                  confirmLoading
+                }
               >
                 Change Password
               </Button>

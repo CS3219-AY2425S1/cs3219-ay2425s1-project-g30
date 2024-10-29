@@ -5,7 +5,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { ActionModals } from '@/components/question/ActionModals';
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 interface QuestionPageProps {
   params: {
@@ -22,9 +23,10 @@ interface QuestionPageProps {
 }
 
 const QuestionPageContent = ({ id }: { id: string }) => {
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const setEditModalOpen = useQuestionsStore.use.setEditModalOpen();
+  const setDeleteModalOpen = useQuestionsStore.use.setDeleteModalOpen();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
+
   const { data: question } = useSuspenseQuery<QuestionDto>({
     queryKey: [QUERY_KEYS.Question, id],
     queryFn: () => fetchQuestionById(id),
@@ -87,17 +89,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
           </div>
         </div>
       </div>
-      {question && (
-        <ActionModals
-          question={question}
-          id={id}
-          setConfirmLoading={setConfirmLoading}
-          isEditModalOpen={isEditModalOpen}
-          setEditModalOpen={setEditModalOpen}
-          isDeleteModalOpen={isDeleteModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
-        />
-      )}
+      {question && <ActionModals question={question} id={id} />}
     </div>
   );
 };

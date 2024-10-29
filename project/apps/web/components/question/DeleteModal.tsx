@@ -9,22 +9,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 interface DeleteModalProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
   onDelete: () => void;
   questionTitle: string;
 }
 
-const DeleteModal = ({
-  open,
-  setOpen,
-  onDelete,
-  questionTitle,
-}: DeleteModalProps) => {
+const DeleteModal = ({ onDelete, questionTitle }: DeleteModalProps) => {
+  const isDeleteModalOpen = useQuestionsStore.use.isDeleteModalOpen();
+  const setDeleteModalOpen = useQuestionsStore.use.setDeleteModalOpen();
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isDeleteModalOpen} onOpenChange={setDeleteModalOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete Question</DialogTitle>
@@ -36,7 +33,7 @@ const DeleteModal = ({
           <div>This action cannot be undone.</div>
         </DialogDescription>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
             Cancel
           </Button>
           <Button variant="destructive" onClick={onDelete}>
