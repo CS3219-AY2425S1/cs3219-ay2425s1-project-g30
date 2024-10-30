@@ -36,13 +36,15 @@ jobs:
           docker compose push
 
       - name: Generate deployment package
+        env:
+          IMAGE_PREFIX: "${{ steps.login-ecr.outputs.registry }}/lastminprep/"
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           # Replace placeholders in docker-compose.template.yml with actual IMAGE_PREFIX and IMAGE_TAG
           sed -e "s|\${IMAGE_PREFIX}|${IMAGE_PREFIX}|g" \
               -e "s|\${IMAGE_TAG}|${IMAGE_TAG}|g" \
               docker-compose-template.yml > ../docker-compose.yml
           cd ../
-          cat docker-compose.yml
           zip deploy.zip docker-compose.yml
         
           rm docker-compose.yml
