@@ -45,6 +45,7 @@ jobs:
               -e "s|\${IMAGE_TAG}|${IMAGE_TAG}|g" \
               docker-compose-template.yml > ../docker-compose.yml
           cd ../
+          cat docker-compose.yml
           zip deploy.zip docker-compose.yml
         
           rm docker-compose.yml
