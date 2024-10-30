@@ -1,6 +1,6 @@
 services:
   web:
-    image: "${IMAGE_PREFIX}web:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}web:${IMAGE_TAG}"
     ports:
       - 3000:3000
     networks:
@@ -12,7 +12,7 @@ services:
       NODE_ENV: production
 
   api-gateway:
-    image: "${IMAGE_PREFIX}api-gateway:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}api-gateway:${IMAGE_TAG}"
     ports:
       - 4000:4000
     networks:
@@ -26,7 +26,7 @@ services:
       NODE_ENV: production
 
   question-service:
-    image: "${IMAGE_PREFIX}question-service:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}question-service:${IMAGE_TAG}"
     ports:
       - 3001:3001
     networks:
@@ -38,7 +38,7 @@ services:
       NODE_ENV: production
 
   user-service:
-    image: "${IMAGE_PREFIX}user-service:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}user-service:${IMAGE_TAG}"
     ports:
       - 3002:3002
     networks:
@@ -50,7 +50,7 @@ services:
       NODE_ENV: production
 
   auth-service:
-    image: "${IMAGE_PREFIX}auth-service:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}auth-service:${IMAGE_TAG}"
     ports:
       - 3003:3003
     networks:
@@ -62,7 +62,7 @@ services:
       NODE_ENV: production
 
   matching-service:
-    image: "${IMAGE_PREFIX}matching-service:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}matching-service:${IMAGE_TAG}"
     ports:
       - 3004:3004
       - 8080:8080  # Expose WebSocket port
@@ -81,7 +81,7 @@ services:
       NODE_ENV: production
 
   collaboration-service:
-    image: "${IMAGE_PREFIX}collaboration-service:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}collaboration-service:${IMAGE_TAG}"
     ports:
       - 3005:3005
       - 1234:1234  # Expose WebSocket port
