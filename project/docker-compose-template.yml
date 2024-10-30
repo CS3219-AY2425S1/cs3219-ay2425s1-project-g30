@@ -95,7 +95,7 @@ services:
       NODE_ENV: production
 
   rabbitmq:
-    image: "${IMAGE_PREFIX}rabbitmq:${IMAGE_TAG:-latest}"
+    image: "${IMAGE_PREFIX}rabbitmq:${IMAGE_TAG}"
     container_name: rabbitmq
     networks:
       - backend
