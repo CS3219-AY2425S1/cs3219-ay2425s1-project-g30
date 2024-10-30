@@ -8,6 +8,8 @@ import { envSchema } from './env/env';
 import { EnvModule } from './env/env.module';
 import { CollaborationRepository } from './domain/ports/collaboration.repository';
 import { CollaborationSupabase } from './adapters/db/collaboration.supabase';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { EnvService } from './env/env.service';
 
 @Module({
   imports: [
@@ -26,6 +28,23 @@ import { CollaborationSupabase } from './adapters/db/collaboration.supabase';
       },
     }),
     EnvModule,
+    ClientsModule.registerAsync([
+      {
+        imports: [EnvModule],
+        name: 'AUTH_SERVICE',
+        useFactory: async (envService: EnvService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('AUTH_SERVICE_HOST'),
+            port: 3003,
+          },
+        }),
+        inject: [EnvService],
+      },
+    ]),
   ],
   controllers: [CollaborationController],
   providers: [

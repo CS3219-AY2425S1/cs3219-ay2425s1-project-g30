@@ -8,17 +8,24 @@ import * as Y from 'yjs';
 
 import { env } from '@/env.mjs';
 
-export default function CollabPage() {
+interface CollabPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function CollabPage({ params }: CollabPageProps) {
   const monaco = useMonaco();
+
+  const id = params.id as string;
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (monaco) {
         const ydoc = new Y.Doc();
-
         const provider = new HocuspocusProvider({
           url: env.NEXT_PUBLIC_COLLAB_SOCKET_URL,
-          name: 'nextjs-monaco-demo',
+          name: id,
           document: ydoc,
         });
 

@@ -29,5 +29,32 @@ export abstract class CollaborationRepository {
    */
   abstract findByMatchId(matchId: string): Promise<CollabDto | null>;
 
+  /**
+   * Finds all active collaborations for a given user.
+   * @param userId - The unique identifier of the user whose active collaborations are to be found.
+   * @returns A promise that resolves to an array of active collaboration data transfer objects.
+   */
   abstract findActive(userId: string): Promise<CollabDto[]>;
+
+  /**
+   * Checks if a user is a collaborator on a document, given the document's unique identifier and the user's unique identifier.
+   * @param id - The unique identifier of the collaboration entry containing the document to be checked.
+   * @param userId - The unique identifier of the user to be checked.
+   * @returns A promise that resolves to true if the user is a collaborator, or false otherwise.
+   */
+  abstract verifyCollaborator(id: string, userId: string): Promise<boolean>;
+
+  /**
+   * Fetches a document by its unique identifier. Used by the Hocuspocus server to retrieve the state of a document.
+   * @param id - The unique identifier of the collaboration entry containing the document to be fetched.
+   * @returns A promise that resolves to the document state, or null if not found.
+   */
+  abstract fetchDocumentById(id: string): Promise<Buffer | null>;
+
+  /**
+   * Stores a document by its unique identifier. Used by the Hocuspocus server to update the state of a document.
+   * @param id - The unique identifier of the collaboration entry containing the document to be stored.
+   * @param state - The new state of the document to be stored.
+   */
+  abstract storeDocumentById(id: string, state: any): Promise<void>;
 }
