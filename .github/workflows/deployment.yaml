@@ -50,4 +50,4 @@ jobs:
           environment_name: LastMinPrep-env
           version_label: ${{ github.sha }}
           region: ap-southeast-1
-          deployment_package: deploy.zip
+          deployment_package: ./project/deploy.zip
