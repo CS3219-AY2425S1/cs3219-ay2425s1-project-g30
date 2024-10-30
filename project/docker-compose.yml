@@ -119,6 +119,7 @@ services:
     build:
       context: ./infra/rabbitmq
       dockerfile: Dockerfile
+    image: "${IMAGE_PREFIX}rabbitmq:${IMAGE_TAG:-latest}"
     container_name: rabbitmq
     networks:
       - backend
