@@ -1,0 +1,137 @@
+services:
+  web:
+    image: "${IMAGE_PREFIX}web:${IMAGE_TAG:-latest}"
+    ports:
+      - 3000:3000
+    networks:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      NEXT_PUBLIC_MATCH_SOCKET_URL: ${NEXT_PUBLIC_MATCH_SOCKET_URL}
+      NEXT_PUBLIC_COLLAB_SOCKET_URL: ${NEXT_PUBLIC_COLLAB_SOCKET_URL}
+      NODE_ENV: production
+
+  api-gateway:
+    image: "${IMAGE_PREFIX}api-gateway:${IMAGE_TAG:-latest}"
+    ports:
+      - 4000:4000
+    networks:
+      - backend
+    environment:
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
+      COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
+      NODE_ENV: production
+
+  question-service:
+    image: "${IMAGE_PREFIX}question-service:${IMAGE_TAG:-latest}"
+    ports:
+      - 3001:3001
+    networks:
+      - backend
+    environment:
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      SUPABASE_URL: ${QUESTION_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${QUESTION_SERVICE_SUPABASE_KEY}
+      NODE_ENV: production
+
+  user-service:
+    image: "${IMAGE_PREFIX}user-service:${IMAGE_TAG:-latest}"
+    ports:
+      - 3002:3002
+    networks:
+      - backend
+    environment:
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY}
+      NODE_ENV: production
+
+  auth-service:
+    image: "${IMAGE_PREFIX}auth-service:${IMAGE_TAG:-latest}"
+    ports:
+      - 3003:3003
+    networks:
+      - backend
+    environment:
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL} # Use the same Supabase URL as the user service
+      SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY} # Use the same Supabase key as the user service
+      NODE_ENV: production
+
+  matching-service:
+    image: "${IMAGE_PREFIX}matching-service:${IMAGE_TAG:-latest}"
+    ports:
+      - 3004:3004
+      - 8080:8080  # Expose WebSocket port
+    networks:
+      - backend
+    environment:
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST} 
+      MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
+      SUPABASE_URL: ${MATCHING_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${MATCHING_SERVICE_SUPABASE_KEY}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      NODE_ENV: production
+
+  collaboration-service:
+    image: "${IMAGE_PREFIX}collaboration-service:${IMAGE_TAG:-latest}"
+    ports:
+      - 3005:3005
+      - 1234:1234  # Expose WebSocket port
+    networks:
+      - backend
+    environment:
+      COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      SUPABASE_URL: ${COLLABORATION_SERVICE_SUPABASE_URL}
+      SUPABASE_KEY: ${COLLABORATION_SERVICE_SUPABASE_KEY}
+      NODE_ENV: production
+
+  rabbitmq:
+    image: "${IMAGE_PREFIX}rabbitmq:${IMAGE_TAG:-latest}"
+    container_name: rabbitmq
+    networks:
+      - backend
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - 5672:5672 # RabbitMQ message broker port
+      - 15672:15672 # RabbitMQ management plugin port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - backend
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - 5540:5540
+    networks:
+      - backend
+    depends_on:
+      - redis  # Ensure Redis starts before Redis Insight
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  redis_data:
