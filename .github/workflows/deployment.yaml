@@ -38,6 +38,9 @@ jobs:
       - name: Generate deployment package
         run: zip deploy.zip docker-compose.yml
       
+      - name: List files to verify deploy.zip
+        run: ls -la
+
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
         with:
@@ -45,6 +48,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: LastMinPrep
           environment_name: LastMinPrep-env
-          version_label: 12345
+          version_label: ${{ github.sha }}
           region: ap-southeast-1
           deployment_package: deploy.zip
