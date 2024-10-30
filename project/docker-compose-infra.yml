@@ -13,9 +13,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
   redis:
-    build:
-      context: ./infra/redis
-      dockerfile: Dockerfile
+    image: redis:latest
     container_name: redis
     ports:
       - 6379:6379
