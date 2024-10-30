@@ -54,5 +54,6 @@ jobs:
           application_name: LastMinPrep
           environment_name: LastMinPrep-env
           version_label: ${{ github.sha }}
+          use_existing_version_if_available: true
           region: ap-southeast-1
           deployment_package: deploy.zip
