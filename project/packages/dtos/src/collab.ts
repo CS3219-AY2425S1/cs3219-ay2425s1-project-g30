@@ -28,18 +28,27 @@ export const collabInfoSchema = z.object({
   question: questionSchema,
 });
 
+export const collabCreateSchema = z.object({
+  user1_id: z.string().uuid(),
+  user2_id: z.string().uuid(),
+  match_id: z.string().uuid(),
+  question_id: z.string().uuid(),
+});
+
 export const collabRequestSchema = collabQuestionSchema.extend({
   user1_id: z.string().uuid(),
   user2_id: z.string().uuid(),
   match_id: z.string().uuid(),
 });
 
-export const collabCreateSchema = collabRequestSchema.extend({
-  question_id: z.string().uuid(),
-});
-
 export const collabSchema = collabCreateSchema.extend({
   id: z.string().uuid(),
+});
+
+export const responseWrapperSchema = z.object({
+  data: z.array(collabSchema),
+  count: z.number(),
+  message: z.string().optional(),
 });
 
 export type CollabUserDto = z.infer<typeof collaboratorSchema>;
@@ -48,3 +57,4 @@ export type CollabRequestDto = z.infer<typeof collabRequestSchema>;
 export type CollabQuestionDto = z.infer<typeof collabQuestionSchema>;
 export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
 export type CollabDto = z.infer<typeof collabSchema>;
+export type ResponseWrapperDto = z.infer<typeof responseWrapperSchema>;

@@ -6,6 +6,7 @@ import {
   CollabInfoDto,
   CollabQuestionDto,
   CollabRequestDto,
+  ResponseWrapperDto,
 } from '@repo/dtos/collab';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
@@ -53,8 +54,6 @@ export class CollaborationService {
       }
 
       const collabCreateData: CollabCreateDto = {
-        category: collabReqData.category,
-        complexity: collabReqData.complexity,
         user1_id: collabReqData.user1_id,
         user2_id: collabReqData.user2_id,
         match_id: collabReqData.match_id,
@@ -75,21 +74,47 @@ export class CollaborationService {
   }
 
   /**
+   * Retrieves all collaborations for a given user.
+   * @param userId - The ID of the user whose collaborations are to be retrieved.
+   * @returns A promise that resolves to the collaboration data transfer objects (CollabDto[]).
+   * @throws Will handle and log any errors that occur during the retrieval process.
+   */
+  async getAllCollabs(userId: string): Promise<ResponseWrapperDto> {
+    try {
+      const collabs = await this.collabRepository.findAll(userId);
+      this.logger.log(
+        `Found ${collabs.length} collaborations for user ${userId}`,
+      );
+
+      return {
+        data: collabs,
+        count: collabs.length,
+      };
+    } catch (error) {
+      this.handleError('get all collaborations', error);
+    }
+  }
+
+  /**
    * Retrieves the active collaborations for a given user.
    *
    * @param userId - The ID of the user whose active collaborations is to be retrieved.
    * @returns A promise that resolves to the active collaboration data transfer objects (CollabDto[]).
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
-  async getActiveCollabs(userId: string): Promise<CollabDto[]> {
+  async getActiveCollabs(userId: string): Promise<ResponseWrapperDto> {
     try {
       const activeCollabs = await this.collabRepository.findActive(userId);
+      this.logger.log(
+        `Found ${activeCollabs.length} active collaborations for user ${userId}`,
+      );
 
-      this.logger.log(`Found active collaborations for user ${userId}`);
-
-      return activeCollabs;
+      return {
+        data: activeCollabs,
+        count: activeCollabs.length,
+      };
     } catch (error) {
-      this.handleError('get collaborations', error);
+      this.handleError('get active collaborations', error);
     }
   }
 
@@ -126,11 +151,23 @@ export class CollaborationService {
   async verifyCollab(collabId: string): Promise<boolean> {
     try {
       this.logger.debug(`Verifying collaboration: ${collabId}`);
-      // TODO: verify that the collaboration is still active
-
-      return true;
+      return await this.collabRepository.checkActiveCollaborationById(collabId);
     } catch (error) {
       this.handleError('verify collaboration', error);
+    }
+  }
+
+  /**
+   * Ends a collaboration by its unique identifier.
+   * @param collabId - The unique identifier of the collaboration to be ended.
+   *
+   */
+  async endCollab(collabId: string): Promise<CollabDto> {
+    try {
+      this.logger.log(`Ending collaboration: ${collabId}`);
+      return await this.collabRepository.endCollab(collabId);
+    } catch (error) {
+      this.handleError('end collaboration', error);
     }
   }
 }

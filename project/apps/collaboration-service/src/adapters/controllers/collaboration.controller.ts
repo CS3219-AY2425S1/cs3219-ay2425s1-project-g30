@@ -18,6 +18,11 @@ export class CollaborationController {
     return await this.collaborationService.createCollab(collabData);
   }
 
+  @MessagePattern({ cmd: 'get_all_collabs' })
+  async getAllCollabs(@Payload() userId: string) {
+    return await this.collaborationService.getAllCollabs(userId);
+  }
+
   @MessagePattern({ cmd: 'get_active_collabs' })
   async getCollab(@Payload() userId: string) {
     return await this.collaborationService.getActiveCollabs(userId);
@@ -33,8 +38,8 @@ export class CollaborationController {
     return await this.collaborationService.getCollabInfo(collabId);
   }
 
-  // @MessagePattern({ cmd: 'end_collab' })
-  // async endCollab(@Payload() collabId: string) {
-  //   return await this.collaborationService.endCollab(collabId);
-  // }
+  @MessagePattern({ cmd: 'end_collab' })
+  async endCollab(@Payload() collabId: string) {
+    return await this.collaborationService.endCollab(collabId);
+  }
 }

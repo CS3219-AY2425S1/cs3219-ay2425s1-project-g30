@@ -44,9 +44,10 @@ export class CollaborationSupabase implements CollaborationRepository {
   async findById(id: string): Promise<CollabDto | null> {
     const { data, error } = await this.supabase
       .from(this.COLLABORATION_TABLE)
-      .select('*')
+      .select()
       .eq('id', id)
       .maybeSingle<CollabDto>();
+
     if (error) {
       throw error;
     }
@@ -91,6 +92,19 @@ export class CollaborationSupabase implements CollaborationRepository {
     return data;
   }
 
+  async findAll(userId: string): Promise<CollabDto[]> {
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .select()
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+      .returns<CollabDto[]>();
+
+    if (error) {
+      throw error;
+    }
+    return data;
+  }
+
   async findActive(userId: string): Promise<CollabDto[]> {
     const { data, error } = await this.supabase
       .from(this.COLLABORATION_TABLE)
@@ -103,6 +117,25 @@ export class CollaborationSupabase implements CollaborationRepository {
       throw error;
     }
     return data;
+  }
+
+  async checkActiveCollaborationById(id: string): Promise<boolean> {
+    if (!(await this.findById(id))) {
+      throw new NotFoundException(`Collaboration with id ${id} not found`);
+    }
+
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .select()
+      .eq('id', id)
+      .is('ended_at', null)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    return !!data;
   }
 
   async verifyCollaborator(id: string, userId: string): Promise<boolean> {
@@ -178,7 +211,9 @@ export class CollaborationSupabase implements CollaborationRepository {
   async fetchCollabInfo(collabId: string): Promise<CollabInfoDto> {
     const collab = await this.findById(collabId);
     if (!collab) {
-      throw new Error(`Collaboration with id ${collabId} not found`);
+      throw new NotFoundException(
+        `Collaboration with id ${collabId} not found`,
+      );
     }
 
     const { question_id, user1_id, user2_id } = collab;
@@ -234,5 +269,25 @@ export class CollaborationSupabase implements CollaborationRepository {
     } catch (error) {
       throw new Error(`Failed to fetch collaboration info: ${error}`);
     }
+  }
+
+  async endCollab(collabId: string): Promise<CollabDto> {
+    if (!(await this.checkActiveCollaborationById(collabId))) {
+      throw new BadRequestException(
+        `Collaboration with id ${collabId} is not active`,
+      );
+    }
+
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .update({ ended_at: new Date() })
+      .eq('id', collabId)
+      .select()
+      .single<CollabDto>();
+
+    if (error) {
+      throw error;
+    }
+    return data;
   }
 }
