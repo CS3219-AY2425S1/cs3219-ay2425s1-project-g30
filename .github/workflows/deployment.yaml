@@ -30,31 +30,8 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           IMAGE_PREFIX: "${{ steps.login-ecr.outputs.registry }}/lastminprep/"
-          IMAGE_TAG: ${{ github.sha }}
         run: |
           docker compose build
           docker compose push
 
-      - name: Generate deployment package
-        env:
-          IMAGE_PREFIX: "${{ steps.login-ecr.outputs.registry }}/lastminprep/"
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          # Replace placeholders in docker-compose.template.yml with actual IMAGE_PREFIX and IMAGE_TAG
-          sed -e "s|\${IMAGE_PREFIX}|${IMAGE_PREFIX}|g" \
-              -e "s|\${IMAGE_TAG}|${IMAGE_TAG}|g" \
-              docker-compose-template.yml > ../docker-compose.yml
-          cd ../
-          zip deploy.zip docker-compose.yml
 
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: LastMinPrep
-          environment_name: LastMinPrep-env
-          version_label: ${{ github.sha }}
-          use_existing_version_if_available: true
-          region: ap-southeast-1
-          deployment_package: deploy.zip
