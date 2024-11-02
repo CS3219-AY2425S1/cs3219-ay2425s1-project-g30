@@ -8,13 +8,13 @@ RUN corepack enable
 # Add necessary packages for compatibility
 RUN apk update && apk add --no-cache libc6-compat
 
+# Install Turbo globally
+RUN pnpm add -g turbo@^2.1.2
+
 # --------------------
 # Builder Stage
 # --------------------
 FROM base AS builder
-
-# Install Turbo globally
-RUN pnpm add -g turbo@^2.1.2
 
 # Set the working directory
 WORKDIR /app
