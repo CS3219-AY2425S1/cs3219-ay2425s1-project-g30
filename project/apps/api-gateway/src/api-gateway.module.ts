@@ -10,6 +10,7 @@ import { MatchingController } from './matching/matching.controller';
 import { QuestionsController } from './questions/questions.controller';
 import { UsersController } from './users/users.controller';
 import { CollaborationController } from './collaboration/collaboration.controller';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -119,6 +120,7 @@ import { CollaborationController } from './collaboration/collaboration.controlle
     AuthController,
     MatchingController,
     CollaborationController,
+    HealthController,
   ],
 })
 export class ApiGatewayModule {}
