@@ -10,7 +10,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useLogger(app.get(Logger));
   app.enableCors({
-    origin: '*',
+    origin: true,
     credentials: true,
   });
   app.useGlobalFilters(new RpcExceptionFilter());
