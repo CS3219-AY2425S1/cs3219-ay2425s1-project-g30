@@ -8,13 +8,15 @@ RUN corepack enable
 # Add necessary packages for compatibility
 RUN apk update && apk add --no-cache libc6-compat
 
-# Install Turbo globally
-RUN pnpm add -g turbo@^2.1.2
+
 
 # --------------------
 # Builder Stage
 # --------------------
 FROM base AS builder
+
+# Install Turbo globally
+RUN pnpm add -g turbo@^2.1.2
 
 # Set the working directory
 WORKDIR /app
@@ -48,7 +50,7 @@ ENV NODE_ENV=$NODE_ENV
 # Install dependencies using pruned package.json and pnpm-lock.yaml
 COPY --from=builder /app/out/json/ .
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prod=false
 
 # Copy the pruned source files
 COPY --from=builder /app/out/full/ .
