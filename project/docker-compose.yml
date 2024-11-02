@@ -3,16 +3,16 @@ services:
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile
+      args: 
+        NEXT_PUBLIC_API_BASE_URL: http://lastminprep-web-1664631383.ap-southeast-1.elb.amazonaws.com/api-gateway
+        NEXT_PUBLIC_MATCH_SOCKET_URL: http://lastminprep-web-1664631383.ap-southeast-1.elb.amazonaws.com/matching-service
+        NEXT_PUBLIC_COLLAB_SOCKET_URL: http://lastminprep-web-1664631383.ap-southeast-1.elb.amazonaws.com/collaboration-service
+        NODE_ENV: production
     image: "${IMAGE_PREFIX}web:latest"
     ports:
       - 3000:3000
     networks:
       - backend
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: http://lastminprep-web-1664631383.ap-southeast-1.elb.amazonaws.com/api-gateway
-      NEXT_PUBLIC_MATCH_SOCKET_URL: http://lastminprep-web-1664631383.ap-southeast-1.elb.amazonaws.com/matching-service
-      NEXT_PUBLIC_COLLAB_SOCKET_URL: http://lastminprep-web-1664631383.ap-southeast-1.elb.amazonaws.com/collaboration-service
-      NODE_ENV: production
 
   api-gateway:
     build:
