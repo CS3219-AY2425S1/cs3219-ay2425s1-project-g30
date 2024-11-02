@@ -51,6 +51,30 @@ export const responseWrapperSchema = z.object({
   message: z.string().optional(),
 });
 
+export const sortCollaborationsQuerySchema = z.object({
+  field: z.string(),
+  order: z.enum(["asc", "desc"]),
+});
+
+export const collabFiltersSchema = z.object({
+  user_id: z.string().uuid(),
+  includeEnded: z.preprocess((val) => {
+    if (typeof val === "string") {
+      if (val.toLowerCase() === "true") return true;
+      if (val.toLowerCase() === "false") return false;
+      return val;
+    }
+    return val;
+  }, z.boolean()),
+  collab_user_id: z.string().uuid().optional(),
+
+  offset: z.coerce.number().int().nonnegative().optional(),
+  limit: z.coerce.number().int().positive().optional(),
+
+  sort: z.array(sortCollaborationsQuerySchema).optional(),
+});
+
+export type CollabFiltersDto = z.infer<typeof collabFiltersSchema>;
 export type CollabUserDto = z.infer<typeof collaboratorSchema>;
 export type CollabInfoDto = z.infer<typeof collabInfoSchema>;
 export type CollabRequestDto = z.infer<typeof collabRequestSchema>;

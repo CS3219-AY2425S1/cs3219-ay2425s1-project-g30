@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CollabRequestDto } from '@repo/dtos/collab';
+import { CollabFiltersDto, CollabRequestDto } from '@repo/dtos/collab';
 
 import { CollaborationService } from 'src/domain/ports/collaboration.service';
 
@@ -19,13 +19,8 @@ export class CollaborationController {
   }
 
   @MessagePattern({ cmd: 'get_all_collabs' })
-  async getAllCollabs(@Payload() userId: string) {
-    return await this.collaborationService.getAllCollabs(userId);
-  }
-
-  @MessagePattern({ cmd: 'get_active_collabs' })
-  async getCollab(@Payload() userId: string) {
-    return await this.collaborationService.getActiveCollabs(userId);
+  async getAllCollabs(@Payload() filters: CollabFiltersDto) {
+    return await this.collaborationService.getAllCollabs(filters);
   }
 
   @MessagePattern({ cmd: 'verify_collab' })

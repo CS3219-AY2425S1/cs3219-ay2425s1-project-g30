@@ -7,6 +7,7 @@ import {
 import {
   CollabCreateDto,
   CollabDto,
+  CollabFiltersDto,
   CollabInfoDto,
   CollabQuestionDto,
 } from '@repo/dtos/collab';
@@ -92,31 +93,75 @@ export class CollaborationSupabase implements CollaborationRepository {
     return data;
   }
 
-  async findAll(userId: string): Promise<CollabDto[]> {
-    const { data, error } = await this.supabase
+  /**
+   * Retrieves all collaborations based on the provided filters.
+   *
+   * @param {CollabFiltersDto} filters - The filters to apply when fetching collaborations.
+   * @returns {Promise<CollabDto[]>} A promise that resolves to an array of collaboration DTOs.
+   * @throws Will throw an error if the collaborations cannot be fetched.
+   */
+  async findAll(filters: CollabFiltersDto): Promise<CollabDto[]> {
+    const { user_id, collab_user_id, includeEnded, offset, limit, sort } =
+      filters;
+
+    let queryBuilder = this.supabase
       .from(this.COLLABORATION_TABLE)
-      .select()
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-      .returns<CollabDto[]>();
+      .select('*', { count: 'exact' });
+
+    // Apply user filtering
+    if (user_id && collab_user_id) {
+      // Both user_id and collab_user_id are provided
+      queryBuilder = queryBuilder.or(
+        `and(user1_id.eq.${user_id},user2_id.eq.${collab_user_id}),and(user1_id.eq.${collab_user_id},user2_id.eq.${user_id})`,
+      );
+    } else if (user_id) {
+      // Only user_id is provided
+      queryBuilder = queryBuilder.or(
+        `user1_id.eq.${user_id},user2_id.eq.${user_id}`,
+      );
+    }
+    console.log(includeEnded);
+    if (includeEnded == false) {
+      queryBuilder = queryBuilder.is('ended_at', null);
+    }
+
+    // Apply sorting
+    if (sort) {
+      for (const s of sort) {
+        queryBuilder = queryBuilder.order(s.field, {
+          ascending: s.order === 'asc',
+        });
+      }
+    }
+
+    const dataQuery = queryBuilder;
+
+    // Apply pagination
+    if (limit) {
+      if (offset !== undefined) {
+        queryBuilder = queryBuilder.range(offset, offset + limit - 1);
+      } else {
+        queryBuilder = queryBuilder.limit(limit);
+      }
+    }
+
+    // Execute the data query
+    const { data: collabs, error } = await queryBuilder;
 
     if (error) {
       throw error;
     }
-    return data;
-  }
 
-  async findActive(userId: string): Promise<CollabDto[]> {
-    const { data, error } = await this.supabase
-      .from(this.COLLABORATION_TABLE)
-      .select()
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
-      .is('ended_at', null)
-      .returns<CollabDto[]>();
+    // Execute the total count query
+    const { error: totalCountError } = await dataQuery;
 
-    if (error) {
-      throw error;
+    if (totalCountError) {
+      throw totalCountError;
     }
-    return data;
+
+    // Optionally, you can handle metadata here or in the service layer
+
+    return collabs as CollabDto[];
   }
 
   async checkActiveCollaborationById(id: string): Promise<boolean> {

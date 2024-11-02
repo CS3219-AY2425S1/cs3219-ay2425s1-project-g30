@@ -3,6 +3,7 @@ import { RpcException } from '@nestjs/microservices';
 import {
   CollabCreateDto,
   CollabDto,
+  CollabFiltersDto,
   CollabInfoDto,
   CollabQuestionDto,
   CollabRequestDto,
@@ -74,16 +75,16 @@ export class CollaborationService {
   }
 
   /**
-   * Retrieves all collaborations for a given user.
-   * @param userId - The ID of the user whose collaborations are to be retrieved.
+   * Retrieves all collaborations for a given user based on a given set of filters.
+   * @param filters - The filters to apply when fetching collaborations.
    * @returns A promise that resolves to the collaboration data transfer objects (ResponseWrapperDto).
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
-  async getAllCollabs(userId: string): Promise<ResponseWrapperDto> {
+  async getAllCollabs(filters: CollabFiltersDto): Promise<ResponseWrapperDto> {
     try {
-      const collabs = await this.collabRepository.findAll(userId);
+      const collabs = await this.collabRepository.findAll(filters);
       this.logger.log(
-        `Found ${collabs.length} collaborations for user ${userId}`,
+        `Found ${collabs.length} collaborations for user ${filters.user_id}`,
       );
 
       return {
@@ -92,29 +93,6 @@ export class CollaborationService {
       };
     } catch (error) {
       this.handleError('get all collaborations', error);
-    }
-  }
-
-  /**
-   * Retrieves the active collaborations for a given user.
-   *
-   * @param userId - The ID of the user whose active collaborations is to be retrieved.
-   * @returns A promise that resolves to the active collaboration data transfer objects (ResponseWrapperDto).
-   * @throws Will handle and log any errors that occur during the retrieval process.
-   */
-  async getActiveCollabs(userId: string): Promise<ResponseWrapperDto> {
-    try {
-      const activeCollabs = await this.collabRepository.findActive(userId);
-      this.logger.log(
-        `Found ${activeCollabs.length} active collaborations for user ${userId}`,
-      );
-
-      return {
-        data: activeCollabs,
-        count: activeCollabs.length,
-      };
-    } catch (error) {
-      this.handleError('get active collaborations', error);
     }
   }
 

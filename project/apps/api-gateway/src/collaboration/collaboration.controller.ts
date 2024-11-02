@@ -1,6 +1,15 @@
-import { Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Query,
+  UsePipes,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-
+import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
+import { collabFiltersSchema, CollabFiltersDto } from '@repo/dtos/collab';
 @Controller('collaboration')
 export class CollaborationController {
   constructor(
@@ -16,19 +25,13 @@ export class CollaborationController {
     );
   }
 
-  @Get('all/:id')
-  async getAllCollaborations(@Param('id') userId: string) {
+  @Get()
+  @UsePipes(new ZodValidationPipe(collabFiltersSchema))
+  async getQuestions(@Query() filters: CollabFiltersDto) {
+    console.log('filters', filters);
     return this.collaborationServiceClient.send(
       { cmd: 'get_all_collabs' },
-      userId,
-    );
-  }
-
-  @Get('active/:id')
-  async getActiveCollaborations(@Param('id') userId: string) {
-    return this.collaborationServiceClient.send(
-      { cmd: 'get_active_collabs' },
-      userId,
+      filters,
     );
   }
 
