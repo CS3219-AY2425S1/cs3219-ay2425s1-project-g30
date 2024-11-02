@@ -120,8 +120,8 @@ export class CollaborationSupabase implements CollaborationRepository {
         `user1_id.eq.${user_id},user2_id.eq.${user_id}`,
       );
     }
-    console.log(includeEnded);
-    if (includeEnded == false) {
+
+    if (!includeEnded) {
       queryBuilder = queryBuilder.is('ended_at', null);
     }
 
@@ -151,15 +151,12 @@ export class CollaborationSupabase implements CollaborationRepository {
     if (error) {
       throw error;
     }
-
-    // Execute the total count query
+    
     const { error: totalCountError } = await dataQuery;
 
     if (totalCountError) {
       throw totalCountError;
     }
-
-    // Optionally, you can handle metadata here or in the service layer
 
     return collabs as CollabDto[];
   }
