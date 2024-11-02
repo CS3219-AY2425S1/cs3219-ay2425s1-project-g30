@@ -34,7 +34,7 @@ export class CollaborationService {
    * Creates a new collaboration entry in the repository.
    *
    * @param {CollabRequestDto} collabReqData - The data transfer object containing the details of the collaboration request to be created.
-   * @returns {Promise<CollabDto>} A promise that resolves to the created collaboration data transfer object.
+   * @returns {Promise<string>} A promise that resolves to the created collaboration data transfer object.
    * @throws Will throw an error if the creation process fails.
    */
   async createCollab(collabReqData: CollabRequestDto): Promise<string> {
@@ -76,7 +76,7 @@ export class CollaborationService {
   /**
    * Retrieves all collaborations for a given user.
    * @param userId - The ID of the user whose collaborations are to be retrieved.
-   * @returns A promise that resolves to the collaboration data transfer objects (CollabDto[]).
+   * @returns A promise that resolves to the collaboration data transfer objects (ResponseWrapperDto).
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
   async getAllCollabs(userId: string): Promise<ResponseWrapperDto> {
@@ -99,7 +99,7 @@ export class CollaborationService {
    * Retrieves the active collaborations for a given user.
    *
    * @param userId - The ID of the user whose active collaborations is to be retrieved.
-   * @returns A promise that resolves to the active collaboration data transfer objects (CollabDto[]).
+   * @returns A promise that resolves to the active collaboration data transfer objects (ResponseWrapperDto).
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
   async getActiveCollabs(userId: string): Promise<ResponseWrapperDto> {
