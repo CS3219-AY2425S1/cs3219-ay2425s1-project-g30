@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: ./apps/web/Dockerfile
       args: 
-        NEXT_PUBLIC_API_BASE_URL: http://lastminprep-2061626337.ap-southeast-1.elb.amazonaws.com/api-gateway
+        NEXT_PUBLIC_API_BASE_URL: http://lastminprep-2061626337.ap-southeast-1.elb.amazonaws.com/api
         NEXT_PUBLIC_MATCH_SOCKET_URL: http://lastminprep-2061626337.ap-southeast-1.elb.amazonaws.com/matching-service
         NEXT_PUBLIC_COLLAB_SOCKET_URL: http://lastminprep-2061626337.ap-southeast-1.elb.amazonaws.com/collaboration-service
         NODE_ENV: production

@@ -13,6 +13,7 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+  app.setGlobalPrefix('/api');
   app.useGlobalFilters(new RpcExceptionFilter());
   app.useGlobalInterceptors(new RpcExceptionInterceptor());
   await app.listen(4000, '0.0.0.0');
