@@ -70,10 +70,13 @@ import { HealthController } from './health/health.controller';
       {
         imports: [EnvModule],
         name: 'AUTH_SERVICE',
-        useFactory: async () => ({
+        useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,
           options: {
-            host: 'auth-service', // temp solution to test aws deployment
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('USER_SERVICE_HOST'),
             port: 3003,
           },
         }),
