@@ -24,7 +24,6 @@ import { firstValueFrom } from 'rxjs';
 import { UserSessionDto } from '@repo/dtos/users';
 import { AuthGuard } from './auth.guard';
 import { EnvService } from 'src/env/env.service';
-import axios from 'axios';
 
 @Controller('auth')
 export class AuthController {
@@ -117,14 +116,10 @@ export class AuthController {
 
     // now try to ping the auth service
     let response = 'no response';
-    let http_response = 'no response';
-
+    const test = await this.authServiceClient.connect();
+    console.log('test:', test);
     try {
       console.log('pinging from gateway to auth service');
-
-      // use tcp to connect to http://auth-service:3003
-      http_response = (await axios.get('http://auth-service:3003/ping')).data;
-
       response = await firstValueFrom(
         this.authServiceClient.send({ cmd: 'ping' }, {}),
       );
@@ -134,6 +129,6 @@ export class AuthController {
 
     return res
       .status(HttpStatus.OK)
-      .json({ message: 'pong', auth_service_host, response, http_response });
+      .json({ message: 'pong', auth_service_host, response });
   }
 }

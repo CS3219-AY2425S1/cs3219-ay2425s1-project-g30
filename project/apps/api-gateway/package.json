@@ -31,7 +31,6 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/pipes": "workspace:*",
     "@supabase/supabase-js": "^2.45.4",
-    "axios": "^1.7.7",
     "cookie-parser": "^1.4.6",
     "nestjs-pino": "^4.1.0",
     "pino-pretty": "^11.2.2",
