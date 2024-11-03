@@ -76,7 +76,7 @@ import { HealthController } from './health/health.controller';
             host:
               envService.get('NODE_ENV') === 'development'
                 ? 'localhost'
-                : envService.get('USER_SERVICE_HOST'),
+                : envService.get('AUTH_SERVICE_HOST'),
             port: 3003,
           },
         }),
