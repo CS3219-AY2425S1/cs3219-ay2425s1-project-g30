@@ -111,6 +111,22 @@ export class AuthController {
   @Get('ping')
   async ping(@Res() res: Response) {
     // just pinging from the gateway, not calling the auth service
-    return res.status(HttpStatus.OK).json({ message: 'pong' });
+    console.log('pinging from gateway');
+    const auth_service_host = this.envService.get('AUTH_SERVICE_HOST');
+
+    // now try to ping the auth service
+    let response = 'no response';
+    try {
+      console.log('pinging from gateway to auth service');
+      response = await firstValueFrom(
+        this.authServiceClient.send({ cmd: 'ping' }, {}),
+      );
+    } catch (error) {
+      console.error('Error pinging auth service:', error);
+    }
+
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'pong', auth_service_host, response });
   }
 }
