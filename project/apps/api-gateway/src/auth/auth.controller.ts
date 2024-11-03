@@ -116,6 +116,8 @@ export class AuthController {
 
     // now try to ping the auth service
     let response = 'no response';
+    const test = await this.authServiceClient.connect();
+    console.log('test:', test);
     try {
       console.log('pinging from gateway to auth service');
       response = await firstValueFrom(
