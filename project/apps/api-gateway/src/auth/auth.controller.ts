@@ -113,11 +113,10 @@ export class AuthController {
     // just pinging from the gateway, not calling the auth service
     console.log('pinging from gateway');
     const auth_service_host = this.envService.get('AUTH_SERVICE_HOST');
+    console.log(`auth_service_host: ${auth_service_host}`);
 
     // now try to ping the auth service
     let response = 'no response';
-    const test = await this.authServiceClient.connect();
-    console.log('test:', test);
     try {
       console.log('pinging from gateway to auth service');
       response = await firstValueFrom(
