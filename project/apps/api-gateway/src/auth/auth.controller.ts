@@ -106,4 +106,11 @@ export class AuthController {
 
     return res.status(HttpStatus.OK).json(userData);
   }
+
+  // to test if this is reachable
+  @Get('ping')
+  async ping(@Res() res: Response) {
+    // just pinging from the gateway, not calling the auth service
+    return res.status(HttpStatus.OK).json({ message: 'pong' });
+  }
 }
