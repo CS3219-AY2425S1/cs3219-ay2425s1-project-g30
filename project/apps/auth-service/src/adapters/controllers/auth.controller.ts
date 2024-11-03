@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SignInDto, SignUpDto } from '@repo/dtos/auth';
 import { AuthService } from 'src/domain/ports/auth.service';
@@ -40,6 +40,12 @@ export class AuthController {
   @MessagePattern({ cmd: 'ping' })
   async ping() {
     console.log('received ping');
+    return 'pong';
+  }
+
+  @Get('ping')
+  async pingHttp() {
+    console.log('received http ping');
     return 'pong';
   }
 }
