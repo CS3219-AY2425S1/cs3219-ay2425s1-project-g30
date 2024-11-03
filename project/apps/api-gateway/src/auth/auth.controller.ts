@@ -111,7 +111,7 @@ export class AuthController {
   @Get('ping')
   async ping(@Res() res: Response) {
     // just pinging from the gateway, not calling the auth service
-    console.log('pinging from gateway');
+    console.log('pinging from gateway...');
     const auth_service_host = this.envService.get('AUTH_SERVICE_HOST');
     console.log(`auth_service_host: ${auth_service_host}`);
 
