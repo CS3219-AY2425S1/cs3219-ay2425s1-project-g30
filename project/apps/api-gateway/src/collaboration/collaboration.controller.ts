@@ -27,7 +27,7 @@ export class CollaborationController {
 
   @Get()
   @UsePipes(new ZodValidationPipe(collabFiltersSchema))
-  async getQuestions(@Query() filters: CollabFiltersDto) {
+  async getCollaborationInfos(@Query() filters: CollabFiltersDto) {
     console.log('filters', filters);
     return this.collaborationServiceClient.send(
       { cmd: 'get_all_collabs' },
