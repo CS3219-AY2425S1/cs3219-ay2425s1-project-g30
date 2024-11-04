@@ -3,12 +3,8 @@ import { MatchExpiryProducer } from './matchEngine.produceExpiry';
 import { MatchRedis } from 'src/db/match.redis';
 import { MatchSupabase } from 'src/db/match.supabase';
 import { MatchingGateway } from 'src/matching.gateway';
-import {
-  MatchCriteriaDto,
-  MatchDataDto,
-  MatchRequestDto,
-} from '@repo/dtos/match';
-import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
+import { MatchDataDto, MatchRequestDto } from '@repo/dtos/match';
+import { CollabRequestDto } from '@repo/dtos/collab';
 import { MATCH_TIMEOUT } from 'src/constants/queue';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
@@ -65,60 +61,42 @@ export class MatchEngineService {
       matchedData.category.includes(value),
     );
 
-    const filters: MatchCriteriaDto = {
-      category: overlappingCategories,
-      complexity: complexity,
-    };
-
-    const selectedQuestion =
-      await this.matchSupabase.getRandomQuestion(filters);
-
-    if (selectedQuestion === '') {
-      this.logger.warn(
-        `No suitable questions found for match ${matchedData.matchId}`,
-      );
-      this.matchGateway.sendMatchInvalid({
-        userId: userId,
-        message: 'No suitable questions found for match',
-      });
-      return;
-    }
     const matchData: MatchDataDto = {
       user1_id: userId,
       user2_id: matchedData.userId,
       complexity: complexity,
-      category: category,
+      category: overlappingCategories,
       id: matchedData.matchId,
-      question_id: selectedQuestion,
     };
 
     this.logger.debug(`Saving match data to DB: ${JSON.stringify(matchData)}`);
 
     // Obtain the Collab ID from Collaboration-service
-    const collabData = await this.createCollab({
+    const collabId = await this.createCollab({
       user1_id: matchData.user1_id,
       user2_id: matchData.user2_id,
+      complexity: matchData.complexity,
+      category: matchData.category,
       match_id: matchData.id,
-      question_id: matchData.question_id,
     });
 
-    // Send match found message containg matchId to both users
+    // Send match found message containg collabId to both users
     this.matchGateway.sendMatchFound({
       userId: userId,
-      message: collabData.id,
+      message: collabId,
     });
 
     this.matchGateway.sendMatchFound({
       userId: matchedData.userId,
-      message: collabData.id,
+      message: collabId,
     });
     await this.matchSupabase.saveMatch(matchData);
   }
 
-  async createCollab(collabCreateData: CollabCreateDto) {
-    const collabData: CollabDto = await firstValueFrom(
-      this.collabServiceClient.send({ cmd: 'create_collab' }, collabCreateData),
+  async createCollab(collabReqData: CollabRequestDto) {
+    const collabId: string = await firstValueFrom(
+      this.collabServiceClient.send({ cmd: 'create_collab' }, collabReqData),
     );
-    return collabData;
+    return collabId;
   }
 }
