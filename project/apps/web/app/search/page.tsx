@@ -168,32 +168,36 @@ const Search = () => {
     exit: { opacity: 0 },
     transition: { duration: 0.5 },
   };
-  if (!isConnected) {
-    return (
-      <div className="flex items-center justify-center h-full gap-2 align-middle">
-        Connecting...
-        <LoadingSpinner />
-      </div>
-    );
-  }
+
   return (
     <div className="container flex justify-between h-full mx-auto overflow-hidden">
       <AnimatePresence mode="wait">
-        <motion.div
-          className="flex flex-col items-center justify-center w-full gap-4"
-          key="searching"
-          {...fadeAnimation}
-        >
-          <div className="flex flex-row">
-            <div className="mr-2 text-lg font-medium">Searching...</div>
-            <div className="text-lg font-medium text-gray-600">
-              ({totalSeconds}s)
+        {!isConnected ? (
+          <motion.div
+            className="flex items-center justify-center text-lg font-medium w-full h-full gap-2"
+            key="connecting"
+            {...fadeAnimation}
+          >
+            Connecting...
+            <LoadingSpinner />
+          </motion.div>
+        ) : (
+          <motion.div
+            className="flex flex-col items-center justify-center w-full gap-4"
+            key="searching"
+            {...fadeAnimation}
+          >
+            <div className="flex flex-row">
+              <div className="mr-2 text-lg font-medium">Searching...</div>
+              <div className="text-lg font-medium text-gray-600">
+                ({totalSeconds}s)
+              </div>
             </div>
-          </div>
-          <Button variant="default" onClick={stopMatching}>
-            Cancel
-          </Button>
-        </motion.div>
+            <Button variant="default" onClick={stopMatching}>
+              Cancel
+            </Button>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

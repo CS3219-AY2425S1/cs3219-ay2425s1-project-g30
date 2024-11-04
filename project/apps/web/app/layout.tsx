@@ -36,7 +36,7 @@ const LayoutWithSidebarAndTopbar = ({
   const signOut = useAuthStore.use.signOut();
 
   const renderSidebarAndTopbar =
-    !pathname.startsWith('/match') &&
+    !pathname.startsWith('/collab') &&
     !pathname.startsWith('/login') &&
     !pathname.startsWith('/search');
 
