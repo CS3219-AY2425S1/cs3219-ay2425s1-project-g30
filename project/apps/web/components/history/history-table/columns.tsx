@@ -1,11 +1,6 @@
 'use client';
 
-import { CollabInfoDto } from '@repo/dtos/collab';
-import {
-  CATEGORY,
-  COMPLEXITY,
-} from '@repo/dtos/generated/enums/questions.enums';
-import { ColumnDef, SortingFn } from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';

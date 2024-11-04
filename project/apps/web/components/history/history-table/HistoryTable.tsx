@@ -9,11 +9,7 @@ import {
   CATEGORY,
   COMPLEXITY,
 } from '@repo/dtos/generated/enums/questions.enums';
-import {
-  QuestionFiltersDto,
-  QuestionCollectionDto,
-  SortQuestionsQueryDto,
-} from '@repo/dtos/questions';
+import { SortQuestionsQueryDto } from '@repo/dtos/questions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
@@ -31,7 +27,6 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import useDebounce from '@/hooks/useDebounce';
 import { useMe } from '@/hooks/useMe';
 import { fetchCollabs } from '@/lib/api/collab';
-import { fetchQuestions } from '@/lib/api/question';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 import { columns } from './columns';
