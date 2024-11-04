@@ -21,10 +21,11 @@ import EditorSkeleton from './EditorSkeleton';
 import { LoadingSpinner } from '../ui/spinner';
 
 interface CollaborativeEditorProps {
+  id: string;
   className?: string;
 }
 
-const CollaborativeEditor = ({ className }: CollaborativeEditorProps) => {
+const CollaborativeEditor = ({ id, className }: CollaborativeEditorProps) => {
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] =
     useState<Runtime>(defaultRuntime);
@@ -64,7 +65,7 @@ const CollaborativeEditor = ({ className }: CollaborativeEditorProps) => {
     const ydoc = new Y.Doc();
     const provider = new HocuspocusProvider({
       url: env.NEXT_PUBLIC_COLLAB_SOCKET_URL,
-      name: 'collaborative-editor',
+      name: id,
       document: ydoc,
     });
 

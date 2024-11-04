@@ -10,7 +10,13 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/useAuthStore';
 import CollaborativeEditor from '@/components/collab/CollaborativeEditor';
 
-const CollabPageContent = () => {
+interface CollabPageProps {
+  params: {
+    id: string;
+  };
+}
+
+const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
 
   // TODO: Replace placeholder user name and question
@@ -46,16 +52,18 @@ const CollabPageContent = () => {
         </div>
 
         {/* Code editor */}
-        <CollaborativeEditor className="w-1/2" />
+        <CollaborativeEditor id={id} className="w-1/2" />
       </div>
     </div>
   );
 };
 
-const CollabPage = () => {
+const CollabPage = ({ params }: CollabPageProps) => {
+  const { id } = params;
+
   return (
     <Suspense fallback={<CollabSkeleton />}>
-      <CollabPageContent />
+      <CollabPageContent id={id} />
     </Suspense>
   );
 };
