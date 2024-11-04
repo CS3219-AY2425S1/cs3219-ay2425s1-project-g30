@@ -4,12 +4,13 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import MatchSkeleton from '@/components/home/MatchSkeleton';
+import CollabSkeleton from '@/components/collab/CollabSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/useAuthStore';
+import CollaborativeEditor from '@/components/collab/CollaborativeEditor';
 
-const MatchPageContent = () => {
+const CollabPageContent = () => {
   const user = useAuthStore.use.user();
 
   // TODO: Replace placeholder user name and question
@@ -21,7 +22,7 @@ const MatchPageContent = () => {
   };
 
   return (
-    <div className="h-screen py-4 px-8">
+    <div className="h-screen px-8 py-4">
       {/* Header with Back button */}
       <div className="flex items-center mb-4">
         <Link href="/">
@@ -30,36 +31,33 @@ const MatchPageContent = () => {
           </Button>
         </Link>
         <span className="text-md">You've been paired with</span>
-        <span className="text-md font-semibold ml-1 mr-2">{userName}</span>
+        <span className="ml-1 mr-2 font-semibold text-md">{userName}</span>
         <Avatar className="w-8 h-8">
           <AvatarImage />
           <AvatarFallback>{user?.username[0]}</AvatarFallback>
         </Avatar>
       </div>
 
-      <div className="flex max-h-fit gap-8">
+      <div className="flex gap-8 max-h-fit">
         {/* Question info */}
         <div className="w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white">
-          <h2 className="text-xl font-semibold mb-4">{question.title}</h2>
+          <h2 className="mb-4 text-xl font-semibold">{question.title}</h2>
           <p>{question.description}</p>
         </div>
 
         {/* Code editor */}
-        <textarea
-          className="w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md"
-          placeholder="Write your code here..."
-        />
+        <CollaborativeEditor className="w-1/2" />
       </div>
     </div>
   );
 };
 
-const MatchPage = () => {
+const CollabPage = () => {
   return (
-    <Suspense fallback={<MatchSkeleton />}>
-      <MatchPageContent />
+    <Suspense fallback={<CollabSkeleton />}>
+      <CollabPageContent />
     </Suspense>
   );
 };
 
-export default MatchPage;
+export default CollabPage;
