@@ -19,7 +19,11 @@ import { CollaborationRepository } from 'src/domain/ports/collaboration.reposito
 import { EnvService } from 'src/env/env.service';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { QuestionDto } from '@repo/dtos/questions';
+import {
+  QuestionCollectionDto,
+  QuestionDto,
+  QuestionFiltersDto,
+} from '@repo/dtos/questions';
 import { UserDataDto } from '@repo/dtos/users';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
 
@@ -96,11 +100,47 @@ export class CollaborationSupabase implements CollaborationRepository {
   }
 
   async findAll(filters: CollabFiltersDto): Promise<CollabCollectionDto> {
-    const { user_id, collab_user_id, has_ended, offset, limit, sort } = filters;
+    const {
+      user_id,
+      collab_user_id,
+      has_ended,
+      offset,
+      limit,
+      sort,
+      q_title,
+      q_category,
+      q_complexity,
+    } = filters;
+
+    let filteredQuestionIds = null;
+    if (q_title || q_category || q_complexity) {
+      // query for questions that match the filters
+      const questionFilters: QuestionFiltersDto = {
+        title: q_title,
+        categories: q_category,
+        complexities: q_complexity,
+        includeDeleted: true,
+      };
+
+      // get the filtered question ids
+      // we have to call the question service to get the filtered questions as we don't have direct access to the questions
+      const filteredQuestions = await firstValueFrom(
+        this.questionServiceClient.send<QuestionCollectionDto>(
+          { cmd: 'get_questions' },
+          questionFilters,
+        ),
+      );
+
+      filteredQuestionIds = filteredQuestions.questions.map((q) => q.id);
+    }
 
     let queryBuilder = this.supabase
       .from(this.COLLABORATION_TABLE)
       .select('*', { count: 'exact' });
+
+    if (filteredQuestionIds) {
+      queryBuilder = queryBuilder.in('question_id', filteredQuestionIds);
+    }
 
     // Apply user filtering
     if (user_id && collab_user_id) {
@@ -142,7 +182,7 @@ export class CollaborationSupabase implements CollaborationRepository {
     }
 
     // Execute the data query
-    const { data: collaborations, error } = await dataQuery;
+    const { data: collabs, error } = await dataQuery;
 
     // Execute the total count query
     const { count: totalCount, error: totalCountError } = await totalCountQuery;
@@ -152,13 +192,21 @@ export class CollaborationSupabase implements CollaborationRepository {
     }
 
     const metadata: collectionMetadataDto = {
-      count: collaborations ? collaborations.length : 0,
+      count: collabs ? collabs.length : 0,
       totalCount: totalCount ?? 0,
     };
 
+    // get collabInfo for each collab retrieved
+    const collabInfoPromises = collabs.map((collab) =>
+      this.fetchCollabInfo(collab.id),
+    );
+
+    const collabInfoData = await Promise.all(collabInfoPromises);
+
+    // return the collection
     return {
       metadata,
-      collaborations,
+      collaborations: collabInfoData,
     } as CollabCollectionDto;
   }
 
@@ -297,6 +345,11 @@ export class CollaborationSupabase implements CollaborationRepository {
       }
 
       const collabInfoData: CollabInfoDto = {
+        id: collabId,
+
+        started_at: collab.started_at,
+        ended_at: collab.ended_at,
+
         collab_user1: {
           id: user1Data.id,
           username: user1Data.username,

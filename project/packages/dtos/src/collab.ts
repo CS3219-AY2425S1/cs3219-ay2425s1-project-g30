@@ -24,6 +24,9 @@ export const collaboratorSchema = z.object({
 });
 
 export const collabInfoSchema = z.object({
+  id: z.string().uuid(),
+  started_at: z.date(),
+  ended_at: z.date().nullable(),
   collab_user1: collaboratorSchema,
   collab_user2: collaboratorSchema,
   question: questionSchema,
@@ -44,11 +47,13 @@ export const collabRequestSchema = collabQuestionSchema.extend({
 
 export const collabSchema = collabCreateSchema.extend({
   id: z.string().uuid(),
+  started_at: z.date(),
+  ended_at: z.date().nullable(),
 });
 
 export const collabCollectionSchema = z.object({
   metadata: collectionMetadataSchema,
-  collaborations: z.array(collabSchema),
+  collaborations: z.array(collabInfoSchema),
 });
 
 export const sortCollaborationsQuerySchema = z.object({
@@ -66,7 +71,11 @@ export const collabFiltersSchema = z.object({
     }
     return val;
   }, z.boolean()),
-  collab_user_id: z.string().uuid().optional(),
+
+  collab_user_id: z.string().uuid().optional(), // use partner username instead, client does not know user_id
+  q_title: z.string().optional(),
+  q_category: z.array(categoryEnum).optional(),
+  q_complexity: z.array(complexityEnum).optional(),
 
   offset: z.coerce.number().int().nonnegative().optional(),
   limit: z.coerce.number().int().positive().optional(),
