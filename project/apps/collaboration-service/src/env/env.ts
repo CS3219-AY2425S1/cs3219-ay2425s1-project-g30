@@ -9,7 +9,11 @@ export const envSchema = z.object({
   AUTH_SERVICE_HOST: z.string().default('localhost'),
   USER_SERVICE_HOST: z.string().default('localhost'),
 
-  HOCUSPOCUS_PORT: z.number().default(1234),
+  HOCUSPOCUS_PORT: z
+    .string()
+    .transform((v) => parseInt(v, 10))
+    .default('1234')
+    .pipe(z.number()),
 
   SUPABASE_URL: z.string().min(1),
   SUPABASE_KEY: z.string().min(1),

@@ -102,14 +102,14 @@ const Search = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleMatchFound = (message: string) => {
-      console.log('Match found:', message);
+    const handleMatchFound = (collabId: string) => {
+      console.log('Match found, collabId:', collabId);
       toast({
         variant: 'success',
         title: 'Match Found',
         description: 'Your match was successful.',
       });
-      router.push(`/match/${message}`);
+      router.push(`/collab/${collabId}`);
     };
 
     const handleMatchInvalid = (message: string) => {
