@@ -13,7 +13,7 @@ const stack = pulumi.getStack();
 const { vpc, securityGroup, lb } = configureNetwork({ stack });
 const { cluster, namespace } = configureServices({ stack, vpc });
 const { webTargetGroup, apiTargetGroup } = configureListener({ lb, vpc });
-const dnsName = lb.loadBalancer.dnsName.get();
+const dnsName = lb.loadBalancer.dnsName;
 
 // Setup images, task definitions and services
 const apiService = configureApi({

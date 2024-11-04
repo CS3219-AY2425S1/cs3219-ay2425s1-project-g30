@@ -20,8 +20,8 @@ export function configureApi({
 
   const apiImage = new awsx.ecr.Image("api-gateway", {
     platform: "linux/amd64",
-    context: "../../../",
-    dockerfile: "../../../apps/api-gateway/Dockerfile",
+    context: "../../",
+    dockerfile: "../../apps/api-gateway/Dockerfile",
     repositoryUrl: apiRepository.url,
   });
 

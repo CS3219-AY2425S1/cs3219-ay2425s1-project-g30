@@ -1,12 +1,13 @@
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
+import * as pulumi from "@pulumi/pulumi";
 
 interface Props {
   stack: string;
   vpc: awsx.ec2.Vpc;
   cluster: aws.ecs.Cluster;
   securityGroup: aws.ec2.SecurityGroup;
-  dnsName: string;
+  dnsName: pulumi.Output<string>;
   targetGroup: aws.lb.TargetGroup;
 }
 
@@ -22,14 +23,14 @@ export function configureWeb({
 
   const webImage = new awsx.ecr.Image("web", {
     platform: "linux/amd64",
-    context: "../../../",
-    dockerfile: "../../../apps/web/Dockerfile",
+    context: "../../",
+    dockerfile: "../../apps/web/Dockerfile",
     repositoryUrl: webRepository.url,
     args: {
       NODE_ENV: "production",
-      NEXT_PUBLIC_API_BASE_URL: `${dnsName}/api`,
-      NEXT_PUBLIC_MATCH_SOCKET_URL: `${dnsName}/matching-service`,
-      NEXT_PUBLIC_COLLAB_SOCKET_URL: `${dnsName}/collaboration-service`,
+      NEXT_PUBLIC_API_BASE_URL: pulumi.interpolate`${dnsName}/api`,
+      NEXT_PUBLIC_MATCH_SOCKET_URL: pulumi.interpolate`${dnsName}/matching-service`,
+      NEXT_PUBLIC_COLLAB_SOCKET_URL: pulumi.interpolate`${dnsName}/collaboration-service`,
     },
   });
 

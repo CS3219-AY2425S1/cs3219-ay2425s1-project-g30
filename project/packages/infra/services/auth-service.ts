@@ -13,8 +13,8 @@ export function configureAuth({ stack, vpc, cluster, securityGroup }: Props) {
 
   const authImage = new awsx.ecr.Image("auth-service", {
     platform: "linux/amd64",
-    context: "../../../",
-    dockerfile: "../../../apps/auth-service/Dockerfile",
+    context: "../../",
+    dockerfile: "../../apps/auth-service/Dockerfile",
     repositoryUrl: authRepository.url,
   });
   const authService = new awsx.ecs.FargateService("auth-service", {
@@ -37,8 +37,7 @@ export function configureAuth({ stack, vpc, cluster, securityGroup }: Props) {
           },
           {
             name: "SUPABASE_KEY",
-            value:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthbXhic2VramZkemVtdm9ldmd6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNzIzMjI1MiwiZXhwIjoyMDQyODA4MjUyfQ.NU9ztj3oZXuq8faZvTsztiIJa9OJZj9v0r-MkqNglic",
+            value: "",
           },
           { name: "NODE_ENV", value: "production" },
         ],
