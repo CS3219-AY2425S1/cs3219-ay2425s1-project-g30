@@ -29,23 +29,19 @@ export class SupabaseUsersRepository implements UsersRepository {
   }
 
   async findAll(filters: UserFiltersDto): Promise<UserCollectionDto> {
-    const { email, username, offset, limit, sort } = filters;
+    const { username, roles, offset, limit, sort } = filters;
 
     let queryBuilder = this.supabase
       .from(this.PROFILES_TABLE)
       .select('*', { count: 'exact' });
 
-    if (email || username) {
-      const orFilter = [];
-      if (email) {
-        orFilter.push(`email.eq.${email}`);
-      }
-      if (username) {
-        orFilter.push(`username.eq.${username}`);
-      }
-      if (orFilter.length > 0) {
-        queryBuilder = queryBuilder.or(orFilter.join(','));
-      }
+    if (username) {
+      queryBuilder = queryBuilder.ilike('username', `%${username}%`);
+    }
+
+    if (roles) {
+      // result must match ANY role provided
+      queryBuilder = queryBuilder.in('role', roles);
     }
 
     if (sort) {

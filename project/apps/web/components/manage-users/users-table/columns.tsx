@@ -27,18 +27,14 @@ export const columns: ColumnDef<UserDataDto>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Username" />
     ),
-    cell: ({ row }) => {
-      return row.original.username;
-    },
+    cell: ({ row }) => row.original.username,
   },
   {
     accessorKey: 'email',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
-    cell: ({ row }) => {
-      return row.original.email;
-    },
+    cell: ({ row }) => row.original.email,
   },
   {
     accessorKey: 'role',
