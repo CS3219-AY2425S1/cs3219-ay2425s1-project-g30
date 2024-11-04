@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
+  CollabCollectionDto,
   CollabCreateDto,
   CollabDto,
   CollabFiltersDto,
@@ -20,6 +21,7 @@ import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { QuestionDto } from '@repo/dtos/questions';
 import { UserDataDto } from '@repo/dtos/users';
+import { collectionMetadataDto } from '@repo/dtos/metadata';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
@@ -93,16 +95,8 @@ export class CollaborationSupabase implements CollaborationRepository {
     return data;
   }
 
-  /**
-   * Retrieves all collaborations based on the provided filters.
-   *
-   * @param {CollabFiltersDto} filters - The filters to apply when fetching collaborations.
-   * @returns {Promise<CollabDto[]>} A promise that resolves to an array of collaboration DTOs.
-   * @throws Will throw an error if the collaborations cannot be fetched.
-   */
-  async findAll(filters: CollabFiltersDto): Promise<CollabDto[]> {
-    const { user_id, collab_user_id, includeEnded, offset, limit, sort } =
-      filters;
+  async findAll(filters: CollabFiltersDto): Promise<CollabCollectionDto> {
+    const { user_id, collab_user_id, has_ended, offset, limit, sort } = filters;
 
     let queryBuilder = this.supabase
       .from(this.COLLABORATION_TABLE)
@@ -121,7 +115,9 @@ export class CollaborationSupabase implements CollaborationRepository {
       );
     }
 
-    if (!includeEnded) {
+    if (has_ended) {
+      queryBuilder = queryBuilder.not('ended_at', 'is', null);
+    } else {
       queryBuilder = queryBuilder.is('ended_at', null);
     }
 
@@ -134,31 +130,36 @@ export class CollaborationSupabase implements CollaborationRepository {
       }
     }
 
-    const dataQuery = queryBuilder;
+    const totalCountQuery = queryBuilder;
 
-    // Apply pagination
+    let dataQuery = queryBuilder;
     if (limit) {
       if (offset !== undefined) {
-        queryBuilder = queryBuilder.range(offset, offset + limit - 1);
+        dataQuery = dataQuery.range(offset, offset + limit - 1);
       } else {
-        queryBuilder = queryBuilder.limit(limit);
+        dataQuery = dataQuery.limit(limit);
       }
     }
 
     // Execute the data query
-    const { data: collabs, error } = await queryBuilder;
+    const { data: collaborations, error } = await dataQuery;
 
-    if (error) {
-      throw error;
-    }
-    
-    const { error: totalCountError } = await dataQuery;
+    // Execute the total count query
+    const { count: totalCount, error: totalCountError } = await totalCountQuery;
 
-    if (totalCountError) {
-      throw totalCountError;
+    if (error || totalCountError) {
+      throw error || totalCountError;
     }
 
-    return collabs as CollabDto[];
+    const metadata: collectionMetadataDto = {
+      count: collaborations ? collaborations.length : 0,
+      totalCount: totalCount ?? 0,
+    };
+
+    return {
+      metadata,
+      collaborations,
+    } as CollabCollectionDto;
   }
 
   async checkActiveCollaborationById(id: string): Promise<boolean> {

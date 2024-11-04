@@ -1,4 +1,5 @@
 import {
+  CollabCollectionDto,
   CollabCreateDto,
   CollabDto,
   CollabFiltersDto,
@@ -38,9 +39,9 @@ export abstract class CollaborationRepository {
   /**
    * Fetches all collaboration entries for a given user.
    * @param filters - The filters to apply when fetching collaborations.
-   * @returns A promise that resolves to an array of collaboration data transfer objects.
+   * @returns A promise that resolves to a collection of collaborations.
    */
-  abstract findAll(filters: CollabFiltersDto): Promise<CollabDto[]>;
+  abstract findAll(filters: CollabFiltersDto): Promise<CollabCollectionDto>;
 
   /**
    * Check if a collaboration is active by its unique identifier.
