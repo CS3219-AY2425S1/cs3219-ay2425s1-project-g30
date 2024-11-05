@@ -83,7 +83,7 @@ export function configureMatching({
           },
           {
             name: 'RABBITMQ_URL',
-            value: 'amqp://rabbitq.service:5672',
+            value: 'amqp://rabbitmq.service:5672',
           },
           {
             name: 'REDIS_HOST',
