@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { HistoryTable } from '@/components/history/history-table/HistoryTable';
 import QuestionsSkeleton from '@/components/question/QuestionsSkeleton';
 
-const QuestionRepositoryContent = () => {
+const HistoryRepositoryContent = () => {
   return (
     <div className="container p-6 mx-auto">
       {/* Header */}
@@ -19,12 +19,12 @@ const QuestionRepositoryContent = () => {
   );
 };
 
-const QuestionRepository = () => {
+const HistoryRepository = () => {
   return (
     <Suspense fallback={<QuestionsSkeleton />}>
-      <QuestionRepositoryContent />
+      <HistoryRepositoryContent />
     </Suspense>
   );
 };
 
-export default QuestionRepository;
+export default HistoryRepository;
