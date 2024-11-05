@@ -1,4 +1,10 @@
-import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
+import {
+  CollabCreateDto,
+  CollabDto,
+  CollabFiltersDto,
+  CollabInfoDto,
+  CollabQuestionDto,
+} from '@repo/dtos/collab';
 
 /**
  * Abstract class representing a repository for managing collaborations.
@@ -30,11 +36,18 @@ export abstract class CollaborationRepository {
   abstract findByMatchId(matchId: string): Promise<CollabDto | null>;
 
   /**
-   * Finds all active collaborations for a given user.
-   * @param userId - The unique identifier of the user whose active collaborations are to be found.
-   * @returns A promise that resolves to an array of active collaboration data transfer objects.
+   * Fetches all collaboration entries for a given user.
+   * @param filters - The filters to apply when fetching collaborations.
+   * @returns A promise that resolves to an array of collaboration data transfer objects.
    */
-  abstract findActive(userId: string): Promise<CollabDto[]>;
+  abstract findAll(filters: CollabFiltersDto): Promise<CollabDto[]>;
+
+  /**
+   * Check if a collaboration is active by its unique identifier.
+   * @param id
+   * @returns A promise that resolves to true if the collaboration is active, or false otherwise.
+   */
+  abstract checkActiveCollaborationById(id: string): Promise<boolean>;
 
   /**
    * Checks if a user is a collaborator on a document, given the document's unique identifier and the user's unique identifier.
@@ -57,4 +70,24 @@ export abstract class CollaborationRepository {
    * @param state - The new state of the document to be stored.
    */
   abstract storeDocumentById(id: string, state: any): Promise<void>;
+
+  /**
+   * Retrieves a random question from the question database that matches the given filters.
+   * @param filters - The filters to apply when selecting a question.
+   * @returns A promise that resolves to the selected question id.
+   */
+  abstract getRandomQuestion(filters: CollabQuestionDto): Promise<string>;
+
+  /**
+   * Fetches the collaboration information for a given collaboration id.
+   * @param id The unique identifier of the collaboration to fetch information for.
+   * @returns A promise that resolves to the collaboration information data transfer object.
+   */
+  abstract fetchCollabInfo(id: string): Promise<CollabInfoDto>;
+
+  /**
+   * Ends a collaboration by its unique identifier.
+   * @param id The unique identifier of the collaboration to end.
+   */
+  abstract endCollab(id: string): Promise<CollabDto>;
 }

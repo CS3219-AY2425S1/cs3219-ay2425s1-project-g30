@@ -19,7 +19,6 @@ export const matchDataSchema = matchCriteriaSchema.extend({
   user1_id: z.string().uuid(),
   user2_id: z.string().uuid(),
   id: z.string().uuid(),
-  question_id: z.string().uuid(),
 });
 
 export const matchRequestMsgSchema = matchCriteriaSchema.extend({

@@ -1,7 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { CollabCreateDto, CollabDto } from '@repo/dtos/collab';
-
+import {
+  CollabCreateDto,
+  CollabDto,
+  CollabFiltersDto,
+  CollabInfoDto,
+  CollabQuestionDto,
+  CollabRequestDto,
+  ResponseWrapperDto,
+} from '@repo/dtos/collab';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
 @Injectable()
@@ -27,36 +34,88 @@ export class CollaborationService {
   /**
    * Creates a new collaboration entry in the repository.
    *
-   * @param {CollabCreateDto} collabData - The data transfer object containing the details of the collaboration to be created.
-   * @returns {Promise<CollabDto>} A promise that resolves to the created collaboration data transfer object.
+   * @param {CollabRequestDto} collabReqData - The data transfer object containing the details of the collaboration request to be created.
+   * @returns {Promise<string>} A promise that resolves to the created collaboration data transfer object.
    * @throws Will throw an error if the creation process fails.
    */
-  async createCollab(collabData: CollabCreateDto): Promise<CollabDto> {
+  async createCollab(collabReqData: CollabRequestDto): Promise<string> {
     try {
-      const createdCollab = await this.collabRepository.create(collabData);
+      const filters: CollabQuestionDto = {
+        category: collabReqData.category,
+        complexity: collabReqData.complexity,
+      };
+
+      const selectedQuestionId =
+        await this.collabRepository.getRandomQuestion(filters);
+
+      if (selectedQuestionId === '') {
+        new Error(
+          `No suitable questions found for match id ${collabReqData.match_id}`,
+        );
+      }
+
+      const collabCreateData: CollabCreateDto = {
+        user1_id: collabReqData.user1_id,
+        user2_id: collabReqData.user2_id,
+        match_id: collabReqData.match_id,
+        question_id: selectedQuestionId,
+      };
+
+      const createdCollab =
+        await this.collabRepository.create(collabCreateData);
+
+      if (!createdCollab) {
+        throw new Error('Failed to create collaboration');
+      }
       this.logger.log(`Created collaboration with id: ${createdCollab.id}`);
-      return createdCollab;
+      return createdCollab.id;
     } catch (error) {
       this.handleError('create collaboration', error);
     }
   }
 
   /**
-   * Retrieves the active collaborations for a given user.
-   *
-   * @param userId - The ID of the user whose active collaborations is to be retrieved.
-   * @returns A promise that resolves to the active collaboration data transfer objects (CollabDto[]).
+   * Retrieves all collaborations for a given user based on a given set of filters.
+   * @param filters - The filters to apply when fetching collaborations.
+   * @returns A promise that resolves to the collaboration data transfer objects (ResponseWrapperDto).
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
-  async getActiveCollabs(userId: string): Promise<CollabDto[]> {
+  async getAllCollabs(filters: CollabFiltersDto): Promise<ResponseWrapperDto> {
     try {
-      const activeCollabs = await this.collabRepository.findActive(userId);
+      const collabs = await this.collabRepository.findAll(filters);
+      this.logger.log(
+        `Found ${collabs.length} collaborations for user ${filters.user_id}`,
+      );
 
-      this.logger.log(`Found active collaborations for user ${userId}`);
-
-      return activeCollabs;
+      return {
+        data: collabs,
+        count: collabs.length,
+      };
     } catch (error) {
-      this.handleError('get collaborations', error);
+      this.handleError('get all collaborations', error);
+    }
+  }
+
+  /**
+   * Fetches the information of a collaboration including the selected question data by its unique identifier.
+   * @param collabId - The unique identifier of the collaboration to be fetched.
+   * @returns A promise that resolves to the collaboration information data transfer object.
+   * @throws Will handle and log any errors that occur during the retrieval process.
+   */
+
+  async getCollabInfo(collabId: string): Promise<CollabInfoDto> {
+    try {
+      const collab = await this.collabRepository.fetchCollabInfo(collabId);
+
+      if (!collab) {
+        throw new Error(`Collaboration with id ${collabId} not found`);
+      }
+
+      this.logger.debug(`Found collaboration with id: ${collabId}`);
+
+      return collab;
+    } catch (error) {
+      this.handleError('get collaboration info', error);
     }
   }
 
@@ -70,11 +129,23 @@ export class CollaborationService {
   async verifyCollab(collabId: string): Promise<boolean> {
     try {
       this.logger.debug(`Verifying collaboration: ${collabId}`);
-      // TODO: verify that the collaboration is still active
-
-      return true;
+      return await this.collabRepository.checkActiveCollaborationById(collabId);
     } catch (error) {
       this.handleError('verify collaboration', error);
+    }
+  }
+
+  /**
+   * Ends a collaboration by its unique identifier.
+   * @param collabId - The unique identifier of the collaboration to be ended.
+   *
+   */
+  async endCollab(collabId: string): Promise<CollabDto> {
+    try {
+      this.logger.log(`Ending collaboration: ${collabId}`);
+      return await this.collabRepository.endCollab(collabId);
+    } catch (error) {
+      this.handleError('end collaboration', error);
     }
   }
 }

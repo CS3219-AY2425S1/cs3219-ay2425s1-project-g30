@@ -39,21 +39,6 @@ import { MatchService } from './matching.service';
     ClientsModule.registerAsync([
       {
         imports: [EnvModule],
-        name: 'QUESTION_SERVICE',
-        useFactory: async (envService: EnvService) => ({
-          transport: Transport.TCP,
-          options: {
-            host:
-              envService.get('NODE_ENV') === 'development'
-                ? 'localhost'
-                : envService.get('QUESTION_SERVICE_HOST'),
-            port: 3001,
-          },
-        }),
-        inject: [EnvService],
-      },
-      {
-        imports: [EnvModule],
         name: 'AUTH_SERVICE',
         useFactory: async (envService: EnvService) => ({
           transport: Transport.TCP,

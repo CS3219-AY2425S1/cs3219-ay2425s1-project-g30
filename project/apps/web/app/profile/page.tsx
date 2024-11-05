@@ -6,14 +6,13 @@ import { Suspense } from 'react';
 
 import { ActionModals } from '@/components/profile/ActionModals';
 import ProfileDetails from '@/components/profile/ProfileDetails';
+import ProfileSkeleton from '@/components/profile/ProfileSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { updateUser } from '@/lib/api/users';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
-
-import ProfileSkeleton from '@/components/profile/ProfileSkeleton';
 
 const ProfilePageContent = () => {
   const user = useAuthStore.use.user();

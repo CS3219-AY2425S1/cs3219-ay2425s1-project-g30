@@ -44,6 +44,36 @@ import { EnvService } from './env/env.service';
         }),
         inject: [EnvService],
       },
+      {
+        imports: [EnvModule],
+        name: 'QUESTION_SERVICE',
+        useFactory: async (envService: EnvService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('QUESTION_SERVICE_HOST'),
+            port: 3001,
+          },
+        }),
+        inject: [EnvService],
+      },
+      {
+        imports: [EnvModule],
+        name: 'USER_SERVICE',
+        useFactory: async (envService: EnvService) => ({
+          transport: Transport.TCP,
+          options: {
+            host:
+              envService.get('NODE_ENV') === 'development'
+                ? 'localhost'
+                : envService.get('USER_SERVICE_HOST'),
+            port: 3002,
+          },
+        }),
+        inject: [EnvService],
+      },
     ]),
   ],
   controllers: [CollaborationController],

@@ -5,7 +5,7 @@ import {
   QuestionFiltersDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
-import { MatchCriteriaDto } from '@repo/dtos/match';
+import { CollabQuestionDto } from '@repo/dtos/collab';
 
 import { QuestionsService } from 'src/domain/ports/questions.service';
 @Controller()
@@ -23,7 +23,7 @@ export class QuestionsController {
   }
 
   @MessagePattern({ cmd: 'get_random_question' })
-  async getRandomQuestion(@Payload() filters: MatchCriteriaDto) {
+  async getRandomQuestion(@Payload() filters: CollabQuestionDto) {
     return await this.questionsService.findRandom(filters);
   }
 
