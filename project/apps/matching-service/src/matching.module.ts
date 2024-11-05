@@ -17,6 +17,7 @@ import { MatchRequestService } from './matchRequest/matchRequest.service';
 import { MatchingGateway } from './matching.gateway';
 import { RedisModule } from './redis/redis.module';
 import { MatchService } from './matching.service';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -69,7 +70,7 @@ import { MatchService } from './matching.service';
       },
     ]),
   ],
-  controllers: [MatchingController],
+  controllers: [MatchingController, HealthController],
   providers: [
     MatchRedis,
     MatchSupabase,

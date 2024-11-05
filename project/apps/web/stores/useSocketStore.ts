@@ -24,6 +24,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const socket = io(SOCKET_SERVER_URL, {
       reconnectionAttempts: 5,
       withCredentials: true,
+      path: '/matching-service',
     });
 
     socket.on('connect', () => {
