@@ -23,6 +23,7 @@ const Search = () => {
 
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
+  const collaboration = useCollabStore.use.collaboration();
   const fetchCollab = useCollabStore.use.fetchCollab();
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
@@ -191,14 +192,20 @@ const Search = () => {
             {...fadeAnimation}
           >
             <div className="flex flex-row">
-              <div className="mr-2 text-lg font-medium">Searching...</div>
+              <div className="mr-2 text-lg font-medium">
+                {collaboration
+                  ? 'Redirecting you to your collaboration session...'
+                  : 'Searching...'}
+              </div>
               <div className="text-lg font-medium text-gray-600">
-                ({totalSeconds}s)
+                {collaboration ? <LoadingSpinner /> : `${totalSeconds}s`}
               </div>
             </div>
-            <Button variant="default" onClick={stopMatching}>
-              Cancel
-            </Button>
+            {!collaboration && (
+              <Button variant="default" onClick={stopMatching}>
+                Cancel
+              </Button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

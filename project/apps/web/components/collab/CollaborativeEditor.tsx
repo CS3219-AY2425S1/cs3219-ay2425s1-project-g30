@@ -24,6 +24,7 @@ import { LANGUAGES, Runtime } from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useCollabStore } from '@/stores/useCollabStore';
 
 import { Button } from '../ui/button';
 import { LoadingSpinner } from '../ui/spinner';
@@ -49,6 +50,7 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ id, className }, ref) => {
   const user = useAuthStore.use.user();
+  const setCollaboration = useCollabStore.use.setCollaboration();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
   const [collabLoading, setCollabLoading] = useState(true);
@@ -128,6 +130,7 @@ const CollaborativeEditor = forwardRef<
               title: 'Session Ended',
               description: 'Your collaborator ended the session.',
             });
+            setCollaboration(null);
             provider.disconnect();
             router.push('/');
           }
