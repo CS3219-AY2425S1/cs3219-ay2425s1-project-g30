@@ -11,9 +11,9 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
+import { useCollabStore } from '@/stores/useCollabStore';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
-import { useCollabStore } from '@/stores/useCollabStore';
 
 const Search = () => {
   const { toast } = useToast();
