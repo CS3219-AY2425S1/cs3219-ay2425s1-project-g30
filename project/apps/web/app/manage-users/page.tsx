@@ -10,11 +10,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { notFound } from 'next/navigation';
 
 const ManageUsersRepositoryContent = () => {
-  const user = useAuthStore.use.user();
   const selectedUser = useManageUsersStore.use.selectedUser();
-  if (user && user.role !== 'Admin') {
-    return notFound();
-  }
 
   return (
     <div className="container p-6 mx-auto">
@@ -32,6 +28,11 @@ const ManageUsersRepositoryContent = () => {
 };
 
 const UsersRepository = () => {
+  const user = useAuthStore.use.user();
+  if (user && user.role !== 'Admin') {
+    return notFound();
+  }
+  
   return (
     <Suspense fallback={<ManageUsersSkeleton />}>
       <ManageUsersRepositoryContent />
