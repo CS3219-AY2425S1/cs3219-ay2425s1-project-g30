@@ -1,14 +1,15 @@
 'use client';
 
 import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 import CollabSkeleton from '@/components/collab/CollabSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useCollabStore } from '@/stores/useCollabStore';
 import CollaborativeEditor from '@/components/collab/CollaborativeEditor';
+import { ActionModals } from '@/components/collab/ActionModals';
 
 interface CollabPageProps {
   params: {
@@ -18,24 +19,41 @@ interface CollabPageProps {
 
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
+  const fetchCollabInfo = useCollabStore.use.fetchCollabInfo();
+  const collabInfo = useCollabStore.use.collaboration();
+  const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
 
-  // TODO: Replace placeholder user name and question
-  const userName = 'John Doe';
+  useEffect(() => {
+    const initialiseCollab = async () => {
+      try {
+        await fetchCollabInfo(id);
+      } catch (error) {
+        console.error('Failed to fetch collaboration data:', error);
+      }
+    };
+    initialiseCollab();
+  }, [fetchCollabInfo]);
+
+  const userName =
+    collabInfo?.collab_user1.id == user?.id
+      ? collabInfo?.collab_user2.username
+      : collabInfo?.collab_user1.username;
   const question = {
-    title: 'Sample Question Title',
-    description:
-      'This is a placeholder description of the question. It can be a long and detailed problem statement.',
+    title: collabInfo?.question.q_title || 'Untitled Question',
+    description: collabInfo?.question.q_desc || 'No description',
   };
 
   return (
     <div className="h-screen px-8 py-4">
       {/* Header with Back button */}
       <div className="flex items-center mb-4">
-        <Link href="/">
-          <Button variant="link" className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-        </Link>
+        <Button
+          variant="link"
+          onClick={() => setTerminateModalOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
         <span className="text-md">You've been paired with</span>
         <span className="ml-1 mr-2 font-semibold text-md">{userName}</span>
         <Avatar className="w-8 h-8">
@@ -54,6 +72,7 @@ const CollabPageContent = ({ id }: { id: string }) => {
         {/* Code editor */}
         <CollaborativeEditor id={id} className="w-1/2" />
       </div>
+      {collabInfo && <ActionModals collab={collabInfo} collabId={id} />}
     </div>
   );
 };
