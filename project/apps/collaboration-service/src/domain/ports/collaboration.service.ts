@@ -103,9 +103,11 @@ export class CollaborationService {
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
 
-  async getCollabInfo(collabId: string): Promise<CollabInfoDto> {
+  async getCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
     try {
       const collab = await this.collabRepository.fetchCollabInfo(collabId);
+      const isActive =
+        await this.collabRepository.checkActiveCollaborationById(collabId);
 
       if (!collab) {
         throw new Error(`Collaboration with id ${collabId} not found`);
@@ -113,7 +115,7 @@ export class CollaborationService {
 
       this.logger.debug(`Found collaboration with id: ${collabId}`);
 
-      return collab;
+      return isActive ? collab : null;
     } catch (error) {
       this.handleError('get collaboration info', error);
     }

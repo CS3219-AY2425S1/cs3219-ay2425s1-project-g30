@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
+import { useCollabStore } from '@/stores/useCollabStore';
 
 const Search = () => {
   const { toast } = useToast();
@@ -22,6 +23,7 @@ const Search = () => {
 
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
+  const fetchCollab = useCollabStore.use.fetchCollab();
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
   const disconnect = useSocketStore((state) => state.disconnect);
@@ -109,6 +111,7 @@ const Search = () => {
         title: 'Match Found',
         description: 'Your match was successful.',
       });
+      fetchCollab(collabId);
       router.push(`/collab/${collabId}`);
     };
 
@@ -174,7 +177,7 @@ const Search = () => {
       <AnimatePresence mode="wait">
         {!isConnected ? (
           <motion.div
-            className="flex items-center justify-center text-lg font-medium w-full h-full gap-2"
+            className="flex items-center justify-center w-full h-full gap-2 text-lg font-medium"
             key="connecting"
             {...fadeAnimation}
           >
