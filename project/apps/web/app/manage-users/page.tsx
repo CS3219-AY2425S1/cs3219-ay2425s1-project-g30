@@ -6,6 +6,8 @@ import { ActionModals } from '@/components/manage-users/ActionModals';
 import ManageUsersSkeleton from '@/components/manage-users/ManageUsersSkeleton';
 import { UsersTable } from '@/components/manage-users/users-table/UsersTable';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { notFound } from 'next/navigation';
 
 const ManageUsersRepositoryContent = () => {
   const selectedUser = useManageUsersStore.use.selectedUser();
@@ -26,6 +28,11 @@ const ManageUsersRepositoryContent = () => {
 };
 
 const UsersRepository = () => {
+  const user = useAuthStore.use.user();
+  if (user && user.role !== 'Admin') {
+    return notFound();
+  }
+  
   return (
     <Suspense fallback={<ManageUsersSkeleton />}>
       <ManageUsersRepositoryContent />
