@@ -51,7 +51,8 @@ const HistoryViewContent = ({ id }: { id: string }) => {
 
     if (typeof window !== 'undefined') {
       const ydoc = ydocRef.current;
-      // Y.applyUpdate(ydoc, collab.document);
+      const uint8Arr = new Uint8Array(collab.document.data);
+      Y.applyUpdate(ydoc, uint8Arr);
 
       // Bind Monaco editor to Yjs document
       const yText = ydoc.getText('monaco');
