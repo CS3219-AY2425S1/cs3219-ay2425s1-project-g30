@@ -142,18 +142,20 @@ export function HistoryTable() {
   };
 
   //  dataWithPartner includes a new 'partner' field, which is the other user in the collaboration
-  const dataWithPartner = useMemo(() => {
-    data?.collaborations.map((collab) => {
-      const partner =
-        collab.collab_user1.id === userData!.id
-          ? collab.collab_user2
-          : collab.collab_user1;
-      return {
-        ...collab,
-        partner,
-      };
-    }) as CollabInfoWithPartner[];
-  }, [data, userData]);
+  const dataWithPartner = useMemo(
+    () =>
+      data?.collaborations.map((collab) => {
+        const partner =
+          collab.collab_user1.id === userData!.id
+            ? collab.collab_user2
+            : collab.collab_user1;
+        return {
+          ...collab,
+          partner,
+        };
+      }) as CollabInfoWithPartner[],
+    [data, userData],
+  );
 
   const metadata = data.metadata;
   const collaborations = dataWithPartner;
