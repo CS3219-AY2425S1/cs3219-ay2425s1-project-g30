@@ -6,6 +6,7 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
   CollabQuestionDto,
   CollabRequestDto,
 } from '@repo/dtos/collab';
@@ -113,6 +114,31 @@ export class CollaborationService {
       return collab;
     } catch (error) {
       this.handleError('get collaboration info', error);
+    }
+  }
+
+  /**
+   * Fetches the collaboration information and associated document of a collaboration by its unique identifier.
+   * @param collabId - The unique identifier of the collaboration to be fetched.
+   * @returns A promise that resolves to the collaboration information with document data transfer object.
+   * @throws Will handle and log any errors that occur during the retrieval process.
+   */
+  async getCollabInfoAndDocument(
+    collabId: string,
+  ): Promise<CollabInfoWithDocumentDto> {
+    try {
+      const collab =
+        await this.collabRepository.fetchCollabInfoWithDocument(collabId);
+
+      if (!collab) {
+        throw new Error(`Collaboration with id ${collabId} not found`);
+      }
+
+      this.logger.debug(`Found collaboration document with id: ${collabId}`);
+
+      return collab;
+    } catch (error) {
+      this.handleError('get collaboration document', error);
     }
   }
 

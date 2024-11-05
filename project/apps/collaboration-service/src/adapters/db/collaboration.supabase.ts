@@ -10,6 +10,7 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
   CollabQuestionDto,
 } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -364,6 +365,24 @@ export class CollaborationSupabase implements CollaborationRepository {
       return collabInfoData;
     } catch (error) {
       throw new Error(`Failed to fetch collaboration info: ${error}`);
+    }
+  }
+
+  async fetchCollabInfoWithDocument(
+    collabId: string,
+  ): Promise<CollabInfoWithDocumentDto> {
+    try {
+      const collabInfo = await this.fetchCollabInfo(collabId);
+      const document = await this.fetchDocumentById(collabId);
+
+      return {
+        ...collabInfo,
+        document,
+      } as CollabInfoWithDocumentDto;
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to fetch collaboration info with document: ${error}`,
+      );
     }
   }
 
