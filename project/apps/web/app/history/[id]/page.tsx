@@ -86,9 +86,9 @@ const HistoryViewContent = ({ id }: { id: string }) => {
         </div>
         {/* Code editor */}
         {/* Monaco Editor */}
-        {/* <div className="flex h-full p-6">
+        <div className="w-full p-6">
           <Editor
-            theme="light"
+            theme="vs-dark"
             // defaultLanguage={selectedRuntime?.language || 'javascript'}
             defaultLanguage="javascript"
             // loading={
@@ -105,7 +105,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
             }}
             className="w-full"
           />
-        </div> */}
+        </div>
       </div>
       {/* {collabInfo && <ActionModals collabId={id} />} */}
     </div>
