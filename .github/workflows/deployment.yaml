@@ -22,7 +22,7 @@ jobs:
           run_install: false
       - name: Install dependencies
         run: pnpm install  
-        working-directory: ./packages/infra
+        working-directory: ./project/packages/infra
       - name: Update the resources
         uses: pulumi/actions@v6
         with:
