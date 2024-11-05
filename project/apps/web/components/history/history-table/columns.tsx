@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
 import DifficultyBadge from '@/components/DifficultyBadge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 import { CollabInfoiWithPartner } from './HistoryTable';
@@ -70,10 +71,15 @@ export const columns: ColumnDef<CollabInfoiWithPartner>[] = [
       <DataTableColumnHeader column={column} title="Partner" />
     ),
     cell: ({ row }) => {
+      const username = row.original.partner.username;
       return (
-        <Badge variant="outline" className="mr-2">
-          {row.original.partner.username}
-        </Badge>
+        <div className="flex items-center mb-4">
+          <Avatar className="w-8 h-8">
+            <AvatarImage />
+            <AvatarFallback>{username[0]}</AvatarFallback>
+          </Avatar>
+          <span className="ml-1 mr-2 font-semibold text-md">{username}</span>
+        </div>
       );
     },
     enableColumnFilter: false,
