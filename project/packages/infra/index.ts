@@ -1,29 +1,42 @@
-import * as pulumi from "@pulumi/pulumi";
+import * as pulumi from '@pulumi/pulumi';
 
-import { configureListener, configureNetwork } from "./network";
+import { configureNetwork } from './network';
 import {
   configureApi,
   configureAuth,
   configureServices,
   configureWeb,
-} from "./services";
+} from './services';
+import { configureCollaboration } from './services/collaboration-service';
+import { configureMatching } from './services/matching-service';
+import { configureQuestion } from './services/question-service';
+import { configureRabbitmq } from './services/rabbitmq-service';
+import { configureRedis } from './services/redis';
+import { configureUser } from './services/user-service';
 
 const stack = pulumi.getStack();
 
-const { vpc, securityGroup, lb } = configureNetwork({ stack });
+const {
+  vpc,
+  securityGroup,
+  lb,
+  apiTargetGroup,
+  webTargetGroup,
+  matchingTargetGroup,
+  collaborationTargetGroup,
+} = configureNetwork({ stack });
 const { cluster, namespace } = configureServices({ stack, vpc });
-const { webTargetGroup, apiTargetGroup } = configureListener({ lb, vpc });
 const dnsName = lb.loadBalancer.dnsName;
 
 // Setup images, task definitions and services
-const apiService = configureApi({
+configureApi({
   stack,
   vpc,
   cluster,
   securityGroup,
   targetGroup: apiTargetGroup,
 });
-const webService = configureWeb({
+configureWeb({
   stack,
   vpc,
   cluster,
@@ -31,9 +44,63 @@ const webService = configureWeb({
   dnsName,
   targetGroup: webTargetGroup,
 });
-const authService = configureAuth({ stack, vpc, cluster, securityGroup });
+configureAuth({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+});
 
-// Attach Listeners
+configureQuestion({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+});
+
+configureUser({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+});
+
+configureRabbitmq({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+});
+
+configureRedis({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+});
+
+configureMatching({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+  targetGroup: matchingTargetGroup,
+});
+
+configureCollaboration({
+  stack,
+  vpc,
+  cluster,
+  securityGroup,
+  namespace,
+  targetGroup: collaborationTargetGroup,
+});
 
 export const vpcId = vpc.vpcId;
 export const privateSubnetIds = vpc.privateSubnetIds;

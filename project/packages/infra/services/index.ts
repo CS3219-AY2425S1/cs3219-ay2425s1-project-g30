@@ -1,5 +1,5 @@
-import * as aws from "@pulumi/aws";
-import * as awsx from "@pulumi/awsx";
+import * as aws from '@pulumi/aws';
+import * as awsx from '@pulumi/awsx';
 
 interface Props {
   stack: string;
@@ -13,13 +13,13 @@ export function configureServices({ stack, vpc }: Props) {
     `namespace-${stack}`,
     {
       vpc: vpc.vpcId,
-      name: "service",
+      name: 'service',
     },
   );
 
   return { cluster, namespace };
 }
 
-export * from "./api-gateway";
-export * from "./auth-service";
-export * from "./web";
+export * from './api-gateway';
+export * from './auth-service';
+export * from './web';

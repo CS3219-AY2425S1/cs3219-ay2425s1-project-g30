@@ -9,17 +9,17 @@ interface Props {
   namespace: aws.servicediscovery.PrivateDnsNamespace;
 }
 
-export function configureAuth({
+export function configureUser({
   stack,
   vpc,
   cluster,
   securityGroup,
   namespace,
 }: Props) {
-  const authServiceDiscovery = new aws.servicediscovery.Service(
-    `auth-service-discovery-${stack}`,
+  const userServiceDiscovery = new aws.servicediscovery.Service(
+    `user-service-discovery-${stack}`,
     {
-      name: 'auth',
+      name: 'user',
       dnsConfig: {
         namespaceId: namespace.id,
         dnsRecords: [
@@ -34,26 +34,26 @@ export function configureAuth({
       },
     },
   );
-  const authRepository = new awsx.ecr.Repository('auth-service');
+  const userRepository = new awsx.ecr.Repository('user-service');
 
-  const authImage = new awsx.ecr.Image('auth-service', {
+  const userImage = new awsx.ecr.Image('user-service', {
     platform: 'linux/amd64',
     context: '../../',
-    dockerfile: '../../apps/auth-service/Dockerfile',
-    repositoryUrl: authRepository.url,
+    dockerfile: '../../apps/user-service/Dockerfile',
+    repositoryUrl: userRepository.url,
   });
-  const authService = new awsx.ecs.FargateService('auth-service', {
+  const userService = new awsx.ecs.FargateService('user-service', {
     cluster: cluster.arn,
     taskDefinitionArgs: {
       container: {
-        name: `auth-${stack}`,
-        image: authImage.imageUri,
+        name: `user-${stack}`,
+        image: userImage.imageUri,
         cpu: 1024,
         memory: 1024,
-        portMappings: [{ containerPort: 3003, hostPort: 3003 }],
+        portMappings: [{ containerPort: 3002, hostPort: 3002 }],
         environment: [
           {
-            name: 'AUTH_SERVICE_HOST',
+            name: 'USER_SERVICE_HOST',
             value: '0.0.0.0',
           },
           {
@@ -74,9 +74,9 @@ export function configureAuth({
       assignPublicIp: true,
     },
     serviceRegistries: {
-      registryArn: authServiceDiscovery.arn,
+      registryArn: userServiceDiscovery.arn,
     },
     desiredCount: 1,
   });
-  return authService;
+  return userService;
 }

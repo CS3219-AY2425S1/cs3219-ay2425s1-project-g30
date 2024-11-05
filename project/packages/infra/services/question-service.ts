@@ -9,17 +9,17 @@ interface Props {
   namespace: aws.servicediscovery.PrivateDnsNamespace;
 }
 
-export function configureAuth({
+export function configureQuestion({
   stack,
   vpc,
   cluster,
   securityGroup,
   namespace,
 }: Props) {
-  const authServiceDiscovery = new aws.servicediscovery.Service(
-    `auth-service-discovery-${stack}`,
+  const questionServiceDiscovery = new aws.servicediscovery.Service(
+    `question-service-discovery-${stack}`,
     {
-      name: 'auth',
+      name: 'question',
       dnsConfig: {
         namespaceId: namespace.id,
         dnsRecords: [
@@ -34,35 +34,35 @@ export function configureAuth({
       },
     },
   );
-  const authRepository = new awsx.ecr.Repository('auth-service');
+  const questionRepository = new awsx.ecr.Repository('question-service');
 
-  const authImage = new awsx.ecr.Image('auth-service', {
+  const questionImage = new awsx.ecr.Image('question-service', {
     platform: 'linux/amd64',
     context: '../../',
-    dockerfile: '../../apps/auth-service/Dockerfile',
-    repositoryUrl: authRepository.url,
+    dockerfile: '../../apps/question-service/Dockerfile',
+    repositoryUrl: questionRepository.url,
   });
-  const authService = new awsx.ecs.FargateService('auth-service', {
+  const questionService = new awsx.ecs.FargateService('question-service', {
     cluster: cluster.arn,
     taskDefinitionArgs: {
       container: {
-        name: `auth-${stack}`,
-        image: authImage.imageUri,
+        name: `question-${stack}`,
+        image: questionImage.imageUri,
         cpu: 1024,
         memory: 1024,
-        portMappings: [{ containerPort: 3003, hostPort: 3003 }],
+        portMappings: [{ containerPort: 3001, hostPort: 3001 }],
         environment: [
           {
-            name: 'AUTH_SERVICE_HOST',
+            name: 'QUESTION_SERVICE_HOST',
             value: '0.0.0.0',
           },
           {
             name: 'SUPABASE_URL',
-            value: process.env.USER_SERVICE_SUPABASE_URL,
+            value: process.env.QUESTION_SERVICE_SUPABASE_URL,
           },
           {
             name: 'SUPABASE_KEY',
-            value: process.env.USER_SERVICE_SUPABASE_KEY,
+            value: process.env.QUESTION_SERVICE_SUPABASE_KEY,
           },
           { name: 'NODE_ENV', value: 'production' },
         ],
@@ -74,9 +74,9 @@ export function configureAuth({
       assignPublicIp: true,
     },
     serviceRegistries: {
-      registryArn: authServiceDiscovery.arn,
+      registryArn: questionServiceDiscovery.arn,
     },
     desiredCount: 1,
   });
-  return authService;
+  return questionService;
 }
