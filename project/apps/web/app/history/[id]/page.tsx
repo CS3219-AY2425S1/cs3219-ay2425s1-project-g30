@@ -51,8 +51,10 @@ const HistoryViewContent = ({ id }: { id: string }) => {
 
     if (typeof window !== 'undefined') {
       const ydoc = ydocRef.current;
+      console.log('ydoc', ydoc);
       const uint8Arr = new Uint8Array(collab.document.data);
-      Y.applyUpdate(ydoc, uint8Arr);
+      console.log('uint8Arr:', uint8Arr);
+      // Y.applyUpdate(ydoc, uint8Arr);
 
       // Bind Monaco editor to Yjs document
       const yText = ydoc.getText('monaco');
@@ -86,12 +88,12 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <p>{question.description}</p>
         </div>
         {/* Code editor */}
-        {/* Monaco Editor */}
         <div className="w-full p-6">
           <Editor
             theme="vs-dark"
             // defaultLanguage={selectedRuntime?.language || 'javascript'}
             defaultLanguage="javascript"
+            // TODO: uncomment this after jon's PR is merged to use EditorAreaSkeleton
             // loading={
             //   <div className="flex items-start justify-start w-full h-full">
             //     <EditorAreaSkeleton />
@@ -108,6 +110,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           />
         </div>
       </div>
+      {/* TODO: consider supporting running of code */}
       {/* {collabInfo && <ActionModals collabId={id} />} */}
     </div>
   );
@@ -116,6 +119,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
 const HistoryView = ({ params }: HistoryViewProps) => {
   const { id } = params;
   return (
+    // todo: add fallback=CollabSkeleton from jon's PR
     <Suspense>
       <HistoryViewContent id={id} />
     </Suspense>
