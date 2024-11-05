@@ -194,7 +194,7 @@ const Search = () => {
             <div className="flex flex-row">
               <div className="mr-2 text-lg font-medium">
                 {collaboration
-                  ? 'Redirecting you to your collaboration session...'
+                  ? 'Redirecting you to your match...'
                   : 'Searching...'}
               </div>
               <div className="text-lg font-medium text-gray-600">
