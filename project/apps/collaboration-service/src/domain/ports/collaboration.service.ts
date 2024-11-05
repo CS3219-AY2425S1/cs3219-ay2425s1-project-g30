@@ -82,7 +82,6 @@ export class CollaborationService {
    */
   async getAllCollabs(filters: CollabFiltersDto): Promise<CollabCollectionDto> {
     try {
-      this.logger.debug(`filters: ${JSON.stringify(filters)}`);
       const collabCollection = await this.collabRepository.findAll(filters);
       this.logger.log(
         `Fetched ${collabCollection.metadata.count} collaborations with filters: ${JSON.stringify(filters)}`,
@@ -109,7 +108,7 @@ export class CollaborationService {
         throw new Error(`Collaboration with id ${collabId} not found`);
       }
 
-      this.logger.debug(`Found collaboration with id: ${collabId}`);
+      this.logger.log(`Fetched collaboration with id: ${collabId}`);
 
       return collab;
     } catch (error) {
