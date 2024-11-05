@@ -6,18 +6,16 @@ import { useRouter } from 'next/navigation';
 import TerminateModal from '@/components/collab/TerminateModal';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
-import { CollabInfoDto } from '@repo/dtos/collab';
-import { endCollab } from '@/lib/api/collab';
 import { useCollabStore } from '@/stores/useCollabStore';
 
 interface ActionModalsProps {
-  collab: CollabInfoDto;
   collabId: string;
 }
 
-export const ActionModals = ({ collab, collabId }: ActionModalsProps) => {
+export const ActionModals = ({ collabId }: ActionModalsProps) => {
   const setConfirmLoading = useCollabStore.use.setConfirmLoading();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
+  const endCollab = useCollabStore.use.endCollab();
 
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -28,9 +26,6 @@ export const ActionModals = ({ collab, collabId }: ActionModalsProps) => {
     mutationFn: (id: string) => endCollab(id),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.Collab, collabId],
-      });
       setTerminateModalOpen(false);
       router.replace('/');
       toast({
@@ -53,11 +48,5 @@ export const ActionModals = ({ collab, collabId }: ActionModalsProps) => {
     terminateMutation.mutate(collabId);
   };
 
-  return (
-    <>
-      {collab && (
-        <TerminateModal onTerminate={handleEndCollab} collab={collab} />
-      )}
-    </>
-  );
+  return <>{collabId && <TerminateModal onTerminate={handleEndCollab} />}</>;
 };

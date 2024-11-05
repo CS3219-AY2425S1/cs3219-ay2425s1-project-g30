@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowLeft } from 'lucide-react';
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 
 import CollabSkeleton from '@/components/collab/CollabSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +10,11 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 import CollaborativeEditor from '@/components/collab/CollaborativeEditor';
 import { ActionModals } from '@/components/collab/ActionModals';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { getCollabInfoById, verifyCollab } from '@/lib/api/collab';
+import { CollabInfoDto } from '@repo/dtos/collab';
+import { notFound } from 'next/navigation';
 
 interface CollabPageProps {
   params: {
@@ -19,20 +24,16 @@ interface CollabPageProps {
 
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
-  const fetchCollabInfo = useCollabStore.use.fetchCollabInfo();
-  const collabInfo = useCollabStore.use.collaboration();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
 
-  useEffect(() => {
-    const initialiseCollab = async () => {
-      try {
-        await fetchCollabInfo(id);
-      } catch (error) {
-        console.error('Failed to fetch collaboration data:', error);
-      }
-    };
-    initialiseCollab();
-  }, [fetchCollabInfo]);
+  const { data: collabInfo } = useSuspenseQuery<CollabInfoDto>({
+    queryKey: [QUERY_KEYS.Collab, id],
+    queryFn: () => getCollabInfoById(id),
+  });
+
+  if (!collabInfo) {
+    return notFound();
+  }
 
   const userName =
     collabInfo?.collab_user1.id == user?.id
@@ -72,7 +73,7 @@ const CollabPageContent = ({ id }: { id: string }) => {
         {/* Code editor */}
         <CollaborativeEditor id={id} className="w-1/2" />
       </div>
-      {collabInfo && <ActionModals collab={collabInfo} collabId={id} />}
+      {collabInfo && <ActionModals collabId={id} />}
     </div>
   );
 };
