@@ -8,9 +8,9 @@ import DifficultyBadge from '@/components/DifficultyBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
-import { CollabInfoiWithPartner } from './HistoryTable';
+import { CollabInfoWithPartner } from './HistoryTable';
 
-export const columns: ColumnDef<CollabInfoiWithPartner>[] = [
+export const columns: ColumnDef<CollabInfoWithPartner>[] = [
   {
     id: 'question.q_title',
     accessorFn: (row) => row.question.q_title,

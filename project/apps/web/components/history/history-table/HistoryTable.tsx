@@ -17,7 +17,7 @@ import {
   SortingState,
   Updater,
 } from '@tanstack/react-table';
-import { startTransition, useEffect, useState } from 'react';
+import { startTransition, useEffect, useMemo, useState } from 'react';
 
 import {
   ControlledTableStateProps,
@@ -32,7 +32,7 @@ import { useQuestionsStore } from '@/stores/useQuestionStore';
 import { columns } from './columns';
 import { HistoryTableToolbar } from './HistoryTableToolbar';
 
-export type CollabInfoiWithPartner = CollabInfoDto & {
+export type CollabInfoWithPartner = CollabInfoDto & {
   partner: {
     id: string;
     username: string;
@@ -142,16 +142,18 @@ export function HistoryTable() {
   };
 
   //  dataWithPartner includes a new 'partner' field, which is the other user in the collaboration
-  const dataWithPartner = data?.collaborations.map((collab) => {
-    const partner =
-      collab.collab_user1.id === userData!.id
-        ? collab.collab_user2
-        : collab.collab_user1;
-    return {
-      ...collab,
-      partner,
-    };
-  }) as CollabInfoiWithPartner[];
+  const dataWithPartner = useMemo(() => {
+    data?.collaborations.map((collab) => {
+      const partner =
+        collab.collab_user1.id === userData!.id
+          ? collab.collab_user2
+          : collab.collab_user1;
+      return {
+        ...collab,
+        partner,
+      };
+    }) as CollabInfoWithPartner[];
+  }, [data, userData]);
 
   const metadata = data.metadata;
   const collaborations = dataWithPartner;
