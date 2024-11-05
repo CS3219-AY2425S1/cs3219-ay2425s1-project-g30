@@ -15,7 +15,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install  
+        working-directory: ./packages/infra
       - name: Update the resources
         uses: pulumi/actions@v6
         with:
