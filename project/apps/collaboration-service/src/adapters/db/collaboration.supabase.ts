@@ -151,7 +151,7 @@ export class CollaborationSupabase implements CollaborationRepository {
     if (error) {
       throw error;
     }
-    
+
     const { error: totalCountError } = await dataQuery;
 
     if (totalCountError) {

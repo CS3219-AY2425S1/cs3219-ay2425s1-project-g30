@@ -1,12 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
-import Editor from '@monaco-editor/react';
 import { HocuspocusProvider } from '@hocuspocus/provider';
+import Editor from '@monaco-editor/react';
+import axios from 'axios';
+import { Play } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
-import axios from 'axios';
-import { env } from '@/env.mjs';
-import { Button } from '../ui/button';
-import { Play } from 'lucide-react';
+
 import {
   Select,
   SelectContent,
@@ -15,20 +21,34 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LANGUAGES, Runtime } from '@/constants/languages';
+import { env } from '@/env.mjs';
+import { useToast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/stores/useAuthStore';
+
+import { Button } from '../ui/button';
+import { LoadingSpinner } from '../ui/spinner';
+
 import EditorSkeleton, {
   LanguageSelectSkeleton,
   RunButtonSkeleton,
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
-import { LoadingSpinner } from '../ui/spinner';
 
 interface CollaborativeEditorProps {
   id: string;
   className?: string;
 }
 
-const CollaborativeEditor = ({ id, className }: CollaborativeEditorProps) => {
+export interface CollaborativeEditorRef {
+  endSession: () => void;
+}
+
+const CollaborativeEditor = forwardRef<
+  CollaborativeEditorRef,
+  CollaborativeEditorProps
+>(({ id, className }, ref) => {
+  const user = useAuthStore.use.user();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
   const [collabLoading, setCollabLoading] = useState(true);
@@ -38,6 +58,14 @@ const CollaborativeEditor = ({ id, className }: CollaborativeEditorProps) => {
 
   const editorRef = useRef<any>(null);
   const ydocRef = useRef(new Y.Doc());
+  const providerRef = useRef<HocuspocusProvider | null>(null);
+
+  const router = useRouter();
+  const { toast } = useToast();
+
+  useImperativeHandle(ref, () => ({
+    endSession,
+  }));
 
   // Fetch available languages on mount
   useEffect(() => {
@@ -85,6 +113,26 @@ const CollaborativeEditor = ({ id, className }: CollaborativeEditorProps) => {
         name: id,
         document: ydoc,
       });
+      providerRef.current = provider;
+
+      provider.awareness?.on('change', () => {
+        if (provider.awareness?.getStates().values()) {
+          const states = Array.from(provider.awareness?.getStates().values());
+          const sessionEnded = states.find(
+            (state) => state.sessionEnded,
+          )?.sessionEnded;
+
+          if (sessionEnded && sessionEnded.endedBy != user?.id) {
+            toast({
+              variant: 'error',
+              title: 'Session Ended',
+              description: 'Your collaborator ended the session.',
+            });
+            provider.disconnect();
+            router.push('/');
+          }
+        }
+      });
 
       // Mark loading as false once synced
       provider.on('synced', () => {
@@ -129,6 +177,14 @@ const CollaborativeEditor = ({ id, className }: CollaborativeEditorProps) => {
       };
     } else {
       setCollabLoading(false);
+    }
+  };
+
+  const endSession = () => {
+    if (providerRef.current) {
+      providerRef.current.setAwarenessField('sessionEnded', {
+        endedBy: user?.id,
+      });
     }
   };
 
@@ -267,6 +323,6 @@ const CollaborativeEditor = ({ id, className }: CollaborativeEditorProps) => {
       )}
     </div>
   );
-};
+});
 
 export default CollaborativeEditor;

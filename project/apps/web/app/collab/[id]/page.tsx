@@ -1,20 +1,22 @@
 'use client';
 
+import { CollabInfoDto } from '@repo/dtos/collab';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
-import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import { Suspense, useRef } from 'react';
 
+import { ActionModals } from '@/components/collab/ActionModals';
+import CollaborativeEditor, {
+  CollaborativeEditorRef,
+} from '@/components/collab/CollaborativeEditor';
 import CollabSkeleton from '@/components/collab/CollabSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { getCollabInfoById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
-import CollaborativeEditor from '@/components/collab/CollaborativeEditor';
-import { ActionModals } from '@/components/collab/ActionModals';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { QUERY_KEYS } from '@/constants/queryKeys';
-import { getCollabInfoById, verifyCollab } from '@/lib/api/collab';
-import { CollabInfoDto } from '@repo/dtos/collab';
-import { notFound } from 'next/navigation';
 
 interface CollabPageProps {
   params: {
@@ -25,6 +27,7 @@ interface CollabPageProps {
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
+  const editorRef = useRef<CollaborativeEditorRef>(null);
 
   const { data: collabInfo } = useSuspenseQuery<CollabInfoDto>({
     queryKey: [QUERY_KEYS.Collab, id],
@@ -34,6 +37,12 @@ const CollabPageContent = ({ id }: { id: string }) => {
   if (!collabInfo) {
     return notFound();
   }
+
+  const endSession = () => {
+    if (editorRef.current) {
+      editorRef.current.endSession();
+    }
+  };
 
   const userName =
     collabInfo?.collab_user1.id == user?.id
@@ -71,9 +80,9 @@ const CollabPageContent = ({ id }: { id: string }) => {
         </div>
 
         {/* Code editor */}
-        <CollaborativeEditor id={id} className="w-1/2" />
+        <CollaborativeEditor ref={editorRef} id={id} className="w-1/2" />
       </div>
-      {collabInfo && <ActionModals collabId={id} />}
+      {collabInfo && <ActionModals onEndSession={endSession} collabId={id} />}
     </div>
   );
 };

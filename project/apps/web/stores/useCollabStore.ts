@@ -1,8 +1,8 @@
 import { CollabInfoDto } from '@repo/dtos/collab';
 import { create } from 'zustand';
 
+import { endCollab, getCollabInfoById } from '@/lib/api/collab';
 import { createSelectors } from '@/lib/zustand';
-import { endCollab, getCollabInfoById, verifyCollab } from '@/lib/api/collab';
 
 interface CollabState {
   collaboration: CollabInfoDto | null;

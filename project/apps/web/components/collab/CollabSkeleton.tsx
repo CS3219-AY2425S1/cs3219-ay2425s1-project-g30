@@ -1,6 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
+
 import EditorSkeleton from './EditorSkeleton';
 
 const CollabSkeleton = () => {
