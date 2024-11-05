@@ -39,17 +39,17 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signup' }, body),
     );
-    const NODE_ENV = this.envService.get('NODE_ENV');
+
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
-      secure: NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
-      secure: NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
     });
@@ -65,17 +65,17 @@ export class AuthController {
     const { userData, session } = await firstValueFrom(
       this.authServiceClient.send({ cmd: 'signin' }, body),
     );
-    const NODE_ENV = this.envService.get('NODE_ENV');
+
     res.cookie('access_token', session.access_token, {
       httpOnly: true,
-      secure: NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.cookie('refresh_token', session.refresh_token, {
       httpOnly: true,
-      secure: NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
     });
