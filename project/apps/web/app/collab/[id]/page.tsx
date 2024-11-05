@@ -44,10 +44,11 @@ const CollabPageContent = ({ id }: { id: string }) => {
     }
   };
 
-  const parterUserName = 
-    collabInfo.collab_user1.id == user?.id
+  const parterUserName =
+    user && collabInfo.collab_user1.id == user.id
       ? collabInfo.collab_user2.username
       : collabInfo.collab_user1.username;
+
   const question = {
     title: collabInfo.question.q_title || 'Untitled Question',
     description: collabInfo.question.q_desc || 'No description',
@@ -65,7 +66,9 @@ const CollabPageContent = ({ id }: { id: string }) => {
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <span className="text-md">You've been paired with</span>
-        <span className="ml-1 mr-2 font-semibold text-md">{userName}</span>
+        <span className="ml-1 mr-2 font-semibold text-md">
+          {parterUserName}
+        </span>
         <Avatar className="w-8 h-8">
           <AvatarImage />
           <AvatarFallback>{user?.username[0]}</AvatarFallback>
