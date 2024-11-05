@@ -8,8 +8,6 @@ RUN corepack enable
 # Add necessary packages for compatibility
 RUN apk update && apk add --no-cache libc6-compat
 
-
-
 # --------------------
 # Builder Stage
 # --------------------

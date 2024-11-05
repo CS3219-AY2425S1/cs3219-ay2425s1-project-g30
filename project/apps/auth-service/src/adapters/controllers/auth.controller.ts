@@ -36,10 +36,4 @@ export class AuthController {
   async refresh(@Payload() refreshToken: string) {
     return await this.authService.refreshUserSession(refreshToken);
   }
-
-  @MessagePattern({ cmd: 'ping' })
-  async ping() {
-    console.log('received ping');
-    return 'pong';
-  }
 }

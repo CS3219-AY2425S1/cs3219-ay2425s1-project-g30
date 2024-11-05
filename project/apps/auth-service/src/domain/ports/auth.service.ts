@@ -19,19 +19,7 @@ import { Session } from '@supabase/supabase-js';
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private readonly authRepository: AuthRepository) {
-    this.startAliveLogging();
-  }
-
-  /**
-   * Starts a logging interval to check if the service is alive.
-   * Temporary solution until a proper health check is implemented.
-   */
-  private startAliveLogging(): void {
-    setInterval(() => {
-      this.logger.log('Service alive');
-    }, 1000 * 30); // 30 seconds
-  }
+  constructor(private readonly authRepository: AuthRepository) {}
 
   /**
    * Handles errors by logging the error message and throwing an RpcException.
