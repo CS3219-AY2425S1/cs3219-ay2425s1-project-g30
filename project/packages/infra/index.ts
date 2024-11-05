@@ -1,4 +1,7 @@
 import * as pulumi from '@pulumi/pulumi';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 import { configureNetwork } from './network';
 import {
