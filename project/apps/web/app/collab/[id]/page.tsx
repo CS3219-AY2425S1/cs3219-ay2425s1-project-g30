@@ -45,12 +45,12 @@ const CollabPageContent = ({ id }: { id: string }) => {
   };
 
   const parterUserName = 
-    collabInfo?.collab_user1.id == user?.id
-      ? collabInfo?.collab_user2.username
-      : collabInfo?.collab_user1.username;
+    collabInfo.collab_user1.id == user?.id
+      ? collabInfo.collab_user2.username
+      : collabInfo.collab_user1.username;
   const question = {
-    title: collabInfo?.question.q_title || 'Untitled Question',
-    description: collabInfo?.question.q_desc || 'No description',
+    title: collabInfo.question.q_title || 'Untitled Question',
+    description: collabInfo.question.q_desc || 'No description',
   };
 
   return (
