@@ -14,8 +14,3 @@ export interface Runtime {
   language: LANGUAGES;
   version: string;
 }
-
-export const defaultRuntime = {
-  language: LANGUAGES.JavaScript,
-  version: '1.32.3',
-};
