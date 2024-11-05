@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { MatchCriteriaDto } from '@repo/dtos/match';
+import { CollabQuestionDto } from '@repo/dtos/collab';
 import {
   CreateQuestionDto,
   QuestionFiltersDto,
@@ -74,10 +74,10 @@ export class QuestionsService {
 
   /**
    * Fetches a random question based on the provided filters.
-   * @param {MatchCriteriaDto} filters - The filters to apply when fetching the question
+   * @param {CollabQuestionDto} filters - The filters to apply when fetching the question
    * @returns {string} A promise that resolves to the id of the question
    */
-  async findRandom(filters: MatchCriteriaDto): Promise<string> {
+  async findRandom(filters: CollabQuestionDto): Promise<string> {
     try {
       const randomQuestionId =
         await this.questionsRepository.findOneRandom(filters);

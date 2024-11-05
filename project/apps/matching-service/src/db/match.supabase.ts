@@ -1,13 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { EnvService } from 'src/env/env.service';
-import {
-  matchDataSchema,
-  MatchDataDto,
-  MatchCriteriaDto,
-} from '@repo/dtos/match';
-import { firstValueFrom } from 'rxjs';
-import { ClientProxy } from '@nestjs/microservices';
+import { matchDataSchema, MatchDataDto } from '@repo/dtos/match';
 
 @Injectable()
 export class MatchSupabase {
@@ -15,11 +9,7 @@ export class MatchSupabase {
 
   private readonly MATCHES_TABLE = 'matches';
 
-  constructor(
-    private envService: EnvService,
-    @Inject('QUESTION_SERVICE')
-    private readonly questionServiceClient: ClientProxy,
-  ) {
+  constructor(private envService: EnvService) {
     const supabaseUrl = this.envService.get('SUPABASE_URL');
     const supabaseKey = this.envService.get('SUPABASE_KEY');
     if (!supabaseUrl || !supabaseKey) {
@@ -86,22 +76,5 @@ export class MatchSupabase {
 
     // Return the retrieved data
     return data ?? [];
-  }
-
-  /**
-   * Retrieves a random question based on the selected matching categories and complexity
-   * @param filters The selected matching categories and complexity
-   * @returns The id of the selected question
-   */
-
-  async getRandomQuestion(filters: MatchCriteriaDto): Promise<string> {
-    // Call the question service to get a random question based on the filters
-    const selectedQuestionId = await firstValueFrom(
-      this.questionServiceClient.send<string>(
-        { cmd: 'get_random_question' },
-        filters,
-      ),
-    );
-    return selectedQuestionId;
   }
 }

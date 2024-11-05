@@ -11,7 +11,7 @@ import {
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { QuestionsRepository } from 'src/domain/ports/questions.repository';
-import { MatchCriteriaDto } from '@repo/dtos/match';
+import { CollabQuestionDto } from '@repo/dtos/collab';
 
 @Injectable()
 export class SupabaseQuestionsRepository implements QuestionsRepository {
@@ -114,7 +114,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     return data;
   }
 
-  async findOneRandom(filters: MatchCriteriaDto): Promise<string> {
+  async findOneRandom(filters: CollabQuestionDto): Promise<string> {
     const { category, complexity } = filters;
 
     // Serialize the category array to a string for filter pgres query

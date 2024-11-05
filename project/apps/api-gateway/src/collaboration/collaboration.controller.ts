@@ -1,6 +1,15 @@
-import { Controller, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Query,
+  UsePipes,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-
+import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
+import { collabFiltersSchema, CollabFiltersDto } from '@repo/dtos/collab';
 @Controller('collaboration')
 export class CollaborationController {
   constructor(
@@ -8,5 +17,37 @@ export class CollaborationController {
     private readonly collaborationServiceClient: ClientProxy,
   ) {}
 
-  // TODO: Add route handling methods
+  @Get(':id')
+  async getCollaborationInfoById(@Param('id') collabId: string) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'get_collab_info' },
+      collabId,
+    );
+  }
+
+  @Get()
+  @UsePipes(new ZodValidationPipe(collabFiltersSchema))
+  async getCollaborationInfos(@Query() filters: CollabFiltersDto) {
+    console.log('filters', filters);
+    return this.collaborationServiceClient.send(
+      { cmd: 'get_all_collabs' },
+      filters,
+    );
+  }
+
+  @Get('verify/:id')
+  async verifyCollaboration(@Param('id') collabId: string) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'verify_collab' },
+      collabId,
+    );
+  }
+
+  @Post('end/:id')
+  async endCollaboration(@Param('id') collabId: string) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'end_collab' },
+      collabId,
+    );
+  }
 }
