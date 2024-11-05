@@ -103,7 +103,7 @@ export class CollaborationService {
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
 
-  async getCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
+  async getActiveCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
     try {
       const collab = await this.collabRepository.fetchCollabInfo(collabId);
       const isActive =
