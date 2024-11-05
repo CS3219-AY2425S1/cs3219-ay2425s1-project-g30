@@ -44,7 +44,7 @@ const CollabPageContent = ({ id }: { id: string }) => {
     }
   };
 
-  const userName =
+  const parterUserName = 
     collabInfo?.collab_user1.id == user?.id
       ? collabInfo?.collab_user2.username
       : collabInfo?.collab_user1.username;
