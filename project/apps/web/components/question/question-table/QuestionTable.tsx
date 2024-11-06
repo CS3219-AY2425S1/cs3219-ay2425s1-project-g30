@@ -33,6 +33,7 @@ import { QuestionTableToolbar } from './QuestionTableToolbar';
 export function QuestionTable() {
   const confirmLoading = useQuestionsStore.use.confirmLoading();
   const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
+  const [isDebouncing, setIsDebouncing] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -57,8 +58,14 @@ export function QuestionTable() {
   const debouncedColumnFilters = useDebounce(
     columnFilters,
     300,
-    () => setConfirmLoading(true),
-    () => setConfirmLoading(false),
+    () => {
+      setConfirmLoading(true);
+      setIsDebouncing(true);
+    },
+    () => {
+      setConfirmLoading(false);
+      setIsDebouncing(false);
+    },
   );
 
   useEffect(() => {
@@ -150,7 +157,7 @@ export function QuestionTable() {
       <DataTable
         data={questions}
         columns={columns}
-        confirmLoading={confirmLoading}
+        confirmLoading={confirmLoading || isDebouncing}
         controlledState={controlledState}
         TableToolbar={QuestionTableToolbar}
       />

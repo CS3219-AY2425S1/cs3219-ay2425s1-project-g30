@@ -34,7 +34,9 @@ import { HistoryTableToolbar } from './HistoryTableToolbar';
 
 export function HistoryTable() {
   const { userData } = useMe();
-  const { confirmLoading, setConfirmLoading } = useQuestionsStore();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
+  const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
+  const [isDebouncing, setIsDebouncing] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -58,9 +60,15 @@ export function HistoryTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const debouncedColumnFilters = useDebounce(
     columnFilters,
-    100,
-    () => setConfirmLoading(true),
-    () => setConfirmLoading(false),
+    300,
+    () => {
+      setConfirmLoading(true);
+      setIsDebouncing(true);
+    },
+    () => {
+      setConfirmLoading(false);
+      setIsDebouncing(false);
+    },
   );
 
   useEffect(() => {
@@ -151,7 +159,7 @@ export function HistoryTable() {
     <DataTable
       data={collaborations}
       columns={columns}
-      confirmLoading={confirmLoading}
+      confirmLoading={confirmLoading || isDebouncing}
       controlledState={controlledState}
       TableToolbar={HistoryTableToolbar}
     />

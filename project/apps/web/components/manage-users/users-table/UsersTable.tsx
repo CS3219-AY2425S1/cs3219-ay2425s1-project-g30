@@ -34,6 +34,7 @@ export function UsersTable() {
   if (!user) return;
   const confirmLoading = useManageUsersStore.use.confirmLoading();
   const setConfirmLoading = useManageUsersStore.use.setConfirmLoading();
+  const [isDebouncing, setIsDebouncing] = useState(false);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -58,8 +59,14 @@ export function UsersTable() {
   const debouncedColumnFilters = useDebounce(
     columnFilters,
     300,
-    () => setConfirmLoading(true),
-    () => setConfirmLoading(false),
+    () => {
+      setConfirmLoading(true);
+      setIsDebouncing(true);
+    },
+    () => {
+      setConfirmLoading(false);
+      setIsDebouncing(false);
+    },
   );
 
   useEffect(() => {
@@ -145,7 +152,7 @@ export function UsersTable() {
       <DataTable
         data={users}
         columns={columns}
-        confirmLoading={confirmLoading}
+        confirmLoading={confirmLoading || isDebouncing}
         controlledState={controlledState}
         TableToolbar={UsersTableToolbar}
       />
