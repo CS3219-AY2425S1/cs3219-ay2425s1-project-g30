@@ -171,14 +171,12 @@ export function HistoryTable() {
   };
 
   return (
-    <>
-      <DataTable
-        data={collaborations}
-        columns={columns}
-        confirmLoading={confirmLoading}
-        controlledState={controlledState}
-        TableToolbar={HistoryTableToolbar}
-      />
-    </>
+    <DataTable
+      data={collaborations}
+      columns={columns}
+      confirmLoading={confirmLoading}
+      controlledState={controlledState}
+      TableToolbar={HistoryTableToolbar}
+    />
   );
 }
