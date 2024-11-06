@@ -4,6 +4,7 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
   CollabQuestionDto,
 } from '@repo/dtos/collab';
 
@@ -85,6 +86,15 @@ export abstract class CollaborationRepository {
    * @returns A promise that resolves to the collaboration information data transfer object.
    */
   abstract fetchCollabInfo(id: string): Promise<CollabInfoDto>;
+
+  /**
+   * Fetches the collaboration information and associated document for a given collaboration id.
+   * @param id The unique identifier of the collaboration to fetch information for.
+   * @returns A promise that resolves to the collaboration information with document data transfer object.
+   */
+  abstract fetchCollabInfoWithDocument(
+    id: string,
+  ): Promise<CollabInfoWithDocumentDto>;
 
   /**
    * Ends a collaboration by its unique identifier.

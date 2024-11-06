@@ -45,6 +45,7 @@ interface EditModalProps {
 const EditModal = ({ onSubmit, initialValues }: EditModalProps) => {
   const isEditModalOpen = useQuestionsStore.use.isEditModalOpen();
   const setEditModalOpen = useQuestionsStore.use.setEditModalOpen();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
   const form = useZodForm({
     schema: updateQuestionSchema,
     defaultValues: {
@@ -200,6 +201,7 @@ const EditModal = ({ onSubmit, initialValues }: EditModalProps) => {
               <Button
                 type="button"
                 variant="outline"
+                disabled={confirmLoading}
                 onClick={() => setEditModalOpen(false)}
               >
                 Cancel
@@ -207,7 +209,10 @@ const EditModal = ({ onSubmit, initialValues }: EditModalProps) => {
               <Button
                 type="submit"
                 variant="default"
-                disabled={Object.keys(form.formState.errors).length !== 0}
+                disabled={
+                  Object.keys(form.formState.errors).length !== 0 ||
+                  confirmLoading
+                }
               >
                 Confirm
               </Button>

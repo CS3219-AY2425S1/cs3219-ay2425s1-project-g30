@@ -10,9 +10,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useLogger(app.get(Logger));
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: true,
     credentials: true,
   });
+  app.setGlobalPrefix('/api');
   app.useGlobalFilters(new RpcExceptionFilter());
   app.useGlobalInterceptors(new RpcExceptionInterceptor());
   await app.listen(4000);

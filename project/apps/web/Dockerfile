@@ -33,10 +33,22 @@ FROM base AS installer
 # Set the working directory
 WORKDIR /app
 
+# Accept build arguments
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_MATCH_SOCKET_URL
+ARG NEXT_PUBLIC_COLLAB_SOCKET_URL
+ARG NODE_ENV
+
+# Set environment variables
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_MATCH_SOCKET_URL=$NEXT_PUBLIC_MATCH_SOCKET_URL
+ENV NEXT_PUBLIC_COLLAB_SOCKET_URL=$NEXT_PUBLIC_COLLAB_SOCKET_URL
+ENV NODE_ENV=$NODE_ENV
+
 # Install dependencies using pruned package.json and pnpm-lock.yaml
 COPY --from=builder /app/out/json/ .
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prod=false
 
 # Copy the pruned source files
 COPY --from=builder /app/out/full/ .

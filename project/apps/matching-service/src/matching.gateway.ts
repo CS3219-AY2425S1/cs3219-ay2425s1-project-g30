@@ -22,11 +22,12 @@ export enum MatchEvent {
   'MATCH_INVALID' = 'match_invalid',
 }
 
-@WebSocketGateway(8080, {
+@WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: true,
     credentials: true,
   },
+  path: '/matching-service',
 })
 export class MatchingGateway
   implements OnGatewayConnection, OnGatewayDisconnect

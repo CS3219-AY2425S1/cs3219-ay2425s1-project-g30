@@ -6,7 +6,7 @@ import { z } from 'zod';
  */
 const client = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().default('Peer Prep'),
-  NEXT_PUBLIC_API_BASE_URL: z.string().default('http://localhost:4000'),
+  NEXT_PUBLIC_API_BASE_URL: z.string().default('http://localhost:4000/api'),
   NEXT_PUBLIC_MATCH_SOCKET_URL: z.string().default('http://localhost:8080'),
   NEXT_PUBLIC_COLLAB_SOCKET_URL: z.string().default('http://localhost:1234'),
 });
@@ -23,6 +23,7 @@ const processEnv = {
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
   NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
   NEXT_PUBLIC_MATCH_SOCKET_URL: process.env.NEXT_PUBLIC_MATCH_SOCKET_URL,
+  NEXT_PUBLIC_COLLAB_SOCKET_URL: process.env.NEXT_PUBLIC_COLLAB_SOCKET_URL,
 };
 
 // Don't touch the part below

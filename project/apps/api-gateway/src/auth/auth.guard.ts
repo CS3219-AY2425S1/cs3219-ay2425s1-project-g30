@@ -39,19 +39,18 @@ export class AuthGuard implements CanActivate {
         await firstValueFrom(
           this.authServiceClient.send({ cmd: 'refresh' }, refreshToken),
         );
-      const NODE_ENV = this.envService.get('NODE_ENV');
 
       // Update new tokens in response cookies
       response.cookie('access_token', newAccessToken, {
         httpOnly: true,
-        secure: NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax',
         maxAge: 60 * 60 * 1000, // 1 hour
       });
 
       response.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
-        secure: NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7 * 1000, // 1 week
       });

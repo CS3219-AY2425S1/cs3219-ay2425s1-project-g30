@@ -3,15 +3,16 @@ services:
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_MATCH_SOCKET_URL: ${NEXT_PUBLIC_MATCH_SOCKET_URL}
+        NEXT_PUBLIC_COLLAB_SOCKET_URL: ${NEXT_PUBLIC_COLLAB_SOCKET_URL}
+        NODE_ENV: production
     ports:
       - 3000:3000
     networks:
       - backend
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
-      NEXT_PUBLIC_MATCH_SOCKET_URL: ${NEXT_PUBLIC_MATCH_SOCKET_URL}
-      NEXT_PUBLIC_COLLAB_SOCKET_URL: ${NEXT_PUBLIC_COLLAB_SOCKET_URL}
-      NODE_ENV: production
+
   api-gateway:
     build:
       context: .
@@ -27,6 +28,7 @@ services:
       MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
       COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
       NODE_ENV: production
+
   question-service:
     build:
       context: .
@@ -40,6 +42,7 @@ services:
       SUPABASE_URL: ${QUESTION_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${QUESTION_SERVICE_SUPABASE_KEY}
       NODE_ENV: production
+
   user-service:
     build:
       context: .
@@ -53,6 +56,7 @@ services:
       SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY}
       NODE_ENV: production
+
   auth-service:
     build:
       context: .
@@ -66,17 +70,18 @@ services:
       SUPABASE_URL: ${USER_SERVICE_SUPABASE_URL} # Use the same Supabase URL as the user service
       SUPABASE_KEY: ${USER_SERVICE_SUPABASE_KEY} # Use the same Supabase key as the user service
       NODE_ENV: production
+
   matching-service:
     build:
       context: .
       dockerfile: ./apps/matching-service/Dockerfile
     ports:
       - 3004:3004
-      - 8080:8080  # Expose WebSocket port
+      - 8080:8080 # Expose WebSocket port
     networks:
       - backend
     environment:
-      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST} 
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
@@ -86,21 +91,26 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       NODE_ENV: production
+
   collaboration-service:
     build:
       context: .
       dockerfile: ./apps/collaboration-service/Dockerfile
     ports:
       - 3005:3005
-      - 1234:1234  # Expose WebSocket port
+      - 1234:1234 # Expose WebSocket port
     networks:
       - backend
     environment:
       COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      HOCUSPOCUS_PORT: ${HOCUSPOCUS_PORT}
       SUPABASE_URL: ${COLLABORATION_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${COLLABORATION_SERVICE_SUPABASE_KEY}
       NODE_ENV: production
+
   rabbitmq:
     build:
       context: ./infra/rabbitmq
@@ -116,10 +126,9 @@ services:
       - 15672:15672 # RabbitMQ management plugin port
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
   redis:
-    build:
-      context: ./infra/redis
-      dockerfile: Dockerfile
+    image: redis:latest
     container_name: redis
     networks:
       - backend
@@ -127,6 +136,7 @@ services:
       - 6379:6379
     volumes:
       - redis_data:/data
+
   redisinsight:
     image: redis/redisinsight:latest
     container_name: redisinsight
@@ -135,7 +145,8 @@ services:
     networks:
       - backend
     depends_on:
-      - redis  # Ensure Redis starts before Redis Insight
+      - redis # Ensure Redis starts before Redis Insight
+
 networks:
   backend:
     driver: bridge

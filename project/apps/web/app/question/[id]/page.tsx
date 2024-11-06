@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 interface QuestionPageProps {
@@ -23,6 +24,7 @@ interface QuestionPageProps {
 }
 
 const QuestionPageContent = ({ id }: { id: string }) => {
+  const user = useAuthStore.use.user();
   const setEditModalOpen = useQuestionsStore.use.setEditModalOpen();
   const setDeleteModalOpen = useQuestionsStore.use.setDeleteModalOpen();
   const confirmLoading = useQuestionsStore.use.confirmLoading();
@@ -52,22 +54,24 @@ const QuestionPageContent = ({ id }: { id: string }) => {
       <div
         className={`bg-white shadow-md rounded-lg p-6 relative ${confirmLoading ? 'opacity-50' : 'opacity-100'}`}
       >
-        <div className="absolute flex gap-2 top-4 right-4">
-          <Button
-            variant="outline"
-            disabled={confirmLoading}
-            onClick={() => setEditModalOpen(true)}
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="destructive"
-            disabled={confirmLoading}
-            onClick={() => setDeleteModalOpen(true)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </div>
+        {user?.role === 'Admin' && (
+          <div className="absolute flex gap-2 top-4 right-4">
+            <Button
+              variant="outline"
+              disabled={confirmLoading}
+              onClick={() => setEditModalOpen(true)}
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={confirmLoading}
+              onClick={() => setDeleteModalOpen(true)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
 
         <div className="flex items-center gap-4 mb-4">
           <h1 className="text-2xl font-bold text-gray-800">
