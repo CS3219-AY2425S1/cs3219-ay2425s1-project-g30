@@ -1,5 +1,5 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
-import Editor from '@monaco-editor/react';
+import Editor, { OnMount } from '@monaco-editor/react';
 import axios from 'axios';
 import { Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ import {
 } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
+import * as monaco from 'monaco-editor';
 
 import {
   Select,
@@ -58,7 +59,7 @@ const CollaborativeEditor = forwardRef<
   const [runLoading, setRunLoading] = useState(false);
   const [output, setOutput] = useState('');
 
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
 
@@ -104,8 +105,8 @@ const CollaborativeEditor = forwardRef<
     fetchRuntimes();
   }, []);
 
-  const handleEditorDidMount = (editor: any, monaco: any) => {
-    editorRef.current = editor;
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
+    editorRef.current = editor as monaco.editor.IStandaloneCodeEditor;
     setCollabLoading(true);
 
     if (typeof window !== 'undefined') {
@@ -172,7 +173,7 @@ const CollaborativeEditor = forwardRef<
 
           if (editorRef.current && language) {
             const currentModel = editorRef.current.getModel();
-            monaco.editor.setModelLanguage(currentModel, language);
+            monaco.editor.setModelLanguage(currentModel!, language);
           }
         }
       };
