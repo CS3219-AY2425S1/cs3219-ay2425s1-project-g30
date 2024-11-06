@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
+import { useCollabStore } from '@/stores/useCollabStore';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
 
@@ -22,6 +23,8 @@ const Search = () => {
 
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
+  const collaboration = useCollabStore.use.collaboration();
+  const fetchCollab = useCollabStore.use.fetchCollab();
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
   const disconnect = useSocketStore((state) => state.disconnect);
@@ -109,6 +112,7 @@ const Search = () => {
         title: 'Match Found',
         description: 'Your match was successful.',
       });
+      fetchCollab(collabId);
       router.push(`/collab/${collabId}`);
     };
 
@@ -168,32 +172,42 @@ const Search = () => {
     exit: { opacity: 0 },
     transition: { duration: 0.5 },
   };
-  if (!isConnected) {
-    return (
-      <div className="flex items-center justify-center h-full gap-2 align-middle">
-        Connecting...
-        <LoadingSpinner />
-      </div>
-    );
-  }
+
   return (
     <div className="container flex justify-between h-full mx-auto overflow-hidden">
       <AnimatePresence mode="wait">
-        <motion.div
-          className="flex flex-col items-center justify-center w-full gap-4"
-          key="searching"
-          {...fadeAnimation}
-        >
-          <div className="flex flex-row">
-            <div className="mr-2 text-lg font-medium">Searching...</div>
-            <div className="text-lg font-medium text-gray-600">
-              ({totalSeconds}s)
+        {!isConnected ? (
+          <motion.div
+            className="flex items-center justify-center w-full h-full gap-2 text-lg font-medium"
+            key="connecting"
+            {...fadeAnimation}
+          >
+            Connecting...
+            <LoadingSpinner />
+          </motion.div>
+        ) : (
+          <motion.div
+            className="flex flex-col items-center justify-center w-full gap-4"
+            key="searching"
+            {...fadeAnimation}
+          >
+            <div className="flex flex-row">
+              <div className="mr-2 text-lg font-medium">
+                {collaboration
+                  ? 'Redirecting you to your match...'
+                  : 'Searching...'}
+              </div>
+              <div className="text-lg font-medium text-gray-600">
+                {collaboration ? <LoadingSpinner /> : `${totalSeconds}s`}
+              </div>
             </div>
-          </div>
-          <Button variant="default" onClick={stopMatching}>
-            Cancel
-          </Button>
-        </motion.div>
+            {!collaboration && (
+              <Button variant="default" onClick={stopMatching}>
+                Cancel
+              </Button>
+            )}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

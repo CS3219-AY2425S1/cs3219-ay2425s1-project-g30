@@ -1,13 +1,13 @@
 'use client';
 
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { ActionModals } from '@/components/manage-users/ActionModals';
 import ManageUsersSkeleton from '@/components/manage-users/ManageUsersSkeleton';
 import { UsersTable } from '@/components/manage-users/users-table/UsersTable';
-import { useManageUsersStore } from '@/stores/useManageUsersStore';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { notFound } from 'next/navigation';
+import { useManageUsersStore } from '@/stores/useManageUsersStore';
 
 const ManageUsersRepositoryContent = () => {
   const selectedUser = useManageUsersStore.use.selectedUser();
@@ -32,7 +32,7 @@ const UsersRepository = () => {
   if (user && user.role !== 'Admin') {
     return notFound();
   }
-  
+
   return (
     <Suspense fallback={<ManageUsersSkeleton />}>
       <ManageUsersRepositoryContent />

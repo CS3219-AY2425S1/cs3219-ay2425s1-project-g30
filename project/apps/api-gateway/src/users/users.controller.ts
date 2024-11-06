@@ -73,7 +73,10 @@ export class UsersController {
       this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
 
-    if (userData.role != ROLE.Admin && (userData.id != id || userData.role)) {
+    if (
+      userData.role != ROLE.Admin &&
+      (userData.id != id || updateUserDto.role)
+    ) {
       throw new ForbiddenException('Access denied.');
     }
 

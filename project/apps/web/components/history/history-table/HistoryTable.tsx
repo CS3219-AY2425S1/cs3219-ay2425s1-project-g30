@@ -1,11 +1,15 @@
 'use client';
 
-import { ROLE } from '@repo/dtos/generated/enums/auth.enums';
 import {
-  SortUsersQueryDto,
-  UserCollectionDto,
-  UserFiltersDto,
-} from '@repo/dtos/users';
+  CollabCollectionDto,
+  CollabFiltersDto,
+  CollabInfoDto,
+} from '@repo/dtos/collab';
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
+import { SortQuestionsQueryDto } from '@repo/dtos/questions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
@@ -13,7 +17,7 @@ import {
   SortingState,
   Updater,
 } from '@tanstack/react-table';
-import { startTransition, useEffect, useState } from 'react';
+import { startTransition, useEffect, useMemo, useState } from 'react';
 
 import {
   ControlledTableStateProps,
@@ -21,19 +25,16 @@ import {
 } from '@/components/data-table/DataTable';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import useDebounce from '@/hooks/useDebounce';
-import { fetchUsers } from '@/lib/api/users';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useManageUsersStore } from '@/stores/useManageUsersStore';
+import { useMe } from '@/hooks/useMe';
+import { getCollabs } from '@/lib/api/collab';
+import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 import { columns } from './columns';
-import { UsersTableToolbar } from './UsersTableToolbar';
+import { HistoryTableToolbar } from './HistoryTableToolbar';
 
-export function UsersTable() {
-  const fetchUser = useAuthStore.use.fetchUser();
-  const user = useAuthStore.use.user();
-  if (!user) return;
-  const confirmLoading = useManageUsersStore.use.confirmLoading();
-  const setConfirmLoading = useManageUsersStore.use.setConfirmLoading();
+export function HistoryTable() {
+  const { userData } = useMe();
+  const { confirmLoading, setConfirmLoading } = useQuestionsStore();
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -49,8 +50,8 @@ export function UsersTable() {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: 'username',
-      desc: false,
+      id: 'started_at',
+      desc: true,
     },
   ]);
 
@@ -63,7 +64,6 @@ export function UsersTable() {
   );
 
   useEffect(() => {
-    fetchUser();
     if (confirmLoading) {
       setConfirmLoading(true);
     } else {
@@ -71,17 +71,22 @@ export function UsersTable() {
     }
   }, [pagination, sorting, debouncedColumnFilters, setConfirmLoading]);
 
-  const { data } = useSuspenseQuery<UserCollectionDto>({
-    queryKey: [QUERY_KEYS.Users, pagination, sorting, debouncedColumnFilters],
+  const { data } = useSuspenseQuery<CollabCollectionDto>({
+    queryKey: [QUERY_KEYS.Collab, pagination, sorting, debouncedColumnFilters],
     queryFn: async () => {
-      const username = debouncedColumnFilters.find((f) => f.id === 'username')
-        ?.value as string;
+      const user_id = userData!.id;
 
-      const email = debouncedColumnFilters.find((f) => f.id === 'email')
-        ?.value as string;
+      const q_title = debouncedColumnFilters.find(
+        (f) => f.id === 'question.q_title',
+      )?.value as string;
 
-      const roles = debouncedColumnFilters.find((f) => f.id === 'role')
-        ?.value as ROLE[];
+      const q_category = debouncedColumnFilters.find(
+        (f) => f.id === 'question.q_category',
+      )?.value as CATEGORY[];
+
+      const q_complexity = debouncedColumnFilters.find(
+        (f) => f.id === 'question.q_complexity',
+      )?.value as COMPLEXITY[];
 
       const offset = pagination.pageIndex * pagination.pageSize;
       const limit = pagination.pageSize;
@@ -91,19 +96,21 @@ export function UsersTable() {
           ({
             field: s.id,
             order: s.desc ? 'desc' : 'asc',
-          }) as SortUsersQueryDto,
+          }) as SortQuestionsQueryDto,
       );
 
-      const queryParams: UserFiltersDto = {
-        username,
-        email,
-        roles,
+      const queryParams: CollabFiltersDto = {
+        user_id,
+        has_ended: true,
+        q_title,
+        q_category,
+        q_complexity,
         offset,
         limit,
         sort,
       };
 
-      return await fetchUsers(queryParams);
+      return await getCollabs(queryParams);
     },
   });
 
@@ -128,7 +135,7 @@ export function UsersTable() {
   };
 
   const metadata = data.metadata;
-  const users = data.users.filter((u) => u.id != user.id);
+  const collaborations = data.collaborations;
 
   const controlledState: ControlledTableStateProps = {
     pagination,
@@ -141,14 +148,12 @@ export function UsersTable() {
   };
 
   return (
-    <>
-      <DataTable
-        data={users}
-        columns={columns}
-        confirmLoading={confirmLoading}
-        controlledState={controlledState}
-        TableToolbar={UsersTableToolbar}
-      />
-    </>
+    <DataTable
+      data={collaborations}
+      columns={columns}
+      confirmLoading={confirmLoading}
+      controlledState={controlledState}
+      TableToolbar={HistoryTableToolbar}
+    />
   );
 }
