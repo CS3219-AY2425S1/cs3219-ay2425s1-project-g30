@@ -7,6 +7,7 @@ import {
   UserRound,
   UsersRound,
   LogOut,
+  ListChecks,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -31,6 +32,11 @@ const Sidebar = ({ signOut }: SidebarProps) => {
       name: 'Question',
       href: '/questions',
       icon: <ListIcon className="w-5 h-5" />,
+    },
+    {
+      name: 'History',
+      href: '/history',
+      icon: <ListChecks className="w-5 h-5" />,
     },
     {
       name: 'Profile',
