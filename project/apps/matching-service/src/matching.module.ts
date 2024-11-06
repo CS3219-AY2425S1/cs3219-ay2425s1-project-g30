@@ -16,7 +16,6 @@ import { MatchingController } from './matching.controller';
 import { MatchRequestService } from './matchRequest/matchRequest.service';
 import { MatchingGateway } from './matching.gateway';
 import { RedisModule } from './redis/redis.module';
-import { MatchService } from './matching.service';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -81,7 +80,6 @@ import { HealthController } from './health/health.controller';
     MatchExpiryConsumer,
     MatchExpiryService,
     MatchRequestService,
-    MatchService,
     MatchingGateway,
   ],
   exports: [],
