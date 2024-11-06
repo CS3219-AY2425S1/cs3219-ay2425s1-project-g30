@@ -6,9 +6,10 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Suspense, useRef } from 'react';
-import { MonacoBinding } from 'y-monaco';
-import * as Y from 'yjs';
 
+import { EditorAreaSkeleton } from '@/components/collab/EditorSkeleton';
+import HistoryEditor from '@/components/history-view/HistoryEditor';
+import HistoryViewSkeleton from '@/components/history-view/HistoryViewSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
@@ -23,8 +24,6 @@ interface HistoryViewProps {
 
 const HistoryViewContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
-  const editorRef = useRef<any>(null);
-  const ydocRef = useRef(new Y.Doc());
 
   const { data: collab } = useSuspenseQuery<CollabInfoWithDocumentDto>({
     queryKey: [QUERY_KEYS.Collab, id],
@@ -44,24 +43,6 @@ const HistoryViewContent = ({ id }: { id: string }) => {
     description: collab.question.q_desc || 'No description',
   };
 
-  const handleEditorDidMount = (editor: any) => {
-    editorRef.current = editor;
-
-    if (typeof window !== 'undefined') {
-      const ydoc = ydocRef.current;
-
-      // Load Yjs document from collab data
-      if (!collab.document?.data) {
-        const parsedData = new Uint8Array(collab.document.data);
-        Y.applyUpdate(ydoc, parsedData);
-      }
-
-      // Bind Monaco editor to Yjs document
-      const yText = ydoc.getText('monaco');
-      new MonacoBinding(yText, editor.getModel(), new Set([editor]));
-    }
-  };
-
   return (
     <div className="h-screen px-8 py-4">
       {/* Header with Back button */}
@@ -79,6 +60,9 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <AvatarImage />
           <AvatarFallback>{user?.username[0]}</AvatarFallback>
         </Avatar>
+        <span className="ml-6 font-thin italic text-slate-500">
+          Read-only View
+        </span>
       </div>
 
       <div className="flex gap-8 max-h-fit">
@@ -88,30 +72,8 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <p>{question.description}</p>
         </div>
         {/* Code editor */}
-        <div className="w-full p-6">
-          <Editor
-            theme="vs-dark"
-            // defaultLanguage={selectedRuntime?.language || 'javascript'}
-            defaultLanguage="javascript"
-            // TODO: uncomment this after jon's PR is merged to use EditorAreaSkeleton
-            // loading={
-            //   <div className="flex items-start justify-start w-full h-full">
-            //     <EditorAreaSkeleton />
-            //   </div>
-            // }
-            onMount={handleEditorDidMount}
-            options={{
-              minimap: { enabled: false },
-              readOnly: true,
-              automaticLayout: true,
-              quickSuggestions: { other: true, comments: false, strings: true },
-            }}
-            className="w-full"
-          />
-        </div>
+        <HistoryEditor collab={collab} className="w-1/2" />
       </div>
-      {/* TODO: consider supporting running of code */}
-      {/* {collabInfo && <ActionModals collabId={id} />} */}
     </div>
   );
 };
@@ -119,8 +81,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
 const HistoryView = ({ params }: HistoryViewProps) => {
   const { id } = params;
   return (
-    // todo: add fallback=CollabSkeleton from jon's PR
-    <Suspense>
+    <Suspense fallback={<HistoryViewSkeleton />}>
       <HistoryViewContent id={id} />
     </Suspense>
   );

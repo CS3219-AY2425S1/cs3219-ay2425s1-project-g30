@@ -387,9 +387,11 @@ export class CollaborationSupabase implements CollaborationRepository {
       const collabInfo = await this.fetchCollabInfo(collabId);
       const document = await this.fetchDocumentById(collabId);
 
+      const document_data = document ? Array.from(document) : null;
+
       return {
         ...collabInfo,
-        document,
+        document_data,
       } as CollabInfoWithDocumentDto;
     } catch (error) {
       throw new BadRequestException(

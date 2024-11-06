@@ -34,7 +34,7 @@ export const collabInfoSchema = z.object({
 });
 
 export const collabInfoWithDocumentSchema = collabInfoSchema.extend({
-  document: z.any(),
+  document_data: z.array(z.number()).nullable(),
 });
 
 export const collabCreateSchema = z.object({
