@@ -32,65 +32,75 @@ export class MatchEngineService {
   async generateMatch(matchRequest: MatchRequestDto) {
     const { userId, category, complexity } = matchRequest;
 
-    const matchedData = await this.matchRedis.findPotentialMatch(
-      userId,
-      category,
-      complexity,
-    );
-
-    if (!matchedData) {
-      this.logger.log(
-        `No immediate match found for user ${userId}, adding to matching queue`,
+    try {
+      const matchedData = await this.matchRedis.findPotentialMatch(
+        userId,
+        category,
+        complexity,
       );
-      // No match found, add the match to redis
-      const match_req_id = await this.matchRedis.addMatchRequest(matchRequest);
-      if (!match_req_id) {
-        throw new Error('Failed to add match request');
+
+      if (!matchedData) {
+        this.logger.log(
+          `No immediate match found for user ${userId}, adding to matching queue`,
+        );
+        // No match found, add the match to redis
+        const match_req_id =
+          await this.matchRedis.addMatchRequest(matchRequest);
+        if (!match_req_id) {
+          throw new Error('Failed to add match request');
+        }
+        await this.matchEngineProduceExpiry.enqueueMatchExpiryRequest(
+          match_req_id,
+          MATCH_TIMEOUT,
+        );
+        return;
       }
-      await this.matchEngineProduceExpiry.enqueueMatchExpiryRequest(
-        match_req_id,
-        MATCH_TIMEOUT,
+
+      this.logger.log(
+        `Match found for user ${userId} and ${matchedData.userId}`,
       );
-      return;
+
+      // Find the overlapping categories between both users
+      const overlappingCategories = category.filter((value) =>
+        matchedData.category.includes(value),
+      );
+
+      const matchData: MatchDataDto = {
+        user1_id: userId,
+        user2_id: matchedData.userId,
+        complexity: complexity,
+        category: overlappingCategories,
+        id: matchedData.matchId,
+      };
+
+      this.logger.debug(
+        `Saving match data to DB: ${JSON.stringify(matchData)}`,
+      );
+
+      // Obtain the Collab ID from Collaboration-service
+      const collabId = await this.createCollab({
+        user1_id: matchData.user1_id,
+        user2_id: matchData.user2_id,
+        complexity: matchData.complexity,
+        category: matchData.category,
+        match_id: matchData.id,
+      });
+
+      // Send match found message containg collabId to both users
+      this.matchGateway.sendMatchFound({
+        userId: userId,
+        message: collabId,
+      });
+
+      this.matchGateway.sendMatchFound({
+        userId: matchedData.userId,
+        message: collabId,
+      });
+      await this.matchSupabase.saveMatch(matchData);
+    } catch (error) {
+      this.logger.error(`Error generating match: ${error.message}`);
+      this.matchGateway.sendMatchInvalid({ userId, message: error.message });
     }
-
-    this.logger.log(`Match found for user ${userId} and ${matchedData.userId}`);
-
-    // Find the overlapping categories between both users
-    const overlappingCategories = category.filter((value) =>
-      matchedData.category.includes(value),
-    );
-
-    const matchData: MatchDataDto = {
-      user1_id: userId,
-      user2_id: matchedData.userId,
-      complexity: complexity,
-      category: overlappingCategories,
-      id: matchedData.matchId,
-    };
-
-    this.logger.debug(`Saving match data to DB: ${JSON.stringify(matchData)}`);
-
-    // Obtain the Collab ID from Collaboration-service
-    const collabId = await this.createCollab({
-      user1_id: matchData.user1_id,
-      user2_id: matchData.user2_id,
-      complexity: matchData.complexity,
-      category: matchData.category,
-      match_id: matchData.id,
-    });
-
-    // Send match found message containg collabId to both users
-    this.matchGateway.sendMatchFound({
-      userId: userId,
-      message: collabId,
-    });
-
-    this.matchGateway.sendMatchFound({
-      userId: matchedData.userId,
-      message: collabId,
-    });
-    await this.matchSupabase.saveMatch(matchData);
   }
 
   async createCollab(collabReqData: CollabRequestDto) {
