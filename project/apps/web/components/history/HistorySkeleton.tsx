@@ -16,6 +16,9 @@ const HistorySkeleton = () => (
         <Skeleton className="h-6 w-1/4" />
         <Skeleton className="h-6 w-1/4" />
         <Skeleton className="h-6 w-1/4" />
+        <Skeleton className="h-6 w-1/4" />
+        <Skeleton className="h-6 w-1/4" />
+        <Skeleton className="h-6 w-1/4" />
       </div>
 
       {/* Table Body */}
@@ -26,6 +29,9 @@ const HistorySkeleton = () => (
         >
           <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-1/4" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-full" />
         </div>
       ))}

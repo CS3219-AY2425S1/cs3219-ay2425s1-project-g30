@@ -14,7 +14,7 @@ export const getCollabInfoById = async (id: string): Promise<CollabInfoDto> => {
 export const getCollabs = async (
   filters: CollabFiltersDto,
 ): Promise<CollabCollectionDto> => {
-  return await apiCall('get', '/collaboration', filters);
+  return await apiCall('get', '/collaboration', null, filters);
 };
 
 export const verifyCollab = async (id: string): Promise<boolean> => {
