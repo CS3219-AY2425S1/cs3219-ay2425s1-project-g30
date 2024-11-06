@@ -1,6 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
+import dayjs from 'dayjs';
 import Link from 'next/link';
 
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
@@ -9,6 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 import { CollabInfoWithPartner } from './HistoryTable';
+
+const DATE_FORMAT = 'D MMM YY, h:mm A';
 
 export const columns: ColumnDef<CollabInfoWithPartner>[] = [
   {
@@ -92,7 +95,8 @@ export const columns: ColumnDef<CollabInfoWithPartner>[] = [
       <DataTableColumnHeader column={column} title="Started At" />
     ),
     cell: ({ row }) => {
-      return new Date(row.original.started_at).toLocaleString();
+      const dateStr = dayjs(row.original.started_at).format(DATE_FORMAT);
+      return <span className="ml-1 mr-2">{dateStr}</span>;
     },
   },
   {
@@ -103,7 +107,8 @@ export const columns: ColumnDef<CollabInfoWithPartner>[] = [
     ),
     cell: ({ row }) => {
       if (row.original.ended_at) {
-        return new Date(row.original.ended_at).toLocaleString();
+        const dateStr = dayjs(row.original.ended_at).format(DATE_FORMAT);
+        return <span className="ml-1 mr-2">{dateStr}</span>;
       } else {
         return null;
       }

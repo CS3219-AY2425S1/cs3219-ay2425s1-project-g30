@@ -13,12 +13,12 @@ const HistorySkeleton = () => (
     <div className="w-full overflow-hidden">
       {/* Table Header */}
       <div className="grid grid-cols-6 gap-4 p-4">
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
-        <Skeleton className="h-6 w-1/4" />
+        <Skeleton className="h-6 w-1/3" />
+        <Skeleton className="h-6 w-1/3" />
+        <Skeleton className="h-6 w-1/3" />
+        <Skeleton className="h-6 w-1/3" />
+        <Skeleton className="h-6 w-1/3" />
+        <Skeleton className="h-6 w-1/3" />
       </div>
 
       {/* Table Body */}
@@ -28,7 +28,7 @@ const HistorySkeleton = () => (
           className="grid grid-cols-6 gap-4 p-4 border-t border-gray-200"
         >
           <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-1/4" />
+          <Skeleton className="h-6 w-1/3" />
           <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-full" />
