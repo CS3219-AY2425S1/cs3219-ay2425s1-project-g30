@@ -53,13 +53,11 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <span className="text-md">Collaboration Partner</span>
-        <span className="ml-1 mr-2 font-semibold text-md">
-          {partnerUsername}
-        </span>
-        <Avatar className="w-8 h-8">
+        <Avatar className="w-8 h-8 ml-2">
           <AvatarImage />
           <AvatarFallback>{partnerUsername[0]}</AvatarFallback>
         </Avatar>
+        <span className="ml-2 mr-2 font-medium text-md">{partnerUsername}</span>
         <span className="ml-6 font-thin italic text-slate-500">
           Read-only View
         </span>
