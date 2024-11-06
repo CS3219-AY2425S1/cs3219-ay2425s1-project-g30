@@ -29,8 +29,8 @@ export const sortUsersQuerySchema = z.object({
 });
 
 export const userFiltersSchema = z.object({
-  email: emailSchema.optional(),
-  username: usernameSchema.optional(),
+  email: z.string().optional(),
+  username: z.string().optional(),
   roles: z.array(rolesEnum).optional(),
   // includeDeleted: z.coerce.boolean().optional(),
 

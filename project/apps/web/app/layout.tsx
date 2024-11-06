@@ -1,7 +1,7 @@
 'use client';
 
 import { Inter, Roboto } from 'next/font/google';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
@@ -11,6 +11,7 @@ import Suspense from '@/components/Suspense';
 import Topbar from '@/components/Topbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 import './globals.css';
@@ -63,6 +64,8 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
   const fetchUser = useAuthStore.use.fetchUser();
   const isLoginPage = pathname.startsWith('/login');
 
@@ -72,8 +75,13 @@ const RootLayout = ({
     const initialiseUser = async () => {
       try {
         await fetchUser();
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
+      } catch {
+        router.replace('/login');
+        toast({
+          variant: 'error',
+          title: 'Error',
+          description: 'Please login to continue',
+        });
       }
     };
     initialiseUser();

@@ -22,12 +22,15 @@ import {
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import useDebounce from '@/hooks/useDebounce';
 import { fetchUsers } from '@/lib/api/users';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
 
 import { columns } from './columns';
 import { UsersTableToolbar } from './UsersTableToolbar';
 
 export function UsersTable() {
+  const user = useAuthStore.use.user();
+  if (!user) return;
   const confirmLoading = useManageUsersStore.use.confirmLoading();
   const setConfirmLoading = useManageUsersStore.use.setConfirmLoading();
 
@@ -123,7 +126,7 @@ export function UsersTable() {
   };
 
   const metadata = data.metadata;
-  const users = data.users;
+  const users = data.users.filter((u) => u.id != user.id);
 
   const controlledState: ControlledTableStateProps = {
     pagination,

@@ -9,6 +9,7 @@ import UpdateModal from '@/components/manage-users/UpdateModal';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { updateUser, deleteUser } from '@/lib/api/users';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useManageUsersStore } from '@/stores/useManageUsersStore';
 
 interface ActionModalsProps {
@@ -16,6 +17,7 @@ interface ActionModalsProps {
 }
 
 export const ActionModals = ({ user }: ActionModalsProps) => {
+  const fetchUser = useAuthStore.use.fetchUser();
   const setConfirmLoading = useManageUsersStore.use.setConfirmLoading();
   const setUpdateModalOpen = useManageUsersStore.use.setUpdateModalOpen();
   const setDeleteModalOpen = useManageUsersStore.use.setDeleteModalOpen();
@@ -43,6 +45,8 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
+      fetchUser();
+      router.replace('/');
       toast({
         description: error.message,
         variant: 'error',
@@ -70,6 +74,8 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
     },
     onSettled: () => setConfirmLoading(false),
     onError: (error) => {
+      fetchUser();
+      router.replace('/');
       toast({
         variant: 'error',
         title: 'Error',

@@ -56,6 +56,7 @@ const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
     const updatedData: UpdateUserDto = {
       ...data,
       id: initialValues.id,
+      role: data.role == initialValues.role ? undefined : data.role,
     };
     onSubmit(updatedData);
   };
