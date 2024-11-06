@@ -1,6 +1,8 @@
 {
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
+    "source.fixAll.eslint": true
   },
   "eslint.validate": [
     "javascript",
@@ -8,6 +10,5 @@
     "typescript",
     "typescriptreact"
   ],
-  "editor.formatOnSave": false
+  "cSpell.words": ["Collab", "runtimes", "ydoc"]
 }
-  
