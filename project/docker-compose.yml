@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile
-      args: 
+      args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
         NEXT_PUBLIC_MATCH_SOCKET_URL: ${NEXT_PUBLIC_MATCH_SOCKET_URL}
         NEXT_PUBLIC_COLLAB_SOCKET_URL: ${NEXT_PUBLIC_COLLAB_SOCKET_URL}
@@ -105,10 +105,10 @@ services:
       COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       HOCUSPOCUS_PORT: ${HOCUSPOCUS_PORT}
       SUPABASE_URL: ${COLLABORATION_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${COLLABORATION_SERVICE_SUPABASE_KEY}
-      HOCUSPOCUS_PORT: ${HOCUSPOCUS_PORT}
       NODE_ENV: production
 
   rabbitmq:
@@ -145,7 +145,7 @@ services:
     networks:
       - backend
     depends_on:
-      - redis  # Ensure Redis starts before Redis Insight
+      - redis # Ensure Redis starts before Redis Insight
 
 networks:
   backend:

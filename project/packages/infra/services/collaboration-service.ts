@@ -73,6 +73,10 @@ export function configureCollaboration({
               name: 'AUTH_SERVICE_HOST',
               value: 'auth.service',
             },
+            {
+              name: 'USER_SERVICE_HOST',
+              value: 'user.service',
+            },
             { name: 'HOCUSPOCUS_PORT', value: '1234' },
             {
               name: 'SUPABASE_URL',
