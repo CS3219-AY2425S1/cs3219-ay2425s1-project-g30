@@ -11,8 +11,8 @@ export const envSchema = z.object({
 
   HOCUSPOCUS_PORT: z
     .string()
-    .transform((v) => parseInt(v, 10))
     .default('1234')
+    .transform((v) => parseInt(v, 10))
     .pipe(z.number()),
 
   SUPABASE_URL: z.string().min(1),

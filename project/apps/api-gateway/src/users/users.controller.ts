@@ -52,7 +52,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserById(@Req() req: Request, @Param('id') id: string) {
+  async getUserById(@Param('id') id: string) {
     return this.usersServiceClient.send({ cmd: 'get_user' }, id);
   }
 
@@ -73,17 +73,14 @@ export class UsersController {
       this.authServiceClient.send({ cmd: 'me' }, accessToken),
     );
 
-    if (userData.role != ROLE.Admin && userData.id != id) {
+    if (
+      userData.role != ROLE.Admin &&
+      (userData.id != id || updateUserDto.role)
+    ) {
       throw new ForbiddenException('Access denied.');
     }
 
     return this.usersServiceClient.send({ cmd: 'update_user' }, updateUserDto);
-  }
-
-  @Patch(':id')
-  @Roles(ROLE.Admin)
-  async updateUserPrivilegeById(@Param('id') id: string) {
-    return this.usersServiceClient.send({ cmd: 'update_privilege' }, id);
   }
 
   @Patch('password/:id')
@@ -163,9 +160,13 @@ export class UsersController {
     const isDeleted = await firstValueFrom(
       this.usersServiceClient.send({ cmd: 'delete_user' }, id),
     );
-    await this.authServiceClient.send({ cmd: 'signout' }, {});
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+
+    // Sign out user if they are deleting their own account
+    if (userData.id == id) {
+      await this.authServiceClient.send({ cmd: 'signout' }, {});
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+    }
 
     return res.status(HttpStatus.OK).json(isDeleted);
   }

@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import {
+  CollabCollectionDto,
   CollabCreateDto,
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
   CollabQuestionDto,
   CollabRequestDto,
-  ResponseWrapperDto,
 } from '@repo/dtos/collab';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
@@ -77,45 +78,70 @@ export class CollaborationService {
   /**
    * Retrieves all collaborations for a given user based on a given set of filters.
    * @param filters - The filters to apply when fetching collaborations.
-   * @returns A promise that resolves to the collaboration data transfer objects (ResponseWrapperDto).
+   * @returns A promise that resolves to a collection of collaborations.
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
-  async getAllCollabs(filters: CollabFiltersDto): Promise<ResponseWrapperDto> {
+  async getAllCollabs(filters: CollabFiltersDto): Promise<CollabCollectionDto> {
     try {
-      const collabs = await this.collabRepository.findAll(filters);
+      const collabCollection = await this.collabRepository.findAll(filters);
       this.logger.log(
-        `Found ${collabs.length} collaborations for user ${filters.user_id}`,
+        `Fetched ${collabCollection.metadata.count} collaborations with filters: ${JSON.stringify(filters)}`,
       );
 
-      return {
-        data: collabs,
-        count: collabs.length,
-      };
+      return collabCollection;
     } catch (error) {
       this.handleError('get all collaborations', error);
     }
   }
 
   /**
-   * Fetches the information of a collaboration including the selected question data by its unique identifier.
+   * Fetches the information of an active collaboration including the selected question data by its unique identifier.
    * @param collabId - The unique identifier of the collaboration to be fetched.
    * @returns A promise that resolves to the collaboration information data transfer object.
+   *          If the collaboration is not active, the promise will resolve to null.
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
 
-  async getCollabInfo(collabId: string): Promise<CollabInfoDto> {
+  async getActiveCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
     try {
       const collab = await this.collabRepository.fetchCollabInfo(collabId);
+      const isActive =
+        await this.collabRepository.checkActiveCollaborationById(collabId);
 
       if (!collab) {
         throw new Error(`Collaboration with id ${collabId} not found`);
       }
 
-      this.logger.debug(`Found collaboration with id: ${collabId}`);
+      this.logger.log(`Fetched collaboration with id: ${collabId}`);
+
+      return isActive ? collab : null;
+    } catch (error) {
+      this.handleError('get collaboration info', error);
+    }
+  }
+
+  /**
+   * Fetches the collaboration information and associated document of a collaboration by its unique identifier.
+   * @param collabId - The unique identifier of the collaboration to be fetched.
+   * @returns A promise that resolves to the collaboration information with document data transfer object.
+   * @throws Will handle and log any errors that occur during the retrieval process.
+   */
+  async getCollabInfoAndDocument(
+    collabId: string,
+  ): Promise<CollabInfoWithDocumentDto> {
+    try {
+      const collab =
+        await this.collabRepository.fetchCollabInfoWithDocument(collabId);
+
+      if (!collab) {
+        throw new Error(`Collaboration with id ${collabId} not found`);
+      }
+
+      this.logger.debug(`Found collaboration document with id: ${collabId}`);
 
       return collab;
     } catch (error) {
-      this.handleError('get collaboration info', error);
+      this.handleError('get collaboration document', error);
     }
   }
 

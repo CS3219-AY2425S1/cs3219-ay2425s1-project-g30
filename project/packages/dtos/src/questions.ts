@@ -15,7 +15,16 @@ export const questionFiltersSchema = z.object({
   title: z.string().optional(),
   categories: z.array(categoryEnum).optional(),
   complexities: z.array(complexityEnum).optional(),
-  includeDeleted: z.coerce.boolean().optional(),
+  includeDeleted: z
+    .preprocess((val) => {
+      if (typeof val === "string") {
+        if (val.toLowerCase() === "true") return true;
+        if (val.toLowerCase() === "false") return false;
+        return val;
+      }
+      return val;
+    }, z.boolean())
+    .optional(),
 
   offset: z.coerce.number().int().nonnegative().optional(),
   limit: z.coerce.number().int().positive().optional(),

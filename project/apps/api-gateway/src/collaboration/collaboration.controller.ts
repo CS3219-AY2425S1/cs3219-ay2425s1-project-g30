@@ -25,6 +25,14 @@ export class CollaborationController {
     );
   }
 
+  @Get('history/:id')
+  async getCollaborationHistoryById(@Param('id') collabId: string) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'get_collab_history' },
+      collabId,
+    );
+  }
+
   @Get()
   @UsePipes(new ZodValidationPipe(collabFiltersSchema))
   async getCollaborationInfos(@Query() filters: CollabFiltersDto) {

@@ -2,13 +2,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode } from 'react';
-// import { EnforceLoginStatePageWrapper } from "@/components/auth-wrappers/EnforceLoginStatePageWrapper";
 
-interface MatchLayoutProps {
+interface CollabLayoutProps {
   children: ReactNode;
 }
 
-const MatchLayout = ({ children }: MatchLayoutProps) => {
+const CollabLayout = ({ children }: CollabLayoutProps) => {
   const animationProps = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -18,11 +17,11 @@ const MatchLayout = ({ children }: MatchLayoutProps) => {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div key="match-layout" {...animationProps}>
+      <motion.div key="collab-layout" {...animationProps}>
         {children}
       </motion.div>
     </AnimatePresence>
   );
 };
 
-export default MatchLayout;
+export default CollabLayout;

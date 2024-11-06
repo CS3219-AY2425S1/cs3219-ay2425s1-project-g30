@@ -19,6 +19,7 @@ interface DeleteModalProps {
 export default function DeleteModal({ onDelete, username }: DeleteModalProps) {
   const isDeleteModalOpen = useProfileStore.use.isDeleteModalOpen();
   const setDeleteModalOpen = useProfileStore.use.setDeleteModalOpen();
+  const confirmLoading = useProfileStore.use.confirmLoading();
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={setDeleteModalOpen}>
@@ -31,10 +32,18 @@ export default function DeleteModal({ onDelete, username }: DeleteModalProps) {
           <div>This action cannot be undone.</div>
         </DialogDescription>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+          <Button
+            variant="outline"
+            disabled={confirmLoading}
+            onClick={() => setDeleteModalOpen(false)}
+          >
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onDelete}>
+          <Button
+            variant="destructive"
+            disabled={confirmLoading}
+            onClick={onDelete}
+          >
             Delete
           </Button>
         </DialogFooter>

@@ -26,11 +26,6 @@ export class UsersController {
     return await this.usersService.updateById(updateUserDto);
   }
 
-  @MessagePattern({ cmd: 'update_privilege' })
-  async updateUserPrivilegeById(@Payload() id: string) {
-    return await this.usersService.updatePrivilegeById(id);
-  }
-
   @MessagePattern({ cmd: 'change_password' })
   async changePasswordById(@Payload() changePasswordDto: ChangePasswordDto) {
     return await this.usersService.changePasswordById(changePasswordDto);

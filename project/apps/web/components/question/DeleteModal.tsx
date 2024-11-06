@@ -19,6 +19,7 @@ interface DeleteModalProps {
 const DeleteModal = ({ onDelete, questionTitle }: DeleteModalProps) => {
   const isDeleteModalOpen = useQuestionsStore.use.isDeleteModalOpen();
   const setDeleteModalOpen = useQuestionsStore.use.setDeleteModalOpen();
+  const confirmLoading = useQuestionsStore.use.confirmLoading();
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={setDeleteModalOpen}>
@@ -33,10 +34,18 @@ const DeleteModal = ({ onDelete, questionTitle }: DeleteModalProps) => {
           <div>This action cannot be undone.</div>
         </DialogDescription>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+          <Button
+            variant="outline"
+            disabled={confirmLoading}
+            onClick={() => setDeleteModalOpen(false)}
+          >
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onDelete}>
+          <Button
+            variant="destructive"
+            disabled={confirmLoading}
+            onClick={onDelete}
+          >
             Delete
           </Button>
         </DialogFooter>

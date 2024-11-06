@@ -29,8 +29,13 @@ export class CollaborationController {
   }
 
   @MessagePattern({ cmd: 'get_collab_info' })
-  async getCollabInfo(@Payload() collabId: string) {
-    return await this.collaborationService.getCollabInfo(collabId);
+  async getActiveCollabInfo(@Payload() collabId: string) {
+    return await this.collaborationService.getActiveCollabInfo(collabId);
+  }
+
+  @MessagePattern({ cmd: 'get_collab_history' })
+  async getCollabDocument(@Payload() collabId: string) {
+    return await this.collaborationService.getCollabInfoAndDocument(collabId);
   }
 
   @MessagePattern({ cmd: 'end_collab' })

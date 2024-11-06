@@ -1,8 +1,10 @@
 import {
+  CollabCollectionDto,
   CollabCreateDto,
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
   CollabQuestionDto,
 } from '@repo/dtos/collab';
 
@@ -38,9 +40,9 @@ export abstract class CollaborationRepository {
   /**
    * Fetches all collaboration entries for a given user.
    * @param filters - The filters to apply when fetching collaborations.
-   * @returns A promise that resolves to an array of collaboration data transfer objects.
+   * @returns A promise that resolves to a collection of collaborations.
    */
-  abstract findAll(filters: CollabFiltersDto): Promise<CollabDto[]>;
+  abstract findAll(filters: CollabFiltersDto): Promise<CollabCollectionDto>;
 
   /**
    * Check if a collaboration is active by its unique identifier.
@@ -84,6 +86,15 @@ export abstract class CollaborationRepository {
    * @returns A promise that resolves to the collaboration information data transfer object.
    */
   abstract fetchCollabInfo(id: string): Promise<CollabInfoDto>;
+
+  /**
+   * Fetches the collaboration information and associated document for a given collaboration id.
+   * @param id The unique identifier of the collaboration to fetch information for.
+   * @returns A promise that resolves to the collaboration information with document data transfer object.
+   */
+  abstract fetchCollabInfoWithDocument(
+    id: string,
+  ): Promise<CollabInfoWithDocumentDto>;
 
   /**
    * Ends a collaboration by its unique identifier.

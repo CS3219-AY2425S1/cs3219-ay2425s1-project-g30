@@ -5,10 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
+  CollabCollectionDto,
   CollabCreateDto,
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
   CollabQuestionDto,
 } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -18,8 +20,13 @@ import { CollaborationRepository } from 'src/domain/ports/collaboration.reposito
 import { EnvService } from 'src/env/env.service';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { QuestionDto } from '@repo/dtos/questions';
+import {
+  QuestionCollectionDto,
+  QuestionDto,
+  QuestionFiltersDto,
+} from '@repo/dtos/questions';
 import { UserDataDto } from '@repo/dtos/users';
+import { collectionMetadataDto } from '@repo/dtos/metadata';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
@@ -93,20 +100,48 @@ export class CollaborationSupabase implements CollaborationRepository {
     return data;
   }
 
-  /**
-   * Retrieves all collaborations based on the provided filters.
-   *
-   * @param {CollabFiltersDto} filters - The filters to apply when fetching collaborations.
-   * @returns {Promise<CollabDto[]>} A promise that resolves to an array of collaboration DTOs.
-   * @throws Will throw an error if the collaborations cannot be fetched.
-   */
-  async findAll(filters: CollabFiltersDto): Promise<CollabDto[]> {
-    const { user_id, collab_user_id, includeEnded, offset, limit, sort } =
-      filters;
+  async findAll(filters: CollabFiltersDto): Promise<CollabCollectionDto> {
+    const {
+      user_id,
+      collab_user_id,
+      has_ended,
+      offset,
+      limit,
+      sort,
+      q_title,
+      q_category,
+      q_complexity,
+    } = filters;
+
+    let filteredQuestionIds = null;
+    if (q_title || q_category || q_complexity) {
+      // query for questions that match the filters
+      const questionFilters: QuestionFiltersDto = {
+        title: q_title,
+        categories: q_category,
+        complexities: q_complexity,
+        includeDeleted: true,
+      };
+
+      // get the filtered question ids
+      // we have to call the question service to get the filtered questions as we don't have direct access to the questions
+      const filteredQuestions = await firstValueFrom(
+        this.questionServiceClient.send<QuestionCollectionDto>(
+          { cmd: 'get_questions' },
+          questionFilters,
+        ),
+      );
+
+      filteredQuestionIds = filteredQuestions.questions.map((q) => q.id);
+    }
 
     let queryBuilder = this.supabase
       .from(this.COLLABORATION_TABLE)
       .select('*', { count: 'exact' });
+
+    if (filteredQuestionIds) {
+      queryBuilder = queryBuilder.in('question_id', filteredQuestionIds);
+    }
 
     // Apply user filtering
     if (user_id && collab_user_id) {
@@ -121,7 +156,9 @@ export class CollaborationSupabase implements CollaborationRepository {
       );
     }
 
-    if (!includeEnded) {
+    if (has_ended) {
+      queryBuilder = queryBuilder.not('ended_at', 'is', null);
+    } else {
       queryBuilder = queryBuilder.is('ended_at', null);
     }
 
@@ -134,31 +171,56 @@ export class CollaborationSupabase implements CollaborationRepository {
       }
     }
 
-    const dataQuery = queryBuilder;
+    const totalCountQuery = queryBuilder;
 
-    // Apply pagination
+    let dataQuery = queryBuilder;
     if (limit) {
       if (offset !== undefined) {
-        queryBuilder = queryBuilder.range(offset, offset + limit - 1);
+        dataQuery = dataQuery.range(offset, offset + limit - 1);
       } else {
-        queryBuilder = queryBuilder.limit(limit);
+        dataQuery = dataQuery.limit(limit);
       }
     }
 
     // Execute the data query
-    const { data: collabs, error } = await queryBuilder;
+    const { data: collabs, error } = await dataQuery;
 
-    if (error) {
-      throw error;
-    }
-    
-    const { error: totalCountError } = await dataQuery;
+    // Execute the total count query
+    const { count: totalCount, error: totalCountError } = await totalCountQuery;
 
-    if (totalCountError) {
-      throw totalCountError;
+    if (error || totalCountError) {
+      throw error || totalCountError;
     }
 
-    return collabs as CollabDto[];
+    const metadata: collectionMetadataDto = {
+      count: collabs ? collabs.length : 0,
+      totalCount: totalCount ?? 0,
+    };
+
+    // get collabInfo for each collab retrieved
+    const collabInfoPromises = collabs.map((collab) =>
+      this.fetchCollabInfo(collab.id),
+    );
+
+    const collabInfoData = await Promise.all(collabInfoPromises);
+
+    // get partner info for each collab retrieved
+    const collabInfoWithPartnerData = collabInfoData.map((collab) => {
+      if (collab) {
+        const partner =
+          collab.collab_user1.id === user_id
+            ? collab.collab_user2
+            : collab.collab_user1;
+        return { ...collab, partner } as CollabInfoDto;
+      }
+      return;
+    });
+
+    // return the collection
+    return {
+      metadata,
+      collaborations: collabInfoWithPartnerData,
+    } as CollabCollectionDto;
   }
 
   async checkActiveCollaborationById(id: string): Promise<boolean> {
@@ -296,6 +358,11 @@ export class CollaborationSupabase implements CollaborationRepository {
       }
 
       const collabInfoData: CollabInfoDto = {
+        id: collabId,
+
+        started_at: collab.started_at,
+        ended_at: collab.ended_at,
+
         collab_user1: {
           id: user1Data.id,
           username: user1Data.username,
@@ -310,6 +377,26 @@ export class CollaborationSupabase implements CollaborationRepository {
       return collabInfoData;
     } catch (error) {
       throw new Error(`Failed to fetch collaboration info: ${error}`);
+    }
+  }
+
+  async fetchCollabInfoWithDocument(
+    collabId: string,
+  ): Promise<CollabInfoWithDocumentDto> {
+    try {
+      const collabInfo = await this.fetchCollabInfo(collabId);
+      const document = await this.fetchDocumentById(collabId);
+
+      const document_data = document ? Array.from(document) : null;
+
+      return {
+        ...collabInfo,
+        document_data,
+      } as CollabInfoWithDocumentDto;
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to fetch collaboration info with document: ${error}`,
+      );
     }
   }
 

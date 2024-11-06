@@ -36,7 +36,11 @@ export default function ProfileDetails({
     defaultValues: { email: user?.email },
   });
 
-  async function handleUpdate(data: string, field: 'username' | 'email') {
+  async function handleUpdate(
+    data: string | undefined,
+    field: 'username' | 'email',
+  ) {
+    if (!data) return;
     const updatedData = {
       id: user?.id,
       username: field == 'username' ? data : user?.username,
