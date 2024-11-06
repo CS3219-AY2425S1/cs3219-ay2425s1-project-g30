@@ -57,7 +57,7 @@ export function UsersTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const debouncedColumnFilters = useDebounce(
     columnFilters,
-    100,
+    300,
     () => setConfirmLoading(true),
     () => setConfirmLoading(false),
   );
@@ -128,7 +128,7 @@ export function UsersTable() {
   };
 
   const metadata = data.metadata;
-  const users = data.users.filter((u) => u.id != user.id);
+  const users = data.users;
 
   const controlledState: ControlledTableStateProps = {
     pagination,

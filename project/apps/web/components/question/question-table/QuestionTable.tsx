@@ -56,7 +56,7 @@ export function QuestionTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const debouncedColumnFilters = useDebounce(
     columnFilters,
-    100,
+    300,
     () => setConfirmLoading(true),
     () => setConfirmLoading(false),
   );

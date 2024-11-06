@@ -39,7 +39,7 @@ export function QuestionTableRowActions<TData>({
   };
   return (
     <>
-      {user?.role === 'Admin' && (
+      {user && user.role === 'Admin' && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
