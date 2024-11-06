@@ -26,7 +26,7 @@ import {
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import useDebounce from '@/hooks/useDebounce';
 import { useMe } from '@/hooks/useMe';
-import { fetchCollabs } from '@/lib/api/collab';
+import { getCollabs } from '@/lib/api/collab';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
 
 import { columns } from './columns';
@@ -117,7 +117,7 @@ export function HistoryTable() {
         sort,
       };
 
-      return await fetchCollabs(queryParams);
+      return await getCollabs(queryParams);
     },
   });
 

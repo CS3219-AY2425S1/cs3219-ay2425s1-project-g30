@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 
 import { HistoryTable } from '@/components/history/history-table/HistoryTable';
-import QuestionsSkeleton from '@/components/question/QuestionsSkeleton';
+import HistorySkeleton from '@/components/history/HistorySkeleton';
 
 const HistoryRepositoryContent = () => {
   return (
@@ -21,7 +21,7 @@ const HistoryRepositoryContent = () => {
 
 const HistoryRepository = () => {
   return (
-    <Suspense fallback={<QuestionsSkeleton />}>
+    <Suspense fallback={<HistorySkeleton />}>
       <HistoryRepositoryContent />
     </Suspense>
   );
