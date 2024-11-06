@@ -114,7 +114,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     return data;
   }
 
-  async findOneRandom(filters: CollabQuestionDto): Promise<string> {
+  async findOneRandom(filters: CollabQuestionDto): Promise<string | null> {
     const { category, complexity } = filters;
 
     // Serialize the category array to a string for filter pgres query
@@ -129,13 +129,13 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
       .eq('q_complexity', complexity)
       .filter('q_category', 'ov', categories)
       .limit(1)
-      .single<QuestionDto>();
+      .maybeSingle<QuestionDto>();
 
     if (error) {
-      return '';
+      throw error;
     }
 
-    return data.id;
+    return data?.id ?? null;
   }
 
   async create(question: CreateQuestionDto): Promise<QuestionDto> {

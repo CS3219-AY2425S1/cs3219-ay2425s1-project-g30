@@ -49,7 +49,7 @@ export class CollaborationService {
       const selectedQuestionId =
         await this.collabRepository.getRandomQuestion(filters);
 
-      if (selectedQuestionId === '') {
+      if (!selectedQuestionId) {
         throw new Error(
           `No suitable questions found for match id ${collabReqData.match_id}`,
         );

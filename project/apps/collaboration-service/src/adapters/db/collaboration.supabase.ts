@@ -301,7 +301,7 @@ export class CollaborationSupabase implements CollaborationRepository {
     }
   };
 
-  async getRandomQuestion(filters: CollabQuestionDto): Promise<string> {
+  async getRandomQuestion(filters: CollabQuestionDto): Promise<string | null> {
     // Call the question service to get a random question based on the filters
     const selectedQuestionId = await firstValueFrom(
       this.questionServiceClient.send<string>(
