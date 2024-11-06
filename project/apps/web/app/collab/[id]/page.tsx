@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
+import { getCollabInfoById } from '@/lib/api/collab';
 
 interface CollabPageProps {
   params: {
@@ -25,13 +26,12 @@ interface CollabPageProps {
 
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
-  const fetchCollab = useCollabStore.use.fetchCollab();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
   const editorRef = useRef<CollaborativeEditorRef>(null);
 
   const { data: collabInfo } = useSuspenseQuery<CollabInfoDto>({
     queryKey: [QUERY_KEYS.Collab, id],
-    queryFn: () => fetchCollab(id),
+    queryFn: () => getCollabInfoById(id),
   });
 
   if (!collabInfo) {
