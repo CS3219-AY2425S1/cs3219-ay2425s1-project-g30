@@ -1,8 +1,9 @@
 import {
-  CollabDto,
   CollabCollectionDto,
+  CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
+  CollabInfoWithDocumentDto,
 } from '@repo/dtos/collab';
 
 import { apiCall } from '@/lib/api/apiClient';
@@ -23,4 +24,10 @@ export const verifyCollab = async (id: string): Promise<boolean> => {
 
 export const endCollab = async (id: string): Promise<CollabDto> => {
   return await apiCall('post', `/collaboration/end/${id}`);
+};
+
+export const fetchCollaHistorybById = async (
+  id: string,
+): Promise<CollabInfoWithDocumentDto> => {
+  return await apiCall('get', `/collaboration/history/${id}`);
 };

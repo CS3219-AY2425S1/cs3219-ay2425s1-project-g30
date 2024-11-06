@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  CollabCollectionDto,
-  CollabFiltersDto,
-  CollabInfoDto,
-} from '@repo/dtos/collab';
+import { CollabCollectionDto, CollabFiltersDto } from '@repo/dtos/collab';
 import {
   CATEGORY,
   COMPLEXITY,
@@ -17,7 +13,7 @@ import {
   SortingState,
   Updater,
 } from '@tanstack/react-table';
-import { startTransition, useEffect, useMemo, useState } from 'react';
+import { startTransition, useEffect, useState } from 'react';
 
 import {
   ControlledTableStateProps,

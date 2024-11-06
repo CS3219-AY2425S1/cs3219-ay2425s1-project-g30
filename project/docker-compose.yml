@@ -72,11 +72,11 @@ services:
       dockerfile: ./apps/matching-service/Dockerfile
     ports:
       - 3004:3004
-      - 8080:8080  # Expose WebSocket port
+      - 8080:8080 # Expose WebSocket port
     networks:
       - backend
     environment:
-      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST} 
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
       MATCHING_SERVICE_HOST: ${MATCHING_SERVICE_HOST}
       QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
       COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
@@ -92,12 +92,14 @@ services:
       dockerfile: ./apps/collaboration-service/Dockerfile
     ports:
       - 3005:3005
-      - 1234:1234  # Expose WebSocket port
+      - 1234:1234 # Expose WebSocket port
     networks:
       - backend
     environment:
       COLLABORATION_SERVICE_HOST: ${COLLABORATION_SERVICE_HOST}
       AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      QUESTION_SERVICE_HOST: ${QUESTION_SERVICE_HOST}
+      HOCUSPOCUS_PORT: ${HOCUSPOCUS_PORT}
       SUPABASE_URL: ${COLLABORATION_SERVICE_SUPABASE_URL}
       SUPABASE_KEY: ${COLLABORATION_SERVICE_SUPABASE_KEY}
       NODE_ENV: production
@@ -135,7 +137,7 @@ services:
     networks:
       - backend
     depends_on:
-      - redis  # Ensure Redis starts before Redis Insight
+      - redis # Ensure Redis starts before Redis Insight
 networks:
   backend:
     driver: bridge

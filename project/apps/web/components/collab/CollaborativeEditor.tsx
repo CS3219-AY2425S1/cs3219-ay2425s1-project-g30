@@ -1,5 +1,5 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
-import Editor from '@monaco-editor/react';
+import Editor, { OnMount } from '@monaco-editor/react';
 import axios from 'axios';
 import { Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ import {
 } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
+import * as monaco from 'monaco-editor';
 
 import {
   Select,
@@ -58,7 +59,7 @@ const CollaborativeEditor = forwardRef<
   const [runLoading, setRunLoading] = useState(false);
   const [output, setOutput] = useState('');
 
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
 
@@ -104,8 +105,8 @@ const CollaborativeEditor = forwardRef<
     fetchRuntimes();
   }, []);
 
-  const handleEditorDidMount = (editor: any) => {
-    editorRef.current = editor;
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
+    editorRef.current = editor as monaco.editor.IStandaloneCodeEditor;
     setCollabLoading(true);
 
     if (typeof window !== 'undefined') {
@@ -124,7 +125,7 @@ const CollaborativeEditor = forwardRef<
             (state) => state.sessionEnded,
           )?.sessionEnded;
 
-          if (sessionEnded && sessionEnded.endedBy != user?.id) {
+          if (sessionEnded && sessionEnded.endedBy !== user?.id) {
             toast({
               variant: 'error',
               title: 'Session Ended',
@@ -160,7 +161,7 @@ const CollaborativeEditor = forwardRef<
         });
       }
 
-      // Update local runtime state when Yjs runtime changes
+      // Update local runtime state and editor language when Yjs runtime changes
       const handleYRuntimeChange = () => {
         const { language, version } = yRuntime.get('runtime') as Runtime;
 
@@ -169,6 +170,11 @@ const CollaborativeEditor = forwardRef<
           version !== selectedRuntime?.version
         ) {
           setSelectedRuntime({ language, version });
+
+          if (editorRef.current && language) {
+            const currentModel = editorRef.current.getModel();
+            monaco.editor.setModelLanguage(currentModel!, language);
+          }
         }
       };
 
@@ -294,7 +300,7 @@ const CollaborativeEditor = forwardRef<
                 <EditorAreaSkeleton />
               </div>
             }
-            onMount={handleEditorDidMount}
+            onMount={(editor, monaco) => handleEditorDidMount(editor, monaco)}
             options={{
               minimap: { enabled: false },
               readOnly: collabLoading,
