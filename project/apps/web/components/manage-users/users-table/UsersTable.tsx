@@ -29,6 +29,7 @@ import { columns } from './columns';
 import { UsersTableToolbar } from './UsersTableToolbar';
 
 export function UsersTable() {
+  const fetchUser = useAuthStore.use.fetchUser();
   const user = useAuthStore.use.user();
   if (!user) return;
   const confirmLoading = useManageUsersStore.use.confirmLoading();
@@ -62,6 +63,7 @@ export function UsersTable() {
   );
 
   useEffect(() => {
+    fetchUser();
     if (confirmLoading) {
       setConfirmLoading(true);
     } else {

@@ -24,7 +24,6 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
 
   const queryClient = useQueryClient();
   const router = useRouter();
-
   const { toast } = useToast();
 
   const updateMutation = useMutation({
