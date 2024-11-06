@@ -1,13 +1,11 @@
 'use client';
 
-import { Editor } from '@monaco-editor/react';
 import { CollabInfoWithDocumentDto } from '@repo/dtos/collab';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 
-import { EditorAreaSkeleton } from '@/components/collab/EditorSkeleton';
 import HistoryEditor from '@/components/history-view/HistoryEditor';
 import HistoryViewSkeleton from '@/components/history-view/HistoryViewSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
