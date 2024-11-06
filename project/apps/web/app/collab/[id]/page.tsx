@@ -14,7 +14,6 @@ import CollabSkeleton from '@/components/collab/CollabSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import { getCollabInfoById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
@@ -26,12 +25,13 @@ interface CollabPageProps {
 
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
+  const fetchCollab = useCollabStore.use.fetchCollab();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
   const editorRef = useRef<CollaborativeEditorRef>(null);
 
   const { data: collabInfo } = useSuspenseQuery<CollabInfoDto>({
     queryKey: [QUERY_KEYS.Collab, id],
-    queryFn: () => getCollabInfoById(id),
+    queryFn: () => fetchCollab(id),
   });
 
   if (!collabInfo) {
@@ -77,13 +77,19 @@ const CollabPageContent = ({ id }: { id: string }) => {
         {/* Question info */}
         <div className="w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white">
           <h2 className="mb-4 text-xl font-semibold">{question.title}</h2>
-          <p>{question.description}</p>
+          {question.description}
         </div>
 
         {/* Code editor */}
         <CollaborativeEditor ref={editorRef} id={id} className="w-1/2" />
       </div>
-      {collabInfo && <ActionModals onEndSession={endSession} collabId={id} />}
+      {collabInfo && (
+        <ActionModals
+          onEndSession={endSession}
+          collabPartner={partnerUsername}
+          collabId={id}
+        />
+      )}
     </div>
   );
 };

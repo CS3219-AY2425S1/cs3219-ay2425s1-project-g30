@@ -7,7 +7,7 @@ import { createSelectors } from '@/lib/zustand';
 interface CollabState {
   collaboration: CollabInfoDto | null;
   setCollaboration: (collab: CollabInfoDto | null) => void;
-  fetchCollab: (id: string) => Promise<void>;
+  fetchCollab: (id: string) => Promise<CollabInfoDto>;
   endCollab: (id: string) => Promise<void>;
   isTerminateModalOpen: boolean;
   setTerminateModalOpen: (isOpen: boolean) => void;
@@ -21,6 +21,7 @@ export const useCollabStoreBase = create<CollabState>()((set) => ({
   fetchCollab: async (id: string) => {
     const collab = await getCollabInfoById(id);
     set({ collaboration: collab });
+    return collab;
   },
   endCollab: async (id: string) => {
     await endCollab(id);
