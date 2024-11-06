@@ -1,5 +1,6 @@
 'use client';
 
+import { CollabInfoDto } from '@repo/dtos/collab';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import Link from 'next/link';
@@ -9,11 +10,9 @@ import DifficultyBadge from '@/components/DifficultyBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
-import { CollabInfoWithPartner } from './HistoryTable';
-
 const DATE_FORMAT = 'D MMM YY, h:mm A';
 
-export const columns: ColumnDef<CollabInfoWithPartner>[] = [
+export const columns: ColumnDef<CollabInfoDto>[] = [
   {
     id: 'question.q_title',
     accessorFn: (row) => row.question.q_title,
@@ -69,12 +68,12 @@ export const columns: ColumnDef<CollabInfoWithPartner>[] = [
   },
   {
     id: 'partner.username',
-    accessorFn: (row) => row.partner.username,
+    accessorFn: (row) => row.partner?.username,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Partner" />
     ),
     cell: ({ row }) => {
-      const username = row.original.partner.username;
+      const username = row.original.partner?.username || 'Unknown';
       return (
         <div className="flex items-center mb-4">
           <Avatar className="w-8 h-8">

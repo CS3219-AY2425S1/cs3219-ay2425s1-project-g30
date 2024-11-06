@@ -32,13 +32,6 @@ import { useQuestionsStore } from '@/stores/useQuestionStore';
 import { columns } from './columns';
 import { HistoryTableToolbar } from './HistoryTableToolbar';
 
-export type CollabInfoWithPartner = CollabInfoDto & {
-  partner: {
-    id: string;
-    username: string;
-  };
-};
-
 export function HistoryTable() {
   const { userData } = useMe();
   const { confirmLoading, setConfirmLoading } = useQuestionsStore();
@@ -141,24 +134,8 @@ export function HistoryTable() {
     });
   };
 
-  //  dataWithPartner includes a new 'partner' field, which is the other user in the collaboration
-  const dataWithPartner = useMemo(
-    () =>
-      data?.collaborations.map((collab) => {
-        const partner =
-          collab.collab_user1.id === userData!.id
-            ? collab.collab_user2
-            : collab.collab_user1;
-        return {
-          ...collab,
-          partner,
-        };
-      }) as CollabInfoWithPartner[],
-    [data, userData],
-  );
-
   const metadata = data.metadata;
-  const collaborations = dataWithPartner;
+  const collaborations = data.collaborations;
 
   const controlledState: ControlledTableStateProps = {
     pagination,

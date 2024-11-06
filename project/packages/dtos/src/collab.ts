@@ -29,6 +29,7 @@ export const collabInfoSchema = z.object({
   ended_at: z.date().nullable(),
   collab_user1: collaboratorSchema,
   collab_user2: collaboratorSchema,
+  partner: collaboratorSchema.optional(),
   question: questionSchema,
 });
 

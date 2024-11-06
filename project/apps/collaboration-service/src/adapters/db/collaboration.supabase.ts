@@ -203,10 +203,22 @@ export class CollaborationSupabase implements CollaborationRepository {
 
     const collabInfoData = await Promise.all(collabInfoPromises);
 
+    // get partner info for each collab retrieved
+    const collabInfoWithPartnerData = collabInfoData.map((collab) => {
+      if (collab) {
+        const partner =
+          collab.collab_user1.id === user_id
+            ? collab.collab_user2
+            : collab.collab_user1;
+        return { ...collab, partner } as CollabInfoDto;
+      }
+      return;
+    });
+
     // return the collection
     return {
       metadata,
-      collaborations: collabInfoData,
+      collaborations: collabInfoWithPartnerData,
     } as CollabCollectionDto;
   }
 
