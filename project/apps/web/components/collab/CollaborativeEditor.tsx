@@ -104,7 +104,7 @@ const CollaborativeEditor = forwardRef<
     fetchRuntimes();
   }, []);
 
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
     setCollabLoading(true);
 
@@ -124,7 +124,7 @@ const CollaborativeEditor = forwardRef<
             (state) => state.sessionEnded,
           )?.sessionEnded;
 
-          if (sessionEnded && sessionEnded.endedBy != user?.id) {
+          if (sessionEnded && sessionEnded.endedBy !== user?.id) {
             toast({
               variant: 'error',
               title: 'Session Ended',
@@ -160,7 +160,7 @@ const CollaborativeEditor = forwardRef<
         });
       }
 
-      // Update local runtime state when Yjs runtime changes
+      // Update local runtime state and editor language when Yjs runtime changes
       const handleYRuntimeChange = () => {
         const { language, version } = yRuntime.get('runtime') as Runtime;
 
@@ -169,6 +169,11 @@ const CollaborativeEditor = forwardRef<
           version !== selectedRuntime?.version
         ) {
           setSelectedRuntime({ language, version });
+
+          if (editorRef.current && language) {
+            const currentModel = editorRef.current.getModel();
+            monaco.editor.setModelLanguage(currentModel, language);
+          }
         }
       };
 
@@ -294,7 +299,7 @@ const CollaborativeEditor = forwardRef<
                 <EditorAreaSkeleton />
               </div>
             }
-            onMount={handleEditorDidMount}
+            onMount={(editor, monaco) => handleEditorDidMount(editor, monaco)}
             options={{
               minimap: { enabled: false },
               readOnly: collabLoading,
