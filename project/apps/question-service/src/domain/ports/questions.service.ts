@@ -82,9 +82,13 @@ export class QuestionsService {
       const randomQuestionId =
         await this.questionsRepository.findOneRandom(filters);
       if (randomQuestionId) {
-        this.logger.log(`fetched random question with id ${randomQuestionId}`);
+        this.logger.log(
+          `fetched random question ${randomQuestionId} for filters: ${JSON.stringify(filters)}`,
+        );
       } else {
-        this.logger.log('no random question found');
+        this.logger.log(
+          `no random question found for filters: ${JSON.stringify(filters)}`,
+        );
       }
 
       return randomQuestionId;
