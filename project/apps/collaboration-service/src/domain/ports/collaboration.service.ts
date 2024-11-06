@@ -94,9 +94,10 @@ export class CollaborationService {
   }
 
   /**
-   * Fetches the information of a collaboration including the selected question data by its unique identifier.
+   * Fetches the information of an active collaboration including the selected question data by its unique identifier.
    * @param collabId - The unique identifier of the collaboration to be fetched.
    * @returns A promise that resolves to the collaboration information data transfer object.
+   *          If the collaboration is not active, the promise will resolve to null.
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
 
