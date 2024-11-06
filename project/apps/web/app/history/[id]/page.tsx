@@ -32,7 +32,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
     return notFound();
   }
 
-  const userName =
+  const partnerUsername =
     collab.collab_user1.id == user?.id
       ? collab.collab_user2.username
       : collab.collab_user1.username;
@@ -53,10 +53,12 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <span className="text-md">Collaboration Partner</span>
-        <span className="ml-1 mr-2 font-semibold text-md">{userName}</span>
+        <span className="ml-1 mr-2 font-semibold text-md">
+          {partnerUsername}
+        </span>
         <Avatar className="w-8 h-8">
           <AvatarImage />
-          <AvatarFallback>{user?.username[0]}</AvatarFallback>
+          <AvatarFallback>{partnerUsername[0]}</AvatarFallback>
         </Avatar>
         <span className="ml-6 font-thin italic text-slate-500">
           Read-only View
