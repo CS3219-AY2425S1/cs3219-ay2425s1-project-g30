@@ -1,13 +1,11 @@
 import * as aws from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
-import * as pulumi from '@pulumi/pulumi';
 
 interface Props {
   stack: string;
   vpc: awsx.ec2.Vpc;
   cluster: aws.ecs.Cluster;
   securityGroup: aws.ec2.SecurityGroup;
-  dnsName: pulumi.Output<string>;
   targetGroup: aws.lb.TargetGroup;
 }
 
@@ -16,11 +14,10 @@ export function configureWeb({
   vpc,
   cluster,
   securityGroup,
-  dnsName,
   targetGroup,
 }: Props) {
   const webRepository = new awsx.ecr.Repository('web');
-
+  const URL = 'http://lastminprep.me';
   const webImage = new awsx.ecr.Image('web', {
     platform: 'linux/amd64',
     context: '../../',
@@ -28,9 +25,9 @@ export function configureWeb({
     repositoryUrl: webRepository.url,
     args: {
       NODE_ENV: 'production',
-      NEXT_PUBLIC_API_BASE_URL: pulumi.interpolate`http://${dnsName}/api`,
-      NEXT_PUBLIC_MATCH_SOCKET_URL: pulumi.interpolate`http://${dnsName}`,
-      NEXT_PUBLIC_COLLAB_SOCKET_URL: pulumi.interpolate`http://${dnsName}/collaboration-service`,
+      NEXT_PUBLIC_API_BASE_URL: `${URL}/api`,
+      NEXT_PUBLIC_MATCH_SOCKET_URL: `${URL}`,
+      NEXT_PUBLIC_COLLAB_SOCKET_URL: `${URL}/collaboration-service`,
     },
   });
 
