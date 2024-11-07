@@ -4,10 +4,10 @@ import { UserSessionDto, UserDataDto } from '@repo/dtos/users';
 import { apiCall } from './apiClient';
 
 export const signUp = async (signUpDto: SignUpDto): Promise<UserSessionDto> =>
-  await apiCall('post', '/auth/signup', signUpDto);
+  await apiCall('post', '/api/auth/signup', signUpDto);
 
 export const signIn = async (signInDto: SignInDto): Promise<UserSessionDto> =>
-  await apiCall('post', '/auth/signin', signInDto);
+  await apiCall('post', '/api/auth/signin', signInDto);
 
 export const signOut = async () => await apiCall<void>('post', '/auth/signout');
 

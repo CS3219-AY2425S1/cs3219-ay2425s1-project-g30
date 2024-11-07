@@ -44,27 +44,27 @@ export type Database = {
       };
       test_cases: {
         Row: {
-          cases: Json;
           created_at: string | null;
+          expected_output: string;
           id: string;
-          question_id: string;
-          schema: Json;
+          input: Json;
+          question_id: string | null;
           updated_at: string | null;
         };
         Insert: {
-          cases: Json;
           created_at?: string | null;
+          expected_output: string;
           id?: string;
-          question_id: string;
-          schema: Json;
+          input: Json;
+          question_id?: string | null;
           updated_at?: string | null;
         };
         Update: {
-          cases?: Json;
           created_at?: string | null;
+          expected_output?: string;
           id?: string;
-          question_id?: string;
-          schema?: Json;
+          input?: Json;
+          question_id?: string | null;
           updated_at?: string | null;
         };
         Relationships: [
