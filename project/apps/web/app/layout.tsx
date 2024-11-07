@@ -15,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 import './globals.css';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFallback from '@/components/ErrorFallback';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -90,16 +92,18 @@ const RootLayout = ({
   return (
     <html lang="en" className={inter.className}>
       <body className={roboto.className}>
-        <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
-          <ReactQueryProvider>
-            <EnforceLoginStatePageWrapper requireLogin={!isLoginPage}>
-              <LayoutWithSidebarAndTopbar>
-                {children}
-              </LayoutWithSidebarAndTopbar>
-            </EnforceLoginStatePageWrapper>
-          </ReactQueryProvider>
-          <Toaster />
-        </Suspense>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
+            <ReactQueryProvider>
+              <EnforceLoginStatePageWrapper requireLogin={!isLoginPage}>
+                <LayoutWithSidebarAndTopbar>
+                  {children}
+                </LayoutWithSidebarAndTopbar>
+              </EnforceLoginStatePageWrapper>
+            </ReactQueryProvider>
+            <Toaster />
+          </Suspense>
+        </ErrorBoundary>
       </body>
     </html>
   );
