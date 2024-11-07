@@ -109,7 +109,7 @@ export function CollabTable({ showEndedSessions }: CollabTableProps) {
 
       const queryParams: CollabFiltersDto = {
         user_id,
-        has_ended: true,
+        has_ended: showEndedSessions,
         q_title,
         q_category,
         q_complexity,
