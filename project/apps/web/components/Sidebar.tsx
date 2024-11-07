@@ -1,31 +1,39 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { UserDataDto } from '@repo/dtos/users';
+import { useQuery } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Activity,
+  Clock,
   HomeIcon,
   ListIcon,
+  LogOut,
   UserRound,
   UsersRound,
-  LogOut,
-  Clock,
-  Activity,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
+import { QUERY_KEYS } from '@/constants/queryKeys';
+import { checkActiveCollabs } from '@/lib/api/collab';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/useAuthStore';
 
 interface SidebarProps {
   signOut: () => void;
+  user: UserDataDto;
 }
 
-const Sidebar = ({ signOut }: SidebarProps) => {
-  const user = useAuthStore.use.user();
+const Sidebar = ({ signOut, user }: SidebarProps) => {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
+
+  const { data: showDot } = useQuery<boolean>({
+    queryKey: [QUERY_KEYS.Collab, user.id],
+    queryFn: () => checkActiveCollabs({ user_id: user.id }),
+  });
 
   const navItems = [
     { name: 'Home', href: '/', icon: <HomeIcon className="w-5 h-5" /> },
@@ -37,7 +45,16 @@ const Sidebar = ({ signOut }: SidebarProps) => {
     {
       name: 'Sessions',
       href: '/sessions',
-      icon: <Activity className="w-5 h-5" />,
+      icon: (
+        <div className="relative inline-block">
+          <Activity className="w-5 h-5" />
+          {showDot && (
+            <span
+              className={`absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white`}
+            />
+          )}
+        </div>
+      ),
     },
     {
       name: 'History',

@@ -35,7 +35,6 @@ const LayoutWithSidebarAndTopbar = ({
   const pathname = usePathname();
   const user = useAuthStore.use.user();
   const signOut = useAuthStore.use.signOut();
-
   const renderSidebarAndTopbar =
     !pathname.startsWith('/collab') &&
     !pathname.startsWith('/login') &&
@@ -43,10 +42,10 @@ const LayoutWithSidebarAndTopbar = ({
 
   return (
     <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
-      {renderSidebarAndTopbar && (
+      {user && renderSidebarAndTopbar && (
         <>
           <Topbar user={user} />
-          <Sidebar signOut={signOut} />
+          <Sidebar signOut={signOut} user={user} />
         </>
       )}
       <main

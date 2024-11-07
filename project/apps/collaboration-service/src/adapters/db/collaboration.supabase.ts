@@ -419,4 +419,19 @@ export class CollaborationSupabase implements CollaborationRepository {
     }
     return data;
   }
+
+  async checkActiveCollabs(userId: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .select()
+      .is('ended_at', null)
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+      .limit(1);
+
+    if (error) {
+      throw error;
+    }
+
+    return data && data.length > 0;
+  }
 }
