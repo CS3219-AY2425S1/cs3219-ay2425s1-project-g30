@@ -2,15 +2,14 @@
 
 import { UserDataDto, ChangePasswordDto } from '@repo/dtos/users';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 
 import ChangePasswordModal from '@/components/profile/ChangePasswordModal';
 import DeleteModal from '@/components/profile/DeleteModal';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { changePassword, deleteUser } from '@/lib/api/users';
-import { useProfileStore } from '@/stores/useProfileStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useProfileStore } from '@/stores/useProfileStore';
 
 interface ActionModalsProps {
   user: UserDataDto;
@@ -24,7 +23,6 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
   const setDeleteModalOpen = useProfileStore.use.setDeleteModalOpen();
 
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const { toast } = useToast();
 
