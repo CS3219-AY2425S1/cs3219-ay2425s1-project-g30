@@ -6,6 +6,9 @@ import {
   CollabInfoDto,
   CollabInfoWithDocumentDto,
   CollabQuestionDto,
+  ExecutionSnapshotCollectionDto,
+  ExecutionSnapshotCreateDto,
+  ExecutionSnapshotDto,
 } from '@repo/dtos/collab';
 
 /**
@@ -103,4 +106,22 @@ export abstract class CollaborationRepository {
    * @param id The unique identifier of the collaboration to end.
    */
   abstract endCollab(id: string): Promise<CollabDto>;
+
+  /**
+   * Retrieves all snapshots for a given collaboration id.
+   * @param id The unique identifier of the collaboration to fetch snapshots for.
+   * @returns A promise that resolves to an array of snapshot data transfer objects.
+   */
+  abstract getSnapshotsByCollabId(
+    id: string,
+  ): Promise<ExecutionSnapshotCollectionDto>;
+
+  /**
+   * Creates a snapshot of the execution state of a document.
+   * @param data The data transfer object containing the details of the snapshot to be created.
+   * @returns A promise that resolves to the created snapshot data transfer object.
+   */
+  abstract createSnapshot(
+    data: ExecutionSnapshotCreateDto,
+  ): Promise<ExecutionSnapshotDto>;
 }

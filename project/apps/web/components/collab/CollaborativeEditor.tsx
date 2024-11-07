@@ -1,5 +1,6 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
+import { ExecutionSnapshotCreateDto } from '@repo/dtos/collab';
 import axios from 'axios';
 import { Play } from 'lucide-react';
 import * as monaco from 'monaco-editor';
@@ -24,6 +25,7 @@ import {
 import { LANGUAGES, Runtime } from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
+import { saveCodeExecution } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
@@ -229,10 +231,27 @@ const CollaborativeEditor = forwardRef<
         response.data?.run?.stderr ||
         'Error: Empty code input.';
       setOutput(output);
+
+      // save code execution snapshot in its own try-catch block
+      await saveCodeExecutionSnapshot(code, output);
     } catch (error: any) {
       setOutput(`Error: ${error.message}`);
     } finally {
       setRunLoading(false);
+    }
+  };
+
+  const saveCodeExecutionSnapshot = async (code: string, output: string) => {
+    try {
+      // save code execution snapshot
+      const snapshot: ExecutionSnapshotCreateDto = {
+        collaboration_id: id,
+        code,
+        output,
+      };
+      await saveCodeExecution(snapshot);
+    } catch (error) {
+      console.error('Failed to save code execution snapshot:', error);
     }
   };
 

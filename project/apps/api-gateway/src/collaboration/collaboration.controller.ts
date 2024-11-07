@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Inject,
@@ -9,7 +10,12 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
-import { collabFiltersSchema, CollabFiltersDto } from '@repo/dtos/collab';
+import {
+  collabFiltersSchema,
+  CollabFiltersDto,
+  ExecutionSnapshotDto,
+  executionSnapshotCreateSchema,
+} from '@repo/dtos/collab';
 @Controller('collaboration')
 export class CollaborationController {
   constructor(
@@ -56,6 +62,25 @@ export class CollaborationController {
     return this.collaborationServiceClient.send(
       { cmd: 'end_collab' },
       collabId,
+    );
+  }
+
+  // ===== snapshot related routes =====
+
+  @Get('snapshot/:id')
+  async getExecutionSnapshotsByCollabId(@Param('id') collabId: string) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'get_snapshots' },
+      collabId,
+    );
+  }
+
+  @Post('snapshot')
+  @UsePipes(new ZodValidationPipe(executionSnapshotCreateSchema))
+  async createExecutionSnapshot(@Body() snapshot: ExecutionSnapshotDto) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'create_snapshot' },
+      snapshot,
     );
   }
 }

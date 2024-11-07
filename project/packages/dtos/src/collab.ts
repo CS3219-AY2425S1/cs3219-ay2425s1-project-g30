@@ -88,6 +88,22 @@ export const collabFiltersSchema = z.object({
   sort: z.array(sortCollaborationsQuerySchema).optional(),
 });
 
+export const executionSnapshotSchema = z.object({
+  collaboration_id: z.string().uuid(),
+  code: z.string(),
+  output: z.string(),
+  created_at: z.date(),
+});
+
+export const executionSnapshotCollectionSchema = z.object({
+  metadata: collectionMetadataSchema,
+  snapshots: z.array(executionSnapshotSchema),
+});
+
+export const executionSnapshotCreateSchema = executionSnapshotSchema.omit({
+  created_at: true,
+});
+
 export type CollabFiltersDto = z.infer<typeof collabFiltersSchema>;
 export type CollabUserDto = z.infer<typeof collaboratorSchema>;
 export type CollabInfoDto = z.infer<typeof collabInfoSchema>;
@@ -99,3 +115,11 @@ export type CollabQuestionDto = z.infer<typeof collabQuestionSchema>;
 export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
 export type CollabDto = z.infer<typeof collabSchema>;
 export type CollabCollectionDto = z.infer<typeof collabCollectionSchema>;
+
+export type ExecutionSnapshotDto = z.infer<typeof executionSnapshotSchema>;
+export type ExecutionSnapshotCollectionDto = z.infer<
+  typeof executionSnapshotCollectionSchema
+>;
+export type ExecutionSnapshotCreateDto = z.infer<
+  typeof executionSnapshotCreateSchema
+>;

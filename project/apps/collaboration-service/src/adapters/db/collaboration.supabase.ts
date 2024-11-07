@@ -12,6 +12,9 @@ import {
   CollabInfoDto,
   CollabInfoWithDocumentDto,
   CollabQuestionDto,
+  ExecutionSnapshotCollectionDto,
+  ExecutionSnapshotCreateDto,
+  ExecutionSnapshotDto,
 } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -33,6 +36,7 @@ export class CollaborationSupabase implements CollaborationRepository {
   private supabase: SupabaseClient;
 
   private readonly COLLABORATION_TABLE = 'collaboration';
+  private readonly SNAPSHOT_TABLE = 'snapshots';
 
   constructor(
     private envService: EnvService,
@@ -321,63 +325,51 @@ export class CollaborationSupabase implements CollaborationRepository {
     }
 
     const { question_id, user1_id, user2_id } = collab;
-    try {
-      const [selectedQuestionData, user1Data, user2Data] = await Promise.all([
-        firstValueFrom(
-          this.questionServiceClient.send<QuestionDto>(
-            { cmd: 'get_question' },
-            question_id,
-          ),
+    const [selectedQuestionData, user1Data, user2Data] = await Promise.all([
+      firstValueFrom(
+        this.questionServiceClient.send<QuestionDto>(
+          { cmd: 'get_question' },
+          question_id,
         ),
-        firstValueFrom(
-          this.userServiceClient.send<UserDataDto>(
-            { cmd: 'get_user' },
-            user1_id,
-          ),
-        ),
-        firstValueFrom(
-          this.userServiceClient.send<UserDataDto>(
-            { cmd: 'get_user' },
-            user2_id,
-          ),
-        ),
-      ]);
+      ),
+      firstValueFrom(
+        this.userServiceClient.send<UserDataDto>({ cmd: 'get_user' }, user1_id),
+      ),
+      firstValueFrom(
+        this.userServiceClient.send<UserDataDto>({ cmd: 'get_user' }, user2_id),
+      ),
+    ]);
 
-      if (!selectedQuestionData) {
-        throw new NotFoundException(
-          `Question with id ${question_id} not found`,
-        );
-      }
-
-      if (!user1Data) {
-        throw new NotFoundException(`User with id ${user1_id} not found`);
-      }
-
-      if (!user2Data) {
-        throw new NotFoundException(`User with id ${user2_id} not found`);
-      }
-
-      const collabInfoData: CollabInfoDto = {
-        id: collabId,
-
-        started_at: collab.started_at,
-        ended_at: collab.ended_at,
-
-        collab_user1: {
-          id: user1Data.id,
-          username: user1Data.username,
-        },
-        collab_user2: {
-          id: user2Data.id,
-          username: user2Data.username,
-        },
-        question: selectedQuestionData,
-      };
-
-      return collabInfoData;
-    } catch (error) {
-      throw new Error(`Failed to fetch collaboration info: ${error}`);
+    if (!selectedQuestionData) {
+      throw new NotFoundException(`Question with id ${question_id} not found`);
     }
+
+    if (!user1Data) {
+      throw new NotFoundException(`User with id ${user1_id} not found`);
+    }
+
+    if (!user2Data) {
+      throw new NotFoundException(`User with id ${user2_id} not found`);
+    }
+
+    const collabInfoData: CollabInfoDto = {
+      id: collabId,
+
+      started_at: collab.started_at,
+      ended_at: collab.ended_at,
+
+      collab_user1: {
+        id: user1Data.id,
+        username: user1Data.username,
+      },
+      collab_user2: {
+        id: user2Data.id,
+        username: user2Data.username,
+      },
+      question: selectedQuestionData,
+    };
+
+    return collabInfoData;
   }
 
   async fetchCollabInfoWithDocument(
@@ -418,5 +410,52 @@ export class CollaborationSupabase implements CollaborationRepository {
       throw error;
     }
     return data;
+  }
+
+  async getSnapshotsByCollabId(
+    id: string,
+  ): Promise<ExecutionSnapshotCollectionDto> {
+    const { data: snapshots, error } = await this.supabase
+      .from(this.SNAPSHOT_TABLE)
+      .select()
+      .eq('collaboration_id', id)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+
+    const count = snapshots ? snapshots.length : 0;
+
+    return {
+      metadata: {
+        count,
+        totalCount: count,
+      },
+      snapshots,
+    };
+  }
+
+  async createSnapshot(
+    data: ExecutionSnapshotCreateDto,
+  ): Promise<ExecutionSnapshotDto> {
+    // Check if the collaboration exists
+    if (!(await this.findById(data.collaboration_id))) {
+      throw new NotFoundException(
+        `Collaboration with id ${data.collaboration_id} not found`,
+      );
+    }
+
+    const { data: snapshot, error } = await this.supabase
+      .from(this.SNAPSHOT_TABLE)
+      .insert(data)
+      .select()
+      .single<ExecutionSnapshotDto>();
+
+    if (error) {
+      throw error;
+    }
+
+    return snapshot;
   }
 }

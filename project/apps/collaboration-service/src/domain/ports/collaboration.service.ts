@@ -9,6 +9,7 @@ import {
   CollabInfoWithDocumentDto,
   CollabQuestionDto,
   CollabRequestDto,
+  ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
@@ -172,6 +173,36 @@ export class CollaborationService {
       return await this.collabRepository.endCollab(collabId);
     } catch (error) {
       this.handleError('end collaboration', error);
+    }
+  }
+
+  /**
+   * Retrieves all execution snapshots for a given collaboration by its unique identifier.
+   *
+   * @param collabId The unique identifier of the collaboration to fetch snapshots for.
+   * @returns A promise that resolves to a collection of execution snapshots.
+   * @throws Will handle and log any errors that occur during the retrieval process.
+   */
+  async getSnapshotsByCollabId(collabId: string) {
+    try {
+      return await this.collabRepository.getSnapshotsByCollabId(collabId);
+    } catch (error) {
+      this.handleError('get snapshots', error);
+    }
+  }
+
+  /**
+   * Creates a new execution snapshot entry in the repository.
+   *
+   * @param snapshot The data transfer object containing the details of the execution snapshot to be created.
+   * @returns A promise that resolves to the created execution snapshot data transfer object.
+   * @throws Will handle and log any errors that occur during the creation process.
+   */
+  async createSnapshot(snapshot: ExecutionSnapshotCreateDto) {
+    try {
+      return await this.collabRepository.createSnapshot(snapshot);
+    } catch (error) {
+      this.handleError('create snapshot', error);
     }
   }
 }
