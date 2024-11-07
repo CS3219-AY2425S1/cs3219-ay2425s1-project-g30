@@ -4,7 +4,6 @@ import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
 import { MatchRedis } from 'src/db/match.redis';
-import { EnvService } from 'src/env/env.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
