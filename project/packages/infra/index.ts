@@ -29,7 +29,6 @@ const {
   collaborationTargetGroup,
 } = configureNetwork({ stack });
 const { cluster, namespace } = configureServices({ stack, vpc });
-const dnsName = lb.loadBalancer.dnsName;
 
 // Setup images, task definitions and services
 configureApi({
@@ -44,7 +43,6 @@ configureWeb({
   vpc,
   cluster,
   securityGroup,
-  dnsName,
   targetGroup: webTargetGroup,
 });
 configureAuth({

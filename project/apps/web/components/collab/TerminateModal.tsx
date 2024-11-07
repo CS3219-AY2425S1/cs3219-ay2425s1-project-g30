@@ -9,23 +9,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
 interface TerminateModalProps {
+  collabPartner: string;
   onTerminate: () => void;
 }
 
-export default function TerminateModal({ onTerminate }: TerminateModalProps) {
-  const user = useAuthStore.use.user();
-  const collab = useCollabStore.use.collaboration();
+export default function TerminateModal({
+  collabPartner,
+  onTerminate,
+}: TerminateModalProps) {
   const confirmLoading = useCollabStore.use.confirmLoading();
   const isTerminateModalOpen = useCollabStore.use.isTerminateModalOpen();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
-  const collabPartner =
-    collab?.collab_user1.id === user?.id
-      ? collab?.collab_user2
-      : collab?.collab_user1;
 
   return (
     <Dialog open={isTerminateModalOpen} onOpenChange={setTerminateModalOpen}>
@@ -34,10 +31,7 @@ export default function TerminateModal({ onTerminate }: TerminateModalProps) {
           <DialogTitle>End Collaboration Session</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <div>
-            Are you sure you want to end the current session with{' '}
-            {collabPartner?.username}?
-          </div>
+          Are you sure you want to end the current session with {collabPartner}?
         </DialogDescription>
         <DialogFooter>
           <Button

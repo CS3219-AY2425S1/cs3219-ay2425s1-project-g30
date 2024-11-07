@@ -9,10 +9,15 @@ import { useCollabStore } from '@/stores/useCollabStore';
 
 interface ActionModalsProps {
   collabId: string;
+  collabPartner: string;
   onEndSession: () => void;
 }
 
-export const ActionModals = ({ collabId, onEndSession }: ActionModalsProps) => {
+export const ActionModals = ({
+  collabId,
+  collabPartner,
+  onEndSession,
+}: ActionModalsProps) => {
   const setConfirmLoading = useCollabStore.use.setConfirmLoading();
   const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
   const endCollab = useCollabStore.use.endCollab();
@@ -47,5 +52,14 @@ export const ActionModals = ({ collabId, onEndSession }: ActionModalsProps) => {
     terminateMutation.mutate(collabId);
   };
 
-  return <>{collabId && <TerminateModal onTerminate={handleEndCollab} />}</>;
+  return (
+    <>
+      {collabId && (
+        <TerminateModal
+          collabPartner={collabPartner}
+          onTerminate={handleEndCollab}
+        />
+      )}
+    </>
+  );
 };

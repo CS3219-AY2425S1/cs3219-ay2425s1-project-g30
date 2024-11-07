@@ -78,7 +78,9 @@ export abstract class CollaborationRepository {
    * @param filters - The filters to apply when selecting a question.
    * @returns A promise that resolves to the selected question id.
    */
-  abstract getRandomQuestion(filters: CollabQuestionDto): Promise<string>;
+  abstract getRandomQuestion(
+    filters: CollabQuestionDto,
+  ): Promise<string | null>;
 
   /**
    * Fetches the collaboration information for a given collaboration id.

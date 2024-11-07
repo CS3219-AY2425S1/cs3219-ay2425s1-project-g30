@@ -31,7 +31,7 @@ export abstract class QuestionsRepository {
    * @param filters - The criteria used to filter the questions.
    * @returns A promise that resolves to the id of the question.
    */
-  abstract findOneRandom(filters: CollabQuestionDto): Promise<string>;
+  abstract findOneRandom(filters: CollabQuestionDto): Promise<string | null>;
 
   /**
    * Creates a new question with the given data.

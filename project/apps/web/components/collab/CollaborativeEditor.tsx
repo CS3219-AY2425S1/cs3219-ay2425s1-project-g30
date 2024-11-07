@@ -2,6 +2,7 @@ import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
 import axios from 'axios';
 import { Play } from 'lucide-react';
+import * as monaco from 'monaco-editor';
 import { useRouter } from 'next/navigation';
 import {
   useState,
@@ -12,7 +13,6 @@ import {
 } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
-import * as monaco from 'monaco-editor';
 
 import {
   Select,

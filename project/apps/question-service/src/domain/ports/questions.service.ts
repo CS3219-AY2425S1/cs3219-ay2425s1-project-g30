@@ -77,12 +77,19 @@ export class QuestionsService {
    * @param {CollabQuestionDto} filters - The filters to apply when fetching the question
    * @returns {string} A promise that resolves to the id of the question
    */
-  async findRandom(filters: CollabQuestionDto): Promise<string> {
+  async findRandom(filters: CollabQuestionDto): Promise<string | null> {
     try {
       const randomQuestionId =
         await this.questionsRepository.findOneRandom(filters);
-
-      this.logger.log(`fetched random question with id ${randomQuestionId}`);
+      if (randomQuestionId) {
+        this.logger.log(
+          `fetched random question ${randomQuestionId} for filters: ${JSON.stringify(filters)}`,
+        );
+      } else {
+        this.logger.log(
+          `no random question found for filters: ${JSON.stringify(filters)}`,
+        );
+      }
 
       return randomQuestionId;
     } catch (error) {

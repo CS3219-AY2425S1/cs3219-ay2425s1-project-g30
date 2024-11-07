@@ -1,6 +1,6 @@
 import { Editor } from '@monaco-editor/react';
 import { CollabInfoWithDocumentDto } from '@repo/dtos/collab';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
 
@@ -21,17 +21,20 @@ const HistoryEditor = ({ collab, className }: HistoryEditorProps) => {
     if (typeof window !== 'undefined') {
       const ydoc = ydocRef.current;
 
-      // Load Yjs document from collab data
-      if (collab.document_data) {
-        const parsedData = new Uint8Array(collab.document_data);
-        Y.applyUpdate(ydoc, parsedData);
-      }
-
       // Bind Monaco editor to Yjs document
       const yText = ydoc.getText('monaco');
       new MonacoBinding(yText, editor.getModel(), new Set([editor]));
     }
   };
+
+  useEffect(() => {
+    // Load Yjs document from collab data
+    if (collab.document_data) {
+      const ydoc = ydocRef.current;
+      const parsedData = new Uint8Array(collab.document_data);
+      Y.applyUpdate(ydoc, parsedData);
+    }
+  }, [collab.document_data]);
 
   return (
     <div className={className}>

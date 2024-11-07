@@ -13,11 +13,3 @@ export const cancelMatch = async (
 ): Promise<any> => {
   return await apiCall('post', '/matches/cancel', matchCancel);
 };
-
-export const getMatchById = async (id: string): Promise<any> => {
-  return await apiCall('get', `/matches/${id}`);
-};
-
-export const getMatchesByUserId = async (id: string): Promise<any[]> => {
-  return await apiCall('get', `/matches/user/${id}`);
-};
