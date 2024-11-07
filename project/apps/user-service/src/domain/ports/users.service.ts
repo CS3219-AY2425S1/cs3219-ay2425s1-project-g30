@@ -58,7 +58,7 @@ export class UsersService {
    * @returns {Promise<UserDataDto>} A promise that resolves to the user data transfer object.
    * @throws Will throw an error if the user cannot be fetched.
    */
-  async findById(id: string): Promise<UserDataDto> {
+  async findById(id: string): Promise<UserDataDto | null> {
     try {
       const user = await this.usersRepository.findById(id);
 
@@ -138,7 +138,7 @@ export class UsersService {
    * Deletes a user by their unique identifier.
    *
    * @param {string} id - The unique identifier of the user to be deleted.
-   * @returns {Promise<UserDataDto>} A promise that resolves to the deleted user data transfer object.
+   * @returns {Promise<boolean>} A promise that resolves to the deleted user data transfer object.
    * @throws Will throw an error if the user cannot be deleted.
    */
   async deleteById(id: string): Promise<boolean> {

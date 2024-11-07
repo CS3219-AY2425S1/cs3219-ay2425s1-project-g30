@@ -10,12 +10,14 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { changePassword, deleteUser } from '@/lib/api/users';
 import { useProfileStore } from '@/stores/useProfileStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface ActionModalsProps {
   user: UserDataDto;
 }
 
 export const ActionModals = ({ user }: ActionModalsProps) => {
+  const fetchUser = useAuthStore.use.fetchUser();
   const setConfirmLoading = useProfileStore.use.setConfirmLoading();
   const setChangePasswordModalOpen =
     useProfileStore.use.setChangePasswordModalOpen();
@@ -31,9 +33,6 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
       changePassword(updatedPassword),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.Question, user.id],
-      });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
       setChangePasswordModalOpen(false);
       toast({
@@ -56,16 +55,13 @@ export const ActionModals = ({ user }: ActionModalsProps) => {
     mutationFn: (id: string) => deleteUser(id),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.Me, user.id],
-      });
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
       setDeleteModalOpen(false);
-      router.replace('/'); // replace, not push, to disallow return to deleted user's profile
+      fetchUser();
       toast({
         variant: 'success',
         title: 'Success',
-        description: 'User deleted successfully',
+        description: 'Your account has been deleted successfully',
       });
     },
     onSettled: () => setConfirmLoading(false),
