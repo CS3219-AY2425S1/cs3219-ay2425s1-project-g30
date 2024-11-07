@@ -5,7 +5,11 @@ import {
 } from '@repo/dtos/generated/enums/questions.enums';
 import { MatchRequestDto } from '@repo/dtos/match';
 import Redis from 'ioredis';
-import { MATCH_CANCEL_TTL, MATCH_FETCH_LIMIT } from 'src/constants/queue';
+import {
+  MATCH_CANCEL_TTL,
+  MATCH_FETCH_LIMIT,
+  MATCH_REQUEST_TTL,
+} from 'src/constants/queue';
 import {
   MATCH_CANCELLED_KEY,
   MATCH_CATEGORY,
@@ -76,19 +80,22 @@ export class MatchRedis {
    */
 
   async addMatchRequest(matchRequest: MatchRequestDto): Promise<string | null> {
-    const { userId, category, complexity, match_req_id, timestamp } =
+    const { userId, category, socketId, complexity, match_req_id, timestamp } =
       matchRequest;
-
     // Store match requst details to redis in a hash
     const hashKey = `${MATCH_REQUEST}-${match_req_id}`;
     const pipeline = this.redisClient.multi();
 
     pipeline.hset(hashKey, {
       userId: userId,
+      socketId: socketId,
       complexity: complexity,
       category: JSON.stringify(category),
       timestamp: timestamp.toString(),
     });
+
+    // Set TTL for the match_request hash
+    pipeline.expire(hashKey, MATCH_REQUEST_TTL); // Safeguard: Ghost Matching due to residual key
 
     // Add match_req_id to the sorted set for each category
     for (const cat of category) {
@@ -99,7 +106,7 @@ export class MatchRedis {
     try {
       await pipeline.exec();
       // Add user match_req_id mapping
-      await this.addUserMatchMapaping(userId, match_req_id);
+      await this.addUserMatchMapping(userId, match_req_id);
       this.logger.log(`Match request added for id: ${match_req_id}`);
     } catch (error) {
       this.logger.error(`Error adding match request: ${error}`);
@@ -124,6 +131,7 @@ export class MatchRedis {
       return {
         match_req_id: match_req_Id,
         userId: data.userId,
+        socketId: data.socketId,
         complexity: data.complexity as COMPLEXITY,
         category: JSON.parse(data.category) as CATEGORY[],
         timestamp: parseInt(data.timestamp, 10),
@@ -245,7 +253,20 @@ export class MatchRedis {
           continue;
         }
 
-        if (matchRequest && !isCancelled) {
+        // Check if the partner has a matching socket connection
+        const partnerSocketId = await this.getSocketByUserId(
+          matchRequest.userId,
+        );
+        if (!partnerSocketId || partnerSocketId !== matchRequest.socketId) {
+          this.logger.debug(
+            `Partner ${matchRequest.userId} does not have a socket connection, skipping`,
+          );
+          // Remove the partner match request from the sorted set
+          await this.removeMatchRequest(match_req_Id);
+          continue;
+        }
+
+        if (matchRequest) {
           // Partner match request found
           this.logger.debug(`Partner match request found: ${match_req_Id}`);
 
@@ -314,7 +335,7 @@ export class MatchRedis {
    * @param match_req_id The match_req_id to map
    */
 
-  async addUserMatchMapaping(userId: string, match_req_id: string) {
+  async addUserMatchMapping(userId: string, match_req_id: string) {
     try {
       const key = `${MATCH_USER}-${userId}`;
       await this.redisClient.set(key, match_req_id);
