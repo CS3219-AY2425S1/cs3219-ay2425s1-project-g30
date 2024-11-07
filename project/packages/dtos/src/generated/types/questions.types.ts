@@ -42,6 +42,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      test_cases: {
+        Row: {
+          created_at: string | null;
+          expected_output: string;
+          id: string;
+          input: Json;
+          question_id: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          expected_output: string;
+          id?: string;
+          input: Json;
+          question_id?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          expected_output?: string;
+          id?: string;
+          input?: Json;
+          question_id?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "test_cases_question_id_fkey";
+            columns: ["question_id"];
+            isOneToOne: false;
+            referencedRelation: "question_bank";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "test_cases_question_id_fkey";
+            columns: ["question_id"];
+            isOneToOne: false;
+            referencedRelation: "random_question";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       random_question: {
