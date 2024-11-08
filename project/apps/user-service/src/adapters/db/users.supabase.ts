@@ -89,7 +89,7 @@ export class SupabaseUsersRepository implements UsersRepository {
       .from(this.PROFILES_TABLE)
       .select()
       .eq('id', id)
-      .single<UserDataDto>();
+      .maybeSingle<UserDataDto>();
 
     // for any unexpected error apart from null
     if (error && error.code != 'PGRST116') {
