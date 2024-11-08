@@ -6,12 +6,12 @@ const TestCasesSkeleton = () => (
     <h3 className="mb-4 text-2xl font-bold text-gray-800">
       <Skeleton className="w-48 h-6" />
     </h3>
-    <p className="text-gray-600">
+    <div className="text-gray-600">
       <Skeleton className="w-3/4 h-4 mb-2" />
-    </p>
-    <p className="mb-6 text-gray-600">
+    </div>
+    <div className="mb-6 text-gray-600">
       <Skeleton className="w-2/3 h-4" />
-    </p>
+    </div>
     <Skeleton className="w-1/4 h-40 mb-6" />
 
     {/* JSON Input */}
