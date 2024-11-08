@@ -18,7 +18,6 @@ import {
   REDIS_CLIENT,
 } from 'src/constants/redis';
 import { SOCKET_USER_KEY, USER_SOCKET_KEY } from 'src/constants/websocket';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MatchRedis {
@@ -70,6 +69,21 @@ export class MatchRedis {
   async getSocketByUserId(userId: string) {
     const userSocketKey = `${USER_SOCKET_KEY}-${userId}`;
     return await this.redisClient.get(userSocketKey);
+  }
+
+  async addMatchCategoryRequest(
+    categories: CATEGORY[],
+    complexity: COMPLEXITY,
+  ) {
+    const pipeline = this.redisClient.pipeline();
+    categories.forEach((cat) => {
+      const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
+
+      // Note: we do not just fetch the first match request, because we need to check if it is cancelled
+      pipeline.zrange(sortedSetKey, 0, MATCH_FETCH_LIMIT - 1);
+    });
+
+    return await pipeline.exec();
   }
 
   /**
@@ -200,108 +214,6 @@ export class MatchRedis {
   }
 
   /**
-   * Finds a potential match in redis based on one of the selected categories and complexity
-   * 1. Fetches all the matching match_req_Ids from the sorted set for each category
-   * 2. Checks if the match_req_Id is in the cancelled list
-   * 3. Sort the list of potential matches by earliest timestamp and choose the oldest request
-   * 4. Removes the match request from redis
-   * @param criteria Match requester's selected categories and complexity
-   * @returns The userId and matchId of the potential match if found, otherwise null
-   */
-
-  async findPotentialMatch(
-    userId: string,
-    categories: CATEGORY[],
-    complexity: COMPLEXITY,
-  ): Promise<{ userId: string; category: CATEGORY[]; matchId: string } | null> {
-    const pipeline = this.redisClient.pipeline();
-
-    categories.forEach((cat) => {
-      const sortedSetKey = `${MATCH_CATEGORY}-${cat}-COMPLEXITY-${complexity}`;
-
-      // Note: we do not just fetch the first match request, because we need to check if it is cancelled
-      pipeline.zrange(sortedSetKey, 0, MATCH_FETCH_LIMIT - 1);
-    });
-
-    const responses = await pipeline.exec();
-
-    if (!responses) return null;
-
-    const fetchPromises = responses.map(async ([err, res], index) => {
-      if (err) {
-        this.logger.error(
-          `Error fetching match_req_Id(s) from category ${categories[index]}:`,
-          err,
-        );
-        return null;
-      }
-
-      for (const match_req_Id of res as string[]) {
-        if (!match_req_Id) continue;
-
-        const matchRequest = await this.getMatchRequest(match_req_Id);
-        if (!matchRequest || matchRequest.userId === userId) continue;
-
-        // Also need to check if the match_req_Id is in the cancelled list
-        const isCancelled = await this.isMatchRequestCancelled(match_req_Id);
-        if (isCancelled) {
-          this.logger.debug(
-            `Match request ${match_req_Id} is cancelled, removing match request and skipping`,
-          );
-          // Remove the cancelled match request from the sorted set
-          await this.removeMatchRequest(match_req_Id);
-          continue;
-        }
-
-        // Check if the partner has a matching socket connection
-        const partnerSocketId = await this.getSocketByUserId(
-          matchRequest.userId,
-        );
-        if (!partnerSocketId || partnerSocketId !== matchRequest.socketId) {
-          this.logger.debug(
-            `Partner ${matchRequest.userId} does not have a socket connection, skipping`,
-          );
-          // Remove the partner match request from the sorted set
-          await this.removeMatchRequest(match_req_Id);
-          continue;
-        }
-
-        if (matchRequest) {
-          // Partner match request found
-          this.logger.debug(`Partner match request found: ${match_req_Id}`);
-
-          // Remove the partner match request from the sorted set
-          await this.removeMatchRequest(match_req_Id);
-          return matchRequest;
-        }
-      }
-
-      // No match found for this category
-      return null;
-    });
-
-    const matchResults = await Promise.all(fetchPromises);
-
-    const validResults = matchResults.filter((req) => req !== null);
-
-    if (validResults.length === 0) return null; // No matches found
-
-    // sort by earliest first
-    validResults.sort((a, b) => a.timestamp - b.timestamp);
-    const oldestMatch = validResults[0];
-
-    const match_id = uuidv4();
-
-    await this.removeMatchRequest(oldestMatch.match_req_id);
-
-    return {
-      userId: oldestMatch.userId,
-      category: oldestMatch.category,
-      matchId: match_id,
-    };
-  }
-
-  /**
    * Adds a match_req_Id to the cancelled list in redis
    * We do not remove the match request as it might not exist in redis yet.
    * @param match_req_Id The match_req_Id to add to the cancelled list
@@ -366,6 +278,18 @@ export class MatchRedis {
       return await this.redisClient.get(key);
     } catch (error) {
       this.logger.error(`Error getting matchId from userId: ${error}`);
+    }
+  }
+
+  /**
+   * Flushes the redis database, removing all keys. Invoked during destruction of module
+   */
+  async flushRedisDB() {
+    try {
+      await this.redisClient.flushdb();
+      this.logger.log('Redis database flushed');
+    } catch (error) {
+      this.logger.error(`Error flushing redis database: ${error}`);
     }
   }
 }
