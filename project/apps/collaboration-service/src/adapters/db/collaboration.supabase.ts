@@ -349,14 +349,6 @@ export class CollaborationSupabase implements CollaborationRepository {
         );
       }
 
-      if (!user1Data) {
-        throw new NotFoundException(`User with id ${user1_id} not found`);
-      }
-
-      if (!user2Data) {
-        throw new NotFoundException(`User with id ${user2_id} not found`);
-      }
-
       const collabInfoData: CollabInfoDto = {
         id: collabId,
 
@@ -364,12 +356,12 @@ export class CollaborationSupabase implements CollaborationRepository {
         ended_at: collab.ended_at,
 
         collab_user1: {
-          id: user1Data.id,
-          username: user1Data.username,
+          id: user1Data ? user1Data.id : null,
+          username: user1Data ? user1Data.username : 'DELETED USER',
         },
         collab_user2: {
-          id: user2Data.id,
-          username: user2Data.username,
+          id: user2Data ? user2Data.id : null,
+          username: user2Data ? user2Data.username : 'DELETED USER',
         },
         question: selectedQuestionData,
       };
