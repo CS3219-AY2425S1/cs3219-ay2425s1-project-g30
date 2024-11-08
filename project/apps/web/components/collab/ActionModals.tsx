@@ -3,8 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import EndCollabModal from '@/components/collab/EndCollabModal';
 import EndSessionModal from '@/components/collab/EndSessionModal';
+import LeaveSessionModal from '@/components/collab/LeaveSessionModal';
 import NotifyEndCollabModal from '@/components/collab/NotifyEndCollabModal';
 import { useToast } from '@/hooks/use-toast';
 import { useCollabStore } from '@/stores/useCollabStore';
@@ -12,32 +12,52 @@ import { useCollabStore } from '@/stores/useCollabStore';
 interface ActionModalsProps {
   collabId: string;
   collabPartner: string;
-  onEndSession: () => void;
-  onEndCollab: () => void;
+  notifyPartner: () => void;
 }
 
 export const ActionModals = ({
   collabId,
   collabPartner,
-  onEndSession,
-  onEndCollab,
+  notifyPartner,
 }: ActionModalsProps) => {
-  const endSession = useCollabStore.use.endSession();
+  const endCollab = useCollabStore.use.endCollab();
+  const leaveSession = useCollabStore.use.leaveSession();
   const setConfirmLoading = useCollabStore.use.setConfirmLoading();
 
   const router = useRouter();
   const { toast } = useToast();
 
   const endSessionMutation = useMutation({
-    mutationFn: async () => await onEndSession(),
+    mutationFn: async () => endCollab(collabId),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
-      endSession();
+      notifyPartner();
       router.replace('/');
       toast({
         variant: 'success',
-        title: 'Success',
-        description: 'Collaboration session ended successfully',
+        title: 'End of Collaboration Session',
+        description: 'You have ended the session successfully',
+      });
+    },
+    onSettled: () => setConfirmLoading(false),
+    onError: (error) => {
+      toast({
+        variant: 'error',
+        title: 'Error',
+        description: error.message,
+      });
+    },
+  });
+
+  const leaveSessionMutation = useMutation({
+    mutationFn: async () => await leaveSession(),
+    onMutate: () => setConfirmLoading(true),
+    onSuccess: async () => {
+      router.replace('/');
+      toast({
+        variant: 'default',
+        title: 'End of Collaboration Session',
+        description: 'You have succesfully left the session',
       });
     },
     onSettled: () => setConfirmLoading(false),
@@ -54,6 +74,10 @@ export const ActionModals = ({
     endSessionMutation.mutate();
   };
 
+  const handleLeaveSession = () => {
+    leaveSessionMutation.mutate();
+  };
+
   return (
     <>
       {collabId && (
@@ -62,11 +86,11 @@ export const ActionModals = ({
           onEndSession={handleEndSession}
         />
       )}
-      {collabId && <EndCollabModal onEndCollab={onEndCollab} />}
+      {collabId && <LeaveSessionModal onLeaveSession={handleLeaveSession} />}
       {collabId && (
         <NotifyEndCollabModal
           collabPartner={collabPartner}
-          onEndCollab={onEndCollab}
+          onLeaveSession={handleLeaveSession}
         />
       )}
     </>

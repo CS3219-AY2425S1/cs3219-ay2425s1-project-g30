@@ -13,51 +13,47 @@ import { useCollabStore } from '@/stores/useCollabStore';
 
 interface NotifyEndCollabProps {
   collabPartner: string;
-  onEndCollab: () => void;
+  onLeaveSession: () => void;
 }
 
 export default function NotifyEndCollabModal({
   collabPartner,
-  onEndCollab,
+  onLeaveSession,
 }: NotifyEndCollabProps) {
   const confirmLoading = useCollabStore.use.confirmLoading();
   const isNotifyEndCollabModalOpen =
     useCollabStore.use.isNotifyEndCollabModalOpen();
   const setNotifyEndCollabModalOpen =
     useCollabStore.use.setNotifyEndCollabModalOpen();
-  const setCollabEnding = useCollabStore.use.setCollabEnding();
-  const setCollabExpiryTime = useCollabStore.use.setCollabExpiryTime();
-
-  const handleContinue = () => {
-    const expiryTime = new Date();
-    expiryTime.setSeconds(expiryTime.getSeconds() + 60);
-    setCollabExpiryTime(expiryTime);
-    setNotifyEndCollabModalOpen(false);
-    setCollabEnding(true);
-  };
 
   return (
-    <Dialog open={isNotifyEndCollabModalOpen} onOpenChange={handleContinue}>
+    <Dialog
+      open={isNotifyEndCollabModalOpen}
+      onOpenChange={setNotifyEndCollabModalOpen}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>End of Collaboration Session</DialogTitle>
         </DialogHeader>
         <DialogDescription>
           Your partner, {collabPartner}, has ended the session. You may continue
-          to work on the question until the session closes.
+          working on the question, but please note:
         </DialogDescription>
-        <DialogDescription>The session will close in 60s.</DialogDescription>
+        <DialogDescription>
+          Any further changes will <strong>NOT be saved</strong>, and you will
+          not be able to return to this page once you leave.
+        </DialogDescription>
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={onEndCollab}
+            onClick={onLeaveSession}
             disabled={confirmLoading}
           >
-            End Now
+            Leave
           </Button>
           <Button
             variant="default"
-            onClick={handleContinue}
+            onClick={() => setNotifyEndCollabModalOpen(false)}
             disabled={confirmLoading}
           >
             Continue

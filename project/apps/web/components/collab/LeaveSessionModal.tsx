@@ -11,39 +11,45 @@ import {
 } from '@/components/ui/dialog';
 import { useCollabStore } from '@/stores/useCollabStore';
 
-interface EndCollabModalProps {
-  onEndCollab: () => void;
+interface LeaveSessionModalProps {
+  onLeaveSession: () => void;
 }
 
-export default function EndCollabModal({ onEndCollab }: EndCollabModalProps) {
+export default function LeaveSessionModal({
+  onLeaveSession,
+}: LeaveSessionModalProps) {
   const confirmLoading = useCollabStore.use.confirmLoading();
-  const isEndCollabModalOpen = useCollabStore.use.isEndCollabModalOpen();
-  const setEndCollabModalOpen = useCollabStore.use.setEndCollabModalOpen();
+  const isLeaveSessionModalOpen = useCollabStore.use.isLeaveSessionModalOpen();
+  const setIsLeaveSessionModalOpen =
+    useCollabStore.use.setIsLeaveSessionModalOpen();
 
   return (
-    <Dialog open={isEndCollabModalOpen} onOpenChange={setEndCollabModalOpen}>
+    <Dialog
+      open={isLeaveSessionModalOpen}
+      onOpenChange={setIsLeaveSessionModalOpen}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>End Collaboration Session</DialogTitle>
+          <DialogTitle>Leave Collaboration Session</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Are you sure you want to end the session now?
+          Are you sure you want to leave the session now?
         </DialogDescription>
 
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => setEndCollabModalOpen(false)}
+            onClick={() => setIsLeaveSessionModalOpen(false)}
             disabled={confirmLoading}
           >
             Cancel
           </Button>
           <Button
             variant="destructive"
-            onClick={onEndCollab}
+            onClick={onLeaveSession}
             disabled={confirmLoading}
           >
-            End Now
+            Leave
           </Button>
         </DialogFooter>
       </DialogContent>

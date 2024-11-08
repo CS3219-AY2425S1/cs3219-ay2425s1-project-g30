@@ -7,26 +7,23 @@ import { createSelectors } from '@/lib/zustand';
 interface CollabState {
   collaboration: CollabInfoDto | null;
   initialiseCollab: (id: string) => Promise<void>;
-  endSession: () => void;
   endCollab: (id: string) => Promise<void>;
+  notifyEndSession: () => void;
+  leaveSession: () => void;
   isEndSessionModalOpen: boolean;
   setEndSessionModalOpen: (isOpen: boolean) => void;
   isNotifyEndCollabModalOpen: boolean;
   setNotifyEndCollabModalOpen: (isOpen: boolean) => void;
-  isEndCollabModalOpen: boolean;
-  setEndCollabModalOpen: (isOpen: boolean) => void;
-  collabExpiryTime: Date;
-  setCollabExpiryTime: (time: Date) => void;
-  collabEnding: boolean;
-  setCollabEnding: (value: boolean) => void;
+  isLeaveSessionModalOpen: boolean;
+  setIsLeaveSessionModalOpen: (isOpen: boolean) => void;
+  collabEnded: boolean;
+  setCollabEnded: (value: boolean) => void;
   confirmLoading: boolean;
   setConfirmLoading: (value: boolean) => void;
 }
 
 export const useCollabStoreBase = create<CollabState>()((set) => ({
-  // Store in session storage
   collaboration: null,
-
   initialiseCollab: async (id: string) => {
     const collab = await getCollabInfoById(id);
     set({ collaboration: collab });
@@ -34,47 +31,43 @@ export const useCollabStoreBase = create<CollabState>()((set) => ({
   },
 
   // For the user who initiated to end the session
-  endSession: async () => {
-    set({ collaboration: null, isEndSessionModalOpen: false });
-    sessionStorage.removeItem('collaboration');
-  },
-
-  // For the other user
   endCollab: async (id: string) => {
     await endCollab(id);
+    set({ collaboration: null, isEndSessionModalOpen: false });
+    sessionStorage.clear();
+  },
+  notifyEndSession: () => {
     set({
       collaboration: null,
-      collabEnding: false,
-      isEndCollabModalOpen: false,
-      isNotifyEndCollabModalOpen: false,
+      collabEnded: true,
+      isNotifyEndCollabModalOpen: true,
     });
     sessionStorage.clear();
   },
 
+  // For the other user
+  leaveSession: async () => {
+    set({
+      collabEnded: false,
+      isLeaveSessionModalOpen: false,
+      isNotifyEndCollabModalOpen: false,
+    });
+  },
+
   isEndSessionModalOpen: false,
   setEndSessionModalOpen: (value) => set({ isEndSessionModalOpen: value }),
-  isEndCollabModalOpen: false,
-  setEndCollabModalOpen: (value) => set({ isEndCollabModalOpen: value }),
-  confirmLoading: false,
-  setConfirmLoading: (value) => set({ confirmLoading: value }),
-
-  // For the user who did not end the session
-  // Get and store in session storage
-  isNotifyEndCollabModalOpen:
-    sessionStorage.getItem('isNotifyEndCollabModalOpen') == 'true',
+  isNotifyEndCollabModalOpen: false,
   setNotifyEndCollabModalOpen: (value) => {
     set({ isNotifyEndCollabModalOpen: value });
-    sessionStorage.setItem('isNotifyEndCollabModalOpen', JSON.stringify(value));
   },
-  collabExpiryTime: new Date(sessionStorage.getItem('collabExpiryTime') || ''),
-  setCollabExpiryTime: (time) => {
-    set({ collabExpiryTime: time });
-    sessionStorage.setItem('collabExpiryTime', time.toISOString());
-  },
-  collabEnding: sessionStorage.getItem('collabEnding') == 'true',
-  setCollabEnding: (value) => {
-    set({ collabEnding: value });
-    sessionStorage.setItem('collabEnding', JSON.stringify(value));
+  isLeaveSessionModalOpen: false,
+  setIsLeaveSessionModalOpen: (value) =>
+    set({ isLeaveSessionModalOpen: value }),
+  confirmLoading: false,
+  setConfirmLoading: (value) => set({ confirmLoading: value }),
+  collabEnded: false,
+  setCollabEnded: (value) => {
+    set({ collabEnded: value });
   },
 }));
 

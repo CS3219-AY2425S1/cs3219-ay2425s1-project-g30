@@ -49,9 +49,7 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ id, className }, ref) => {
   const user = useAuthStore.use.user();
-  const collabEnding = useCollabStore.use.collabEnding();
-  const setNotifyEndCollabModalOpen =
-    useCollabStore.use.setNotifyEndCollabModalOpen();
+  const notifyEndSession = useCollabStore.use.notifyEndSession();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
   const [collabLoading, setCollabLoading] = useState(true);
@@ -111,8 +109,8 @@ const CollaborativeEditor = forwardRef<
         (state) => state.sessionEnded,
       )?.sessionEnded;
 
-      if (sessionEnded && sessionEnded.endedBy !== user?.id && !collabEnding) {
-        setNotifyEndCollabModalOpen(true);
+      if (sessionEnded && sessionEnded.endedBy !== user?.id) {
+        notifyEndSession();
 
         // Properly remove the listener
         providerRef.current?.awareness?.off('change', handleAwarenessChange);
