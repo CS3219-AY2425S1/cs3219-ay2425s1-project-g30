@@ -6,6 +6,7 @@ import Ajv from 'ajv';
 import { useTestCasesStore } from '@/stores/useTestCasesStore';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ajv = new Ajv({ allErrors: true, useDefaults: true, strict: false });
 
@@ -163,14 +164,16 @@ const inferSchemaFromTestCases = (testCases: any[]) => {
 const JsonInput = ({ handleSave, isMutating, isDisabled }: JsonInputProps) => {
   const { testCases } = useTestCasesStore();
   const [content, setContent] = useState<string>('');
+  const [isInitalized, setIsInitalized] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const setTestCases = useTestCasesStore.use.setTestCases();
   const setSchema = useTestCasesStore.use.setSchema();
 
   useEffect(() => {
-    if (testCases.length > 0) {
+    if (testCases.length > 0 && !isInitalized) {
       setContent(JSON.stringify({ testCases }, null, 2));
     }
+    setIsInitalized(true);
   }, [testCases]);
 
   const handleEditorChange = (value: string | undefined) => {
@@ -204,6 +207,11 @@ const JsonInput = ({ handleSave, isMutating, isDisabled }: JsonInputProps) => {
       <Editor
         height="300px"
         defaultLanguage="json"
+        loading={
+          <div className="flex items-start justify-start w-full h-full">
+            <Skeleton className="w-full h-64 mb-4" />
+          </div>
+        }
         value={content}
         onChange={handleEditorChange}
         options={{

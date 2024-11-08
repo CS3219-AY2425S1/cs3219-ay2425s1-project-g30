@@ -1,9 +1,10 @@
 import { z } from "zod";
 
-const testCasesItemSchema = z.object({
-  input: z.any(),
-  output: z.any(),
-});
+const testCasesItemSchema = z
+  .object({
+    output: z.any(),
+  })
+  .catchall(z.any());
 
 export const testCasesSchema = z.object({
   id: z.string().uuid(),
