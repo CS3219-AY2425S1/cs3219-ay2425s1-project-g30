@@ -23,7 +23,7 @@ export abstract class UsersRepository {
    * @param id - The unique identifier of the user.
    * @returns A promise that resolves to a UserDataDto object.
    */
-  abstract findById(id: string): Promise<UserDataDto>;
+  abstract findById(id: string): Promise<UserDataDto | null>;
 
   /**
    * Updates an existing user's details with the given data.
@@ -51,7 +51,7 @@ export abstract class UsersRepository {
   /**
    * Deletes an existing by its unique identifier.
    * @param id - The unique identifier of the user to be deleted.
-   * @returns A promise that resolves to a boolean indicating the success of the operation.
+   * @returns A promise that resolves to a UserDataDto indicating the success of the operation.
    */
   abstract deleteById(id: string): Promise<boolean>;
 }

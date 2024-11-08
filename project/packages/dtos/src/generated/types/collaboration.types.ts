@@ -42,6 +42,38 @@ export type Database = {
         };
         Relationships: [];
       };
+      snapshots: {
+        Row: {
+          code: string | null;
+          collaboration_id: string;
+          created_at: string;
+          id: string;
+          output: string | null;
+        };
+        Insert: {
+          code?: string | null;
+          collaboration_id: string;
+          created_at?: string;
+          id?: string;
+          output?: string | null;
+        };
+        Update: {
+          code?: string | null;
+          collaboration_id?: string;
+          created_at?: string;
+          id?: string;
+          output?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "snapshots_collaboration_id_fkey";
+            columns: ["collaboration_id"];
+            isOneToOne: false;
+            referencedRelation: "collaboration";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
