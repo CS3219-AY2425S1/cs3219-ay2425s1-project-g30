@@ -117,7 +117,7 @@ export abstract class CollaborationRepository {
   ): Promise<ExecutionSnapshotCollectionDto>;
 
   /**
-   * Creates a snapshot of the execution state of a document.
+   * Creates a snapshot of the execution state of a document, if the collaboration session has not ended.
    * @param data The data transfer object containing the details of the snapshot to be created.
    * @returns A promise that resolves to the created snapshot data transfer object.
    */

@@ -440,9 +440,17 @@ export class CollaborationSupabase implements CollaborationRepository {
     data: ExecutionSnapshotCreateDto,
   ): Promise<ExecutionSnapshotDto> {
     // Check if the collaboration exists
-    if (!(await this.findById(data.collaboration_id))) {
+    const collab = await this.findById(data.collaboration_id);
+    if (!collab) {
       throw new NotFoundException(
         `Collaboration with id ${data.collaboration_id} not found`,
+      );
+    }
+
+    // Check if the collaboration has ended
+    if (collab.ended_at) {
+      throw new BadRequestException(
+        `Collaboration with id ${data.collaboration_id} has ended`,
       );
     }
 
