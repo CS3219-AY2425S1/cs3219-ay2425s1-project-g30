@@ -4,7 +4,6 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
-  CollabInfoWithDocumentDto,
   CollabQuestionDto,
   ExecutionSnapshotCollectionDto,
   ExecutionSnapshotCreateDto,
@@ -86,20 +85,11 @@ export abstract class CollaborationRepository {
   ): Promise<string | null>;
 
   /**
-   * Fetches the collaboration information for a given collaboration id.
+   * Fetches the collaboration information for a given collaboration id. If no collaboration is found, returns null.
    * @param id The unique identifier of the collaboration to fetch information for.
    * @returns A promise that resolves to the collaboration information data transfer object.
    */
-  abstract fetchCollabInfo(id: string): Promise<CollabInfoDto>;
-
-  /**
-   * Fetches the collaboration information and associated document for a given collaboration id.
-   * @param id The unique identifier of the collaboration to fetch information for.
-   * @returns A promise that resolves to the collaboration information with document data transfer object.
-   */
-  abstract fetchCollabInfoWithDocument(
-    id: string,
-  ): Promise<CollabInfoWithDocumentDto>;
+  abstract fetchCollabInfo(id: string): Promise<CollabInfoDto | null>;
 
   /**
    * Ends a collaboration by its unique identifier.

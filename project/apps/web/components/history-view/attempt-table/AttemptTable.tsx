@@ -1,42 +1,16 @@
 'use client';
 
-import {
-  CollabCollectionDto,
-  CollabFiltersDto,
-  CollabInfoWithDocumentDto,
-  ExecutionSnapshotCollectionDto,
-} from '@repo/dtos/collab';
-import {
-  CATEGORY,
-  COMPLEXITY,
-} from '@repo/dtos/generated/enums/questions.enums';
-import { SortQuestionsQueryDto } from '@repo/dtos/questions';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import {
-  ColumnFiltersState,
-  PaginationState,
-  SortingState,
-  Updater,
-} from '@tanstack/react-table';
-import { startTransition, useEffect, useState } from 'react';
-
-import {
-  ControlledTableStateProps,
-  DataTable,
-} from '@/components/data-table/DataTable';
-import { QUERY_KEYS } from '@/constants/queryKeys';
-import useDebounce from '@/hooks/useDebounce';
-import { useMe } from '@/hooks/useMe';
-import { getCollabs, getExecutionSnapshots } from '@/lib/api/collab';
-import { useQuestionsStore } from '@/stores/useQuestionStore';
+import { DataTable } from '@/components/data-table/DataTable';
+import { useHistoryStore } from '@/stores/useHistoryStore';
 
 import { columns } from './columns';
 
-interface SnapshotTableProps {
-  collab: CollabInfoWithDocumentDto;
-}
+export function AttemptTable() {
+  const attemptCollection = useHistoryStore.use.attemptCollection();
+  const confirmLoading = useHistoryStore.use.confirmLoading();
 
-export function SnapshotTable({ collab }: SnapshotTableProps) {
+  const data = attemptCollection?.attempts!;
+
   //   const confirmLoading = useQuestionsStore.use.confirmLoading();
   //   const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
   //   const [isDebouncing, setIsDebouncing] = useState(false);
@@ -82,15 +56,6 @@ export function SnapshotTable({ collab }: SnapshotTableProps) {
   //     }
   //   }, [pagination, sorting, debouncedColumnFilters, setConfirmLoading]);
 
-  const collabId = collab.id;
-
-  const { data } = useSuspenseQuery<ExecutionSnapshotCollectionDto>({
-    queryKey: [QUERY_KEYS.Snapshot, collabId],
-    queryFn: async () => {
-      return getExecutionSnapshots(collabId);
-    },
-  });
-
   //   const onPaginationChange = (updater: Updater<PaginationState>) => {
   //     startTransition(() => {
   //       setPagination(updater);
@@ -111,9 +76,6 @@ export function SnapshotTable({ collab }: SnapshotTableProps) {
   //     });
   //   };
 
-  const metadata = data.metadata;
-  const snapshots = data.snapshots;
-
   //   const controlledState: ControlledTableStateProps = {
   //     pagination,
   //     onPaginationChange,
@@ -126,7 +88,7 @@ export function SnapshotTable({ collab }: SnapshotTableProps) {
 
   return (
     <DataTable
-      data={snapshots}
+      data={data}
       columns={columns}
       confirmLoading={false}
       //   TableToolbar={HistoryTableToolbar}

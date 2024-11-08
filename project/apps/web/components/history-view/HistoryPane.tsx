@@ -1,19 +1,29 @@
-import { CollabInfoWithDocumentDto } from '@repo/dtos/collab';
+'use client';
+
+import { CollabInfoDto } from '@repo/dtos/collab';
 import { Code, FolderClock } from 'lucide-react';
 import { useState } from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { HistoryPaneView, useHistoryStore } from '@/stores/useHistoryStore';
 
+import { AttemptTable } from './attempt-table/AttemptTable';
 import HistoryEditor from './HistoryEditor';
-import { SnapshotTable } from './snapshot-table/SnapshotTable';
 
 interface HistoryPaneProps {
-  collab: CollabInfoWithDocumentDto;
+  collabInfo: CollabInfoDto;
   className?: string;
 }
 
-const HistoryPane = ({ collab, className }: HistoryPaneProps) => {
-  const [toggleValue, setToggleValue] = useState('Code');
+const HistoryPane = ({ collabInfo, className }: HistoryPaneProps) => {
+  const attempts = useHistoryStore.use.attemptCollection();
+  const fetchAttempts = useHistoryStore.use.fetchAttempts();
+  const historyPaneView = useHistoryStore.use.historyPaneView();
+  const setHistoryPaneView = useHistoryStore.use.setHistoryPaneView();
+
+  if (!attempts) {
+    fetchAttempts(collabInfo.id);
+  }
 
   return (
     <div className={className}>
@@ -21,24 +31,24 @@ const HistoryPane = ({ collab, className }: HistoryPaneProps) => {
         {/* Code and Attempts View Toggle */}
         <ToggleGroup
           type="single"
-          onValueChange={setToggleValue}
-          value={toggleValue}
+          onValueChange={setHistoryPaneView}
+          value={historyPaneView}
           className="self-start pb-2"
         >
-          <ToggleGroupItem value={'Code'}>
+          <ToggleGroupItem value={HistoryPaneView.Code}>
             <Code />
             Code
           </ToggleGroupItem>
-          <ToggleGroupItem value={'Attempts'}>
+          <ToggleGroupItem value={HistoryPaneView.Attempts}>
             <FolderClock />
             Attempts
           </ToggleGroupItem>
         </ToggleGroup>
         {/* Code Viewer */}
-        {toggleValue === 'Code' && <HistoryEditor collab={collab} />}
+        {historyPaneView === HistoryPaneView.Code && <HistoryEditor />}
         {/* Attempts Viewer */}
         {/* TODO: suspense fallback */}
-        {toggleValue === 'Attempts' && <SnapshotTable collab={collab} />}
+        {historyPaneView === HistoryPaneView.Attempts && <AttemptTable />}
       </div>
     </div>
   );

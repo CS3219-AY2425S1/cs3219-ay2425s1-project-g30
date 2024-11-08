@@ -10,7 +10,6 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
-  CollabInfoWithDocumentDto,
   CollabQuestionDto,
   ExecutionSnapshotCollectionDto,
   ExecutionSnapshotCreateDto,
@@ -316,12 +315,10 @@ export class CollaborationSupabase implements CollaborationRepository {
     return selectedQuestionId;
   }
 
-  async fetchCollabInfo(collabId: string): Promise<CollabInfoDto> {
+  async fetchCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
     const collab = await this.findById(collabId);
     if (!collab) {
-      throw new NotFoundException(
-        `Collaboration with id ${collabId} not found`,
-      );
+      return null;
     }
 
     const { question_id, user1_id, user2_id } = collab;
@@ -370,26 +367,6 @@ export class CollaborationSupabase implements CollaborationRepository {
     };
 
     return collabInfoData;
-  }
-
-  async fetchCollabInfoWithDocument(
-    collabId: string,
-  ): Promise<CollabInfoWithDocumentDto> {
-    try {
-      const collabInfo = await this.fetchCollabInfo(collabId);
-      const document = await this.fetchDocumentById(collabId);
-
-      const document_data = document ? Array.from(document) : null;
-
-      return {
-        ...collabInfo,
-        document_data,
-      } as CollabInfoWithDocumentDto;
-    } catch (error) {
-      throw new BadRequestException(
-        `Failed to fetch collaboration info with document: ${error}`,
-      );
-    }
   }
 
   async endCollab(collabId: string): Promise<CollabDto> {

@@ -1,67 +1,93 @@
 import { Editor } from '@monaco-editor/react';
-import { CollabInfoWithDocumentDto } from '@repo/dtos/collab';
-import { Code, FolderClock } from 'lucide-react';
+import { AttemptDto } from '@repo/dtos/attempt';
 import { useEffect, useRef } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
 
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useHistoryStore } from '@/stores/useHistoryStore';
 
 import { EditorAreaSkeleton } from './HistoryEditorSkeleton';
 
-interface HistoryEditorProps {
-  collab: CollabInfoWithDocumentDto;
-  className?: string;
-}
-
-const HistoryEditor = ({ collab, className }: HistoryEditorProps) => {
+const HistoryEditor = () => {
   const editorRef = useRef<any>(null);
-  const ydocRef = useRef(new Y.Doc());
+  const ydocRef = useRef<Y.Doc | null>(null);
+  const bindingRef = useRef<MonacoBinding | null>(null);
+
+  const selectedAttempt = useHistoryStore.use.selectedAttempt();
+  const confirmLoading = useHistoryStore.use.confirmLoading();
+
+  useEffect(() => {
+    // Cleanup previous bindings/documents
+    if (bindingRef.current) {
+      bindingRef.current.destroy();
+      bindingRef.current = null;
+    }
+    if (ydocRef.current) {
+      ydocRef.current.destroy();
+      ydocRef.current = null;
+    }
+  }, [selectedAttempt]); // reload the editor when the selected attempt changes
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
 
     if (typeof window !== 'undefined') {
-      const ydoc = ydocRef.current;
+      if (!selectedAttempt) {
+        editorRef.current.setValue(
+          '// Please refresh the page later, your code may take some time to save from your collaboration session.',
+        );
+        return;
+      }
 
-      // Bind Monaco editor to Yjs document
-      const yText = ydoc.getText('monaco');
-      new MonacoBinding(yText, editor.getModel(), new Set([editor]));
+      if (selectedAttempt.code) {
+        // raw text, use setValue
+        editorRef.current.setValue(selectedAttempt.code);
+      } else if (selectedAttempt.document) {
+        // Yjs document, use Yjs
+        const ydoc = new Y.Doc();
+        ydocRef.current = ydoc;
+        const yText = ydoc.getText('monaco');
+        const parsedData = new Uint8Array(selectedAttempt.document);
+        Y.applyUpdate(ydoc, parsedData);
+        const binding = new MonacoBinding(
+          yText,
+          editor.getModel(),
+          new Set([editor]),
+        );
+        bindingRef.current = binding;
+      }
     }
   };
 
-  useEffect(() => {
-    // Load Yjs document from collab data
-    if (collab.document_data) {
-      const ydoc = ydocRef.current;
-      const parsedData = new Uint8Array(collab.document_data);
-      Y.applyUpdate(ydoc, parsedData);
-    }
-  }, [collab.document_data]);
+  if (confirmLoading) {
+    return (
+      <div className="flex items-start justify-start w-full h-full">
+        <EditorAreaSkeleton />
+      </div>
+    );
+  }
 
   return (
-    <div className={className}>
-      <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
-        {/* Monaco Editor */}
-        <div className="flex h-full p-6">
-          <Editor
-            theme="light"
-            // Potential enhancement: persist the language of the document and use it here
-            defaultLanguage="plaintext"
-            loading={
-              <div className="flex items-start justify-start w-full h-full">
-                <EditorAreaSkeleton />
-              </div>
-            }
-            onMount={handleEditorDidMount}
-            options={{
-              minimap: { enabled: false },
-              readOnly: true,
-              automaticLayout: true,
-            }}
-            className="w-full"
-          />
-        </div>
+    <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
+      {/* Monaco Editor */}
+      <div className="flex h-full p-6">
+        <Editor
+          theme="light"
+          // Potential enhancement: persist the language of the document and use it here
+          defaultLanguage="plaintext"
+          loading={
+            <div className="flex items-start justify-start w-full h-full">
+              <EditorAreaSkeleton />
+            </div>
+          }
+          onMount={handleEditorDidMount}
+          options={{
+            minimap: { enabled: false },
+            readOnly: true,
+            automaticLayout: true,
+          }}
+          className="w-full"
+        />
       </div>
     </div>
   );

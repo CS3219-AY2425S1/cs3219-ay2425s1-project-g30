@@ -31,14 +31,6 @@ export class CollaborationController {
     );
   }
 
-  @Get('history/:id')
-  async getCollaborationHistoryById(@Param('id') collabId: string) {
-    return this.collaborationServiceClient.send(
-      { cmd: 'get_collab_history' },
-      collabId,
-    );
-  }
-
   @Get()
   @UsePipes(new ZodValidationPipe(collabFiltersSchema))
   async getCollaborationInfos(@Query() filters: CollabFiltersDto) {
@@ -65,12 +57,10 @@ export class CollaborationController {
     );
   }
 
-  // ===== snapshot related routes =====
-
-  @Get('snapshot/:id')
-  async getExecutionSnapshotsByCollabId(@Param('id') collabId: string) {
+  @Get('/attempts/:id')
+  async getAttempts(@Param('id') collabId: string) {
     return this.collaborationServiceClient.send(
-      { cmd: 'get_snapshots' },
+      { cmd: 'get_attempts' },
       collabId,
     );
   }

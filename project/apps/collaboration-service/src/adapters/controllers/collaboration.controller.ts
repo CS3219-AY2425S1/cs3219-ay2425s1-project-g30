@@ -33,13 +33,8 @@ export class CollaborationController {
   }
 
   @MessagePattern({ cmd: 'get_collab_info' })
-  async getActiveCollabInfo(@Payload() collabId: string) {
-    return await this.collaborationService.getActiveCollabInfo(collabId);
-  }
-
-  @MessagePattern({ cmd: 'get_collab_history' })
-  async getCollabDocument(@Payload() collabId: string) {
-    return await this.collaborationService.getCollabInfoAndDocument(collabId);
+  async getCollabInfo(@Payload() collabId: string) {
+    return await this.collaborationService.getCollabInfo(collabId);
   }
 
   @MessagePattern({ cmd: 'end_collab' })
@@ -47,9 +42,9 @@ export class CollaborationController {
     return await this.collaborationService.endCollab(collabId);
   }
 
-  @MessagePattern({ cmd: 'get_snapshots' })
-  async getSnapshots(@Payload() collabId: string) {
-    return await this.collaborationService.getSnapshotsByCollabId(collabId);
+  @MessagePattern({ cmd: 'get_attempts' })
+  async getAttempts(@Payload() collabId: string) {
+    return await this.collaborationService.getAttempts(collabId);
   }
 
   @MessagePattern({ cmd: 'create_snapshot' })

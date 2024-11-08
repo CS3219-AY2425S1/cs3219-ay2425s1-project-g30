@@ -1,10 +1,9 @@
+import { AttemptCollectionDto } from '@repo/dtos/attempt';
 import {
   CollabCollectionDto,
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
-  CollabInfoWithDocumentDto,
-  ExecutionSnapshotCollectionDto,
   ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
 
@@ -28,24 +27,14 @@ export const endCollab = async (id: string): Promise<CollabDto> => {
   return await apiCall('post', `/collaboration/end/${id}`);
 };
 
-export const fetchCollabHistoryById = async (
-  id: string,
-): Promise<CollabInfoWithDocumentDto> => {
-  return await apiCall('get', `/collaboration/history/${id}`);
-};
-
 export const saveExecutionSnapshot = async (
   executionSnapshotCreate: ExecutionSnapshotCreateDto,
-): Promise<CollabInfoWithDocumentDto> => {
-  return await apiCall(
-    'post',
-    `/collaboration/snapshot`,
-    executionSnapshotCreate,
-  );
+) => {
+  await apiCall('post', `/collaboration/snapshot`, executionSnapshotCreate);
 };
 
-export const getExecutionSnapshots = async (
+export const getAttempts = async (
   collabId: string,
-): Promise<ExecutionSnapshotCollectionDto> => {
-  return await apiCall('get', `/collaboration/snapshot/${collabId}`);
+): Promise<AttemptCollectionDto> => {
+  return await apiCall('get', `/collaboration/attempts/${collabId}`);
 };

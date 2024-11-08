@@ -6,11 +6,11 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
-  CollabInfoWithDocumentDto,
   CollabQuestionDto,
   CollabRequestDto,
   ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
+import { AttemptCollectionDto, AttemptDto } from '@repo/dtos/attempt';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
 @Injectable()
@@ -96,53 +96,24 @@ export class CollaborationService {
   }
 
   /**
-   * Fetches the information of an active collaboration including the selected question data by its unique identifier.
+   * Fetches the information of an collaboration including the selected question data by its unique identifier.
    * @param collabId - The unique identifier of the collaboration to be fetched.
    * @returns A promise that resolves to the collaboration information data transfer object.
-   *          If the collaboration is not active, the promise will resolve to null.
    * @throws Will handle and log any errors that occur during the retrieval process.
    */
 
-  async getActiveCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
+  async getCollabInfo(collabId: string): Promise<CollabInfoDto> {
     try {
       const collab = await this.collabRepository.fetchCollabInfo(collabId);
-      const isActive =
-        await this.collabRepository.checkActiveCollaborationById(collabId);
-
       if (!collab) {
         throw new Error(`Collaboration with id ${collabId} not found`);
       }
 
       this.logger.log(`Fetched collaboration with id: ${collabId}`);
 
-      return isActive ? collab : null;
-    } catch (error) {
-      this.handleError('get collaboration info', error);
-    }
-  }
-
-  /**
-   * Fetches the collaboration information and associated document of a collaboration by its unique identifier.
-   * @param collabId - The unique identifier of the collaboration to be fetched.
-   * @returns A promise that resolves to the collaboration information with document data transfer object.
-   * @throws Will handle and log any errors that occur during the retrieval process.
-   */
-  async getCollabInfoAndDocument(
-    collabId: string,
-  ): Promise<CollabInfoWithDocumentDto> {
-    try {
-      const collab =
-        await this.collabRepository.fetchCollabInfoWithDocument(collabId);
-
-      if (!collab) {
-        throw new Error(`Collaboration with id ${collabId} not found`);
-      }
-
-      this.logger.debug(`Found collaboration document with id: ${collabId}`);
-
       return collab;
     } catch (error) {
-      this.handleError('get collaboration document', error);
+      this.handleError('get collaboration info', error);
     }
   }
 
@@ -177,17 +148,61 @@ export class CollaborationService {
   }
 
   /**
-   * Retrieves all execution snapshots for a given collaboration by its unique identifier.
-   *
-   * @param collabId The unique identifier of the collaboration to fetch snapshots for.
-   * @returns A promise that resolves to a collection of execution snapshots.
-   * @throws Will handle and log any errors that occur during the retrieval process.
+   * Retrieves all attempts for a collaboration by its unique identifier.
+   * @param collabId - The unique identifier of the collaboration to fetch attempts for.
+   * @returns A promise that resolves to a collection of attempts.
    */
-  async getSnapshotsByCollabId(collabId: string) {
+  async getAttempts(collabId: string): Promise<AttemptCollectionDto> {
     try {
-      return await this.collabRepository.getSnapshotsByCollabId(collabId);
+      const collab = await this.collabRepository.fetchCollabInfo(collabId);
+
+      if (!collab) {
+        throw new Error(`Collaboration with id ${collabId} not found`);
+      }
+      if (!collab.ended_at) {
+        throw new Error(
+          `Collaboration with id ${collabId} is still active. Cannot fetch attempts.`,
+        );
+      }
+
+      // final submission document data
+      const document = await this.collabRepository.fetchDocumentById(collabId);
+      const document_data = document ? Array.from(document) : null;
+      const final_submission: AttemptDto = {
+        id: collabId,
+        name: 'Final Submission',
+        created_at: collab.ended_at,
+        code: null,
+        document: document_data,
+      };
+
+      // code execution attempts
+      const snapshotCollection =
+        await this.collabRepository.getSnapshotsByCollabId(collabId);
+      const codeExecutionAttempts = snapshotCollection.snapshots.map(
+        (snapshot, index) => {
+          return {
+            id: snapshot.id,
+            name: `Attempt ${index + 1}`,
+            created_at: snapshot.created_at,
+            code: snapshot.code,
+            document: null,
+          } as AttemptDto;
+        },
+      );
+
+      const allAttempts = [final_submission, ...codeExecutionAttempts];
+
+      const attemptCollection: AttemptCollectionDto = {
+        attempts: allAttempts,
+        metadata: {
+          count: snapshotCollection.metadata.count + 1, // add 1 for final submission
+          totalCount: snapshotCollection.metadata.totalCount + 1, // add 1 for final submission
+        },
+      };
+      return attemptCollection;
     } catch (error) {
-      this.handleError('get snapshots', error);
+      this.handleError('get attempts', error);
     }
   }
 
