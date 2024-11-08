@@ -11,42 +11,39 @@ import {
 } from '@/components/ui/dialog';
 import { useCollabStore } from '@/stores/useCollabStore';
 
-interface TerminateModalProps {
-  collabPartner: string;
-  onTerminate: () => void;
+interface EndCollabModalProps {
+  onEndCollab: () => void;
 }
 
-export default function TerminateModal({
-  collabPartner,
-  onTerminate,
-}: TerminateModalProps) {
+export default function EndCollabModal({ onEndCollab }: EndCollabModalProps) {
   const confirmLoading = useCollabStore.use.confirmLoading();
-  const isTerminateModalOpen = useCollabStore.use.isTerminateModalOpen();
-  const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
+  const isEndCollabModalOpen = useCollabStore.use.isEndCollabModalOpen();
+  const setEndCollabModalOpen = useCollabStore.use.setEndCollabModalOpen();
 
   return (
-    <Dialog open={isTerminateModalOpen} onOpenChange={setTerminateModalOpen}>
+    <Dialog open={isEndCollabModalOpen} onOpenChange={setEndCollabModalOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>End Collaboration Session</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Are you sure you want to end the current session with {collabPartner}?
+          Are you sure you want to end the session now?
         </DialogDescription>
+
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => setTerminateModalOpen(false)}
+            onClick={() => setEndCollabModalOpen(false)}
             disabled={confirmLoading}
           >
             Cancel
           </Button>
           <Button
             variant="destructive"
-            onClick={onTerminate}
+            onClick={onEndCollab}
             disabled={confirmLoading}
           >
-            End
+            End Now
           </Button>
         </DialogFooter>
       </DialogContent>

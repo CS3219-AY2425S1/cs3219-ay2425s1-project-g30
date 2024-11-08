@@ -3,7 +3,6 @@ import Editor, { OnMount } from '@monaco-editor/react';
 import axios from 'axios';
 import { Play } from 'lucide-react';
 import * as monaco from 'monaco-editor';
-import { useRouter } from 'next/navigation';
 import {
   useState,
   useEffect,
@@ -23,7 +22,6 @@ import {
 } from '@/components/ui/select';
 import { LANGUAGES, Runtime } from '@/constants/languages';
 import { env } from '@/env.mjs';
-import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
@@ -43,7 +41,7 @@ interface CollaborativeEditorProps {
 }
 
 export interface CollaborativeEditorRef {
-  endSession: () => void;
+  handleEndSession: () => void;
 }
 
 const CollaborativeEditor = forwardRef<
@@ -51,7 +49,9 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ id, className }, ref) => {
   const user = useAuthStore.use.user();
-  const setCollaboration = useCollabStore.use.setCollaboration();
+  const collabEnding = useCollabStore.use.collabEnding();
+  const setNotifyEndCollabModalOpen =
+    useCollabStore.use.setNotifyEndCollabModalOpen();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
   const [collabLoading, setCollabLoading] = useState(true);
@@ -63,11 +63,8 @@ const CollaborativeEditor = forwardRef<
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
 
-  const router = useRouter();
-  const { toast } = useToast();
-
   useImperativeHandle(ref, () => ({
-    endSession,
+    handleEndSession,
   }));
 
   // Fetch available languages on mount
@@ -105,6 +102,25 @@ const CollaborativeEditor = forwardRef<
     fetchRuntimes();
   }, []);
 
+  const handleAwarenessChange = () => {
+    if (providerRef.current?.awareness?.getStates().values()) {
+      const states = Array.from(
+        providerRef.current.awareness.getStates().values(),
+      );
+      const sessionEnded = states.find(
+        (state) => state.sessionEnded,
+      )?.sessionEnded;
+
+      if (sessionEnded && sessionEnded.endedBy !== user?.id && !collabEnding) {
+        console.log('Second user received notification, ending collab');
+        setNotifyEndCollabModalOpen(true);
+
+        // Properly remove the listener
+        providerRef.current?.awareness?.off('change', handleAwarenessChange);
+      }
+    }
+  };
+
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor as monaco.editor.IStandaloneCodeEditor;
     setCollabLoading(true);
@@ -117,26 +133,7 @@ const CollaborativeEditor = forwardRef<
         document: ydoc,
       });
       providerRef.current = provider;
-
-      provider.awareness?.on('change', () => {
-        if (provider.awareness?.getStates().values()) {
-          const states = Array.from(provider.awareness?.getStates().values());
-          const sessionEnded = states.find(
-            (state) => state.sessionEnded,
-          )?.sessionEnded;
-
-          if (sessionEnded && sessionEnded.endedBy !== user?.id) {
-            toast({
-              variant: 'error',
-              title: 'Session Ended',
-              description: 'Your collaborator ended the session.',
-            });
-            setCollaboration(null);
-            provider.disconnect();
-            router.push('/');
-          }
-        }
-      });
+      provider.awareness?.on('change', handleAwarenessChange);
 
       // Mark loading as false once synced
       provider.on('synced', () => {
@@ -183,13 +180,14 @@ const CollaborativeEditor = forwardRef<
       return () => {
         provider.disconnect();
         yRuntime.unobserve(handleYRuntimeChange);
+        provider.awareness?.off('change', handleAwarenessChange);
       };
     } else {
       setCollabLoading(false);
     }
   };
 
-  const endSession = () => {
+  const handleEndSession = () => {
     if (providerRef.current) {
       providerRef.current.setAwarenessField('sessionEnded', {
         endedBy: user?.id,

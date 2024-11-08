@@ -24,7 +24,7 @@ const Search = () => {
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
   const collaboration = useCollabStore.use.collaboration();
-  const fetchCollab = useCollabStore.use.fetchCollab();
+  const initialiseCollab = useCollabStore.use.initialiseCollab();
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
   const disconnect = useSocketStore((state) => state.disconnect);
@@ -112,7 +112,7 @@ const Search = () => {
         title: 'Match Found',
         description: 'Your match was successful.',
       });
-      fetchCollab(collabId);
+      initialiseCollab(collabId);
       router.push(`/collab/${collabId}`);
     };
 

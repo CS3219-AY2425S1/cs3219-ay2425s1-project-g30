@@ -3,7 +3,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
-import TerminateModal from '@/components/collab/TerminateModal';
+import EndCollabModal from '@/components/collab/EndCollabModal';
+import EndSessionModal from '@/components/collab/EndSessionModal';
+import NotifyEndCollabModal from '@/components/collab/NotifyEndCollabModal';
 import { useToast } from '@/hooks/use-toast';
 import { useCollabStore } from '@/stores/useCollabStore';
 
@@ -11,26 +13,26 @@ interface ActionModalsProps {
   collabId: string;
   collabPartner: string;
   onEndSession: () => void;
+  onEndCollab: () => void;
 }
 
 export const ActionModals = ({
   collabId,
   collabPartner,
   onEndSession,
+  onEndCollab,
 }: ActionModalsProps) => {
+  const endSession = useCollabStore.use.endSession();
   const setConfirmLoading = useCollabStore.use.setConfirmLoading();
-  const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
-  const endCollab = useCollabStore.use.endCollab();
 
   const router = useRouter();
   const { toast } = useToast();
 
-  const terminateMutation = useMutation({
-    mutationFn: (id: string) => endCollab(id),
+  const endSessionMutation = useMutation({
+    mutationFn: async () => await onEndSession(),
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
-      setTerminateModalOpen(false);
-      onEndSession();
+      endSession();
       router.replace('/');
       toast({
         variant: 'success',
@@ -48,16 +50,23 @@ export const ActionModals = ({
     },
   });
 
-  const handleEndCollab = () => {
-    terminateMutation.mutate(collabId);
+  const handleEndSession = () => {
+    endSessionMutation.mutate();
   };
 
   return (
     <>
       {collabId && (
-        <TerminateModal
+        <EndSessionModal
           collabPartner={collabPartner}
-          onTerminate={handleEndCollab}
+          onEndSession={handleEndSession}
+        />
+      )}
+      {collabId && <EndCollabModal onEndCollab={onEndCollab} />}
+      {collabId && (
+        <NotifyEndCollabModal
+          collabPartner={collabPartner}
+          onEndCollab={onEndCollab}
         />
       )}
     </>
