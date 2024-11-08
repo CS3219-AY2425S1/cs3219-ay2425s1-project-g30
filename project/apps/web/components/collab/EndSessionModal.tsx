@@ -32,15 +32,12 @@ export default function EndSessionModal({
     expiryTimestamp: new Date(),
     autoStart: false,
     onExpire: () => {
-      console.log('timer ended for FIRST user');
-      console.log('collab ended for FIRST user');
       onEndSession();
     },
   });
 
   useEffect(() => {
     if (confirmEnd) {
-      console.log('timer restarted for FIRST user');
       const newExpiry = new Date();
       newExpiry.setSeconds(newExpiry.getSeconds() + 5);
       restart(newExpiry);

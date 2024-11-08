@@ -112,7 +112,6 @@ const CollaborativeEditor = forwardRef<
       )?.sessionEnded;
 
       if (sessionEnded && sessionEnded.endedBy !== user?.id && !collabEnding) {
-        console.log('Second user received notification, ending collab');
         setNotifyEndCollabModalOpen(true);
 
         // Properly remove the listener

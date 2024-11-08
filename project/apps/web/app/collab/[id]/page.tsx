@@ -84,7 +84,6 @@ const CollabPageContent = ({ id }: { id: string }) => {
   };
 
   const handleEndCollab = () => {
-    console.log('CALLED END COLLAB');
     endCollabMutation.mutate();
   };
 

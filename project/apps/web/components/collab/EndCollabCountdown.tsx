@@ -19,7 +19,6 @@ export const EndCollabCountdown = ({
     expiryTimestamp: new Date(),
     autoStart: false,
     onExpire: () => {
-      console.log('timer ended for SECOND user');
       onEndCollab();
     },
   });
