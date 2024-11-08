@@ -1,8 +1,11 @@
 import { Editor } from '@monaco-editor/react';
 import { CollabInfoWithDocumentDto } from '@repo/dtos/collab';
+import { Code, FolderClock } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
+
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 import { EditorAreaSkeleton } from './HistoryEditorSkeleton';
 

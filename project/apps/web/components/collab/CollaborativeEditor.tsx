@@ -25,7 +25,7 @@ import {
 import { LANGUAGES, Runtime } from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
-import { saveCodeExecution } from '@/lib/api/collab';
+import { saveExecutionSnapshot } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
@@ -249,7 +249,7 @@ const CollaborativeEditor = forwardRef<
         code,
         output,
       };
-      await saveCodeExecution(snapshot);
+      await saveExecutionSnapshot(snapshot);
     } catch (error) {
       console.error('Failed to save code execution snapshot:', error);
     }

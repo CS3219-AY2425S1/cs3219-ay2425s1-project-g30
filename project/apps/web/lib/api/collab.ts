@@ -4,8 +4,8 @@ import {
   CollabFiltersDto,
   CollabInfoDto,
   CollabInfoWithDocumentDto,
+  ExecutionSnapshotCollectionDto,
   ExecutionSnapshotCreateDto,
-  executionSnapshotCreateSchema,
 } from '@repo/dtos/collab';
 
 import { apiCall } from '@/lib/api/apiClient';
@@ -34,7 +34,7 @@ export const fetchCollabHistoryById = async (
   return await apiCall('get', `/collaboration/history/${id}`);
 };
 
-export const saveCodeExecution = async (
+export const saveExecutionSnapshot = async (
   executionSnapshotCreate: ExecutionSnapshotCreateDto,
 ): Promise<CollabInfoWithDocumentDto> => {
   return await apiCall(
@@ -42,4 +42,10 @@ export const saveCodeExecution = async (
     `/collaboration/snapshot`,
     executionSnapshotCreate,
   );
+};
+
+export const getExecutionSnapshots = async (
+  collabId: string,
+): Promise<ExecutionSnapshotCollectionDto> => {
+  return await apiCall('get', `/collaboration/snapshot/${collabId}`);
 };

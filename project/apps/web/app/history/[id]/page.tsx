@@ -6,12 +6,12 @@ import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import HistoryEditor from '@/components/history-view/HistoryEditor';
+import HistoryPane from '@/components/history-view/HistoryPane';
 import HistoryViewSkeleton from '@/components/history-view/HistoryViewSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import { fetchCollaHistorybById } from '@/lib/api/collab';
+import { fetchCollabHistoryById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 interface HistoryViewProps {
@@ -25,7 +25,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
 
   const { data: collab } = useSuspenseQuery<CollabInfoWithDocumentDto>({
     queryKey: [QUERY_KEYS.Collab, id],
-    queryFn: () => fetchCollaHistorybById(id),
+    queryFn: () => fetchCollabHistoryById(id),
   });
 
   if (!collab) {
@@ -69,8 +69,8 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <h2 className="mb-4 text-xl font-semibold">{question.title}</h2>
           <p>{question.description}</p>
         </div>
-        {/* Code editor */}
-        <HistoryEditor collab={collab} className="w-1/2" />
+        {/* Snapshot selection and code editor */}
+        <HistoryPane collab={collab} className="w-1/2" />
       </div>
     </div>
   );
