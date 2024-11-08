@@ -27,7 +27,6 @@ export const useCollabStoreBase = create<CollabState>()((set) => ({
   initialiseCollab: async (id: string) => {
     const collab = await getCollabInfoById(id);
     set({ collaboration: collab });
-    sessionStorage.setItem('collaboration', JSON.stringify(collab));
   },
 
   // For the user who initiated to end the session

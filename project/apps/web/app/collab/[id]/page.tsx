@@ -73,7 +73,7 @@ const CollabPageContent = ({ id }: { id: string }) => {
       collabInfo.collab_user2.id != user!.id
     )
       return notFound();
-  }, [collabInfo, router]);
+  }, [collabInfo, router, leaveSession, user, collaboration]);
 
   return (
     <div className="h-screen px-8 py-4">
