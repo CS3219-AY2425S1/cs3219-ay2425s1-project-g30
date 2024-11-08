@@ -8,6 +8,11 @@ import {
   UpdateQuestionDto,
   QuestionCollectionDto,
 } from '@repo/dtos/questions';
+import {
+  TestCasesDto,
+  CreateTestCasesDto,
+  UpdateTestCasesDto,
+} from '@repo/dtos/testCases';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { QuestionsRepository } from 'src/domain/ports/questions.repository';
@@ -18,6 +23,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
   private supabase: SupabaseClient;
 
   private readonly QUESTIONS_TABLE = 'question_bank';
+  private readonly TEST_CASES_TABLE = 'test_cases';
   private readonly RANDOM_ORDERED_QUESTIONS_TABLE = 'random_question';
 
   constructor(private envService: EnvService) {
@@ -180,5 +186,66 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
     }
 
     return data;
+  }
+
+  async createTestCases(testCases: CreateTestCasesDto): Promise<TestCasesDto> {
+    const { data, error } = await this.supabase
+      .from(this.TEST_CASES_TABLE)
+      .insert(testCases)
+      .select()
+      .single<TestCasesDto>();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  async deleteTestCases(testCaseId: string): Promise<boolean> {
+    const { error } = await this.supabase
+      .from(this.TEST_CASES_TABLE)
+      .delete()
+      .eq('id', testCaseId);
+
+    if (error) {
+      throw error;
+    }
+
+    return true;
+  }
+
+  async updateTestCases(testCases: UpdateTestCasesDto): Promise<TestCasesDto> {
+    const { data, error } = await this.supabase
+      .from(this.TEST_CASES_TABLE)
+      .update(testCases)
+      .eq('id', testCases.id)
+      .select()
+      .single<TestCasesDto>();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  async findTestCasesByQuestionId(
+    questionId: string,
+  ): Promise<TestCasesDto | null> {
+    const { data, error } = await this.supabase
+      .from(this.TEST_CASES_TABLE)
+      .select()
+      .eq('question_id', questionId);
+
+    if (error) {
+      throw error;
+    }
+
+    if (data.length === 0) {
+      return null;
+    }
+
+    return data[0];
   }
 }

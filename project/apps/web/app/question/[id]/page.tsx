@@ -16,6 +16,7 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
+import TestCasesSection from '@/components/question/test-cases-section/TestCasesSection';
 
 interface QuestionPageProps {
   params: {
@@ -94,6 +95,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
         </div>
       </div>
       {question && <ActionModals question={question} id={id} />}
+      {user?.role === 'Admin' && <TestCasesSection questionId={id} />}
     </div>
   );
 };

@@ -6,6 +6,11 @@ import {
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
+import {
+  TestCasesDto,
+  CreateTestCasesDto,
+  UpdateTestCasesDto,
+} from '@repo/dtos/testCases';
 
 /**
  * Abstract class representing a repository for managing questions.
@@ -53,4 +58,34 @@ export abstract class QuestionsRepository {
    * @returns A promise that resolves to the deleted QuestionDto object.
    */
   abstract delete(id: string): Promise<QuestionDto>;
+
+  /**
+   * Creates a new set of test cases for a question.
+   * @param data - The data for the new test cases.
+   * @returns A promise that resolves to the created TestCasesDto object.
+   */
+  abstract createTestCases(data: CreateTestCasesDto): Promise<TestCasesDto>;
+
+  /**
+   * Deletes test cases by their unique identifier.
+   * @param testCaseId - The unique identifier of the test cases to be deleted.
+   * @returns A promise that resolves to true if deletion was successful.
+   */
+  abstract deleteTestCases(testCaseId: string): Promise<boolean>;
+
+  /**
+   * Updates existing test cases for a question.
+   * @param data - The updated data for the test cases.
+   * @returns A promise that resolves to the updated TestCasesDto object.
+   */
+  abstract updateTestCases(data: UpdateTestCasesDto): Promise<TestCasesDto>;
+
+  /**
+   * Retrieves test cases by question ID.
+   * @param questionId - The question ID to find associated test cases.
+   * @returns A promise that resolves to a TestCasesDto object.
+   */
+  abstract findTestCasesByQuestionId(
+    questionId: string,
+  ): Promise<TestCasesDto | null>;
 }
