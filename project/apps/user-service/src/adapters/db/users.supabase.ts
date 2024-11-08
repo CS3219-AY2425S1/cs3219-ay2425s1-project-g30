@@ -92,7 +92,7 @@ export class SupabaseUsersRepository implements UsersRepository {
       .maybeSingle<UserDataDto>();
 
     // for any unexpected error apart from null
-    if (error && error.code != 'PGRST116') {
+    if (error) {
       throw error;
     }
 
