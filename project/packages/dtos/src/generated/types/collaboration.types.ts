@@ -42,30 +42,33 @@ export type Database = {
         };
         Relationships: [];
       };
-      execution_snapshots: {
+      snapshots: {
         Row: {
-          colalboration_id: string;
-          created_at: string | null;
-          document: string | null;
+          code: string | null;
+          collaboration_id: string;
+          created_at: string;
+          id: string;
           output: string | null;
         };
         Insert: {
-          colalboration_id: string;
-          created_at?: string | null;
-          document?: string | null;
+          code?: string | null;
+          collaboration_id: string;
+          created_at?: string;
+          id?: string;
           output?: string | null;
         };
         Update: {
-          colalboration_id?: string;
-          created_at?: string | null;
-          document?: string | null;
+          code?: string | null;
+          collaboration_id?: string;
+          created_at?: string;
+          id?: string;
           output?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "execution_snapshots_colalboration_id_fkey";
-            columns: ["colalboration_id"];
-            isOneToOne: true;
+            foreignKeyName: "snapshots_collaboration_id_fkey";
+            columns: ["collaboration_id"];
+            isOneToOne: false;
             referencedRelation: "collaboration";
             referencedColumns: ["id"];
           },

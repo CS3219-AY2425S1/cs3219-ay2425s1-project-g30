@@ -55,7 +55,7 @@ export class UsersService {
    * Fetches a user by their unique identifier.
    *
    * @param {string} id - The unique identifier of the user to be fetched.
-   * @returns {Promise<UserDataDto>} A promise that resolves to the user data transfer object.
+   * @returns {Promise<UserDataDto | null>} A promise that resolves to the user data transfer object if the user is found, else null.
    * @throws Will throw an error if the user cannot be fetched.
    */
   async findById(id: string): Promise<UserDataDto | null> {
