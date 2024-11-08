@@ -36,6 +36,7 @@ import EditorSkeleton, {
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
+import Timer, { TimerState } from './Timer';
 
 interface CollaborativeEditorProps {
   id: string;
@@ -58,7 +59,11 @@ const CollaborativeEditor = forwardRef<
   const [languageLoading, setLanguageLoading] = useState(true);
   const [runLoading, setRunLoading] = useState(false);
   const [output, setOutput] = useState('');
-
+  const [timerState, setTimerState] = useState<TimerState>({
+    isRunning: false,
+    elapsedTime: 0,
+    lastStartTime: null,
+  });
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -103,6 +108,41 @@ const CollaborativeEditor = forwardRef<
     };
 
     fetchRuntimes();
+  }, []);
+
+  // Initialize Yjs timer state
+  useEffect(() => {
+    const yTimer = ydocRef.current.getMap('timer');
+
+    // Initialize timer state if not present
+    if (!yTimer.has('isRunning')) {
+      yTimer.set('isRunning', false);
+      yTimer.set('elapsedTime', 0);
+      yTimer.set('lastStartTime', null);
+    }
+
+    // Observe changes to the timer state
+    const updateTimer = () => {
+      const isRunning = yTimer.get('isRunning') as boolean;
+      const elapsedTime = yTimer.get('elapsedTime') as number;
+      const lastStartTime = yTimer.get('lastStartTime') as number | null;
+
+      setTimerState({
+        isRunning,
+        elapsedTime,
+        lastStartTime,
+      });
+    };
+
+    yTimer.observeDeep(updateTimer);
+
+    // Initial timer update
+    updateTimer();
+
+    // Cleanup
+    return () => {
+      yTimer.unobserveDeep(updateTimer);
+    };
   }, []);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -240,10 +280,51 @@ const CollaborativeEditor = forwardRef<
     return <EditorSkeleton />;
   }
 
+  // Timer Controls
+  const startTimer = () => {
+    const yTimer = ydocRef.current.getMap('timer');
+    ydocRef.current.transact(() => {
+      yTimer.set('isRunning', true);
+      yTimer.set('lastStartTime', Date.now());
+    });
+  };
+
+  const pauseTimer = () => {
+    const yTimer = ydocRef.current.getMap('timer');
+    ydocRef.current.transact(() => {
+      yTimer.set('isRunning', false);
+      const lastStartTime = yTimer.get('lastStartTime') as number | null;
+      if (lastStartTime) {
+        const currentTime = Date.now();
+        const additionalTime = Math.floor((currentTime - lastStartTime) / 1000);
+        yTimer.set(
+          'elapsedTime',
+          (yTimer.get('elapsedTime') as number) + additionalTime,
+        );
+        yTimer.set('lastStartTime', null);
+      }
+    });
+  };
+
+  const resetTimer = () => {
+    const yTimer = ydocRef.current.getMap('timer');
+    ydocRef.current.transact(() => {
+      yTimer.set('isRunning', false);
+      yTimer.set('elapsedTime', 0);
+      yTimer.set('lastStartTime', null);
+    });
+  };
+
   return (
     <div className={className}>
       <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
+          <Timer
+            timerState={timerState}
+            startTimer={startTimer}
+            pauseTimer={pauseTimer}
+            resetTimer={resetTimer}
+          />
           <div className="flex items-center gap-2">
             {collabLoading ? (
               <LanguageSelectSkeleton />
