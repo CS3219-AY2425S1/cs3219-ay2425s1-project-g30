@@ -5,6 +5,9 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Suspense, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 import { ActionModals } from '@/components/collab/ActionModals';
 import CollaborativeEditor, {
   CollaborativeEditorRef,
@@ -15,8 +18,6 @@ import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { getCollabInfoById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { useCollabStore } from '@/stores/useCollabStore';
 
 interface CollabPageProps {
