@@ -11,7 +11,7 @@ import HistoryViewSkeleton from '@/components/history-view/HistoryViewSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import { fetchCollaHistorybById } from '@/lib/api/collab';
+import { fetchCollabHistorybById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 interface HistoryViewProps {
@@ -25,7 +25,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
 
   const { data: collab } = useSuspenseQuery<CollabInfoWithDocumentDto>({
     queryKey: [QUERY_KEYS.Collab, id],
-    queryFn: () => fetchCollaHistorybById(id),
+    queryFn: () => fetchCollabHistorybById(id),
   });
 
   if (!collab) {
@@ -58,7 +58,7 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <AvatarFallback>{partnerUsername[0]}</AvatarFallback>
         </Avatar>
         <span className="ml-2 mr-2 font-medium text-md">{partnerUsername}</span>
-        <span className="ml-6 font-thin italic text-slate-500">
+        <span className="ml-6 italic font-thin text-slate-500">
           Read-only View
         </span>
       </div>

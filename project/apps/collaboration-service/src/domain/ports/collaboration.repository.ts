@@ -103,4 +103,10 @@ export abstract class CollaborationRepository {
    * @param id The unique identifier of the collaboration to end.
    */
   abstract endCollab(id: string): Promise<CollabDto>;
+
+  /**
+   * Checks if a user has an active collaboration
+   * @param userId The unique identifier of the user.
+   */
+  abstract checkActiveCollabs(userId: string): Promise<boolean>;
 }

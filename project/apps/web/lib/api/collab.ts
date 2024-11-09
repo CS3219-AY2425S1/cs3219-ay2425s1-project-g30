@@ -4,6 +4,7 @@ import {
   CollabFiltersDto,
   CollabInfoDto,
   CollabInfoWithDocumentDto,
+  ActiveCollabExistsDto,
 } from '@repo/dtos/collab';
 
 import { apiCall } from '@/lib/api/apiClient';
@@ -26,8 +27,19 @@ export const endCollab = async (id: string): Promise<CollabDto> => {
   return await apiCall('post', `/collaboration/end/${id}`);
 };
 
-export const fetchCollaHistorybById = async (
+export const fetchCollabHistorybById = async (
   id: string,
 ): Promise<CollabInfoWithDocumentDto> => {
   return await apiCall('get', `/collaboration/history/${id}`);
+};
+
+export const checkActiveCollabs = async (
+  checkActiveCollabsDto: ActiveCollabExistsDto,
+): Promise<boolean> => {
+  return await apiCall(
+    'get',
+    `/collaboration/active-exists`,
+    null,
+    checkActiveCollabsDto,
+  );
 };

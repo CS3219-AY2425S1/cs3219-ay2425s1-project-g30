@@ -88,6 +88,10 @@ export const collabFiltersSchema = z.object({
   sort: z.array(sortCollaborationsQuerySchema).optional(),
 });
 
+export const activeCollabExistsSchema = z.object({
+  user_id: z.string().uuid(),
+});
+
 export type CollabFiltersDto = z.infer<typeof collabFiltersSchema>;
 export type CollabUserDto = z.infer<typeof collaboratorSchema>;
 export type CollabInfoDto = z.infer<typeof collabInfoSchema>;
@@ -99,3 +103,4 @@ export type CollabQuestionDto = z.infer<typeof collabQuestionSchema>;
 export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
 export type CollabDto = z.infer<typeof collabSchema>;
 export type CollabCollectionDto = z.infer<typeof collabCollectionSchema>;
+export type ActiveCollabExistsDto = z.infer<typeof activeCollabExistsSchema>;

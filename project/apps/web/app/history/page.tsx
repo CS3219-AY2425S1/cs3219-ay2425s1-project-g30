@@ -2,8 +2,8 @@
 
 import { Suspense } from 'react';
 
-import { HistoryTable } from '@/components/history/history-table/HistoryTable';
 import HistorySkeleton from '@/components/history/HistorySkeleton';
+import { HistoryTable } from '@/components/history/HistoryTable';
 
 const HistoryRepositoryContent = () => {
   return (
