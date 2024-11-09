@@ -156,14 +156,13 @@ export class UsersController {
       throw new ForbiddenException('Access denied.');
     }
 
-    // Delete user and clear session
+    // Delete user -> automatic session termination on supabase end
     const isDeleted = await firstValueFrom(
       this.usersServiceClient.send({ cmd: 'delete_user' }, id),
     );
 
-    // Sign out user if they are deleting their own account
+    // Clear cookies for user if they are deleting their own account
     if (userData.id == id) {
-      await this.authServiceClient.send({ cmd: 'signout' }, {});
       res.clearCookie('access_token');
       res.clearCookie('refresh_token');
     }

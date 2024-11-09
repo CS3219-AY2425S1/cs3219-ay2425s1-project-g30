@@ -84,13 +84,14 @@ export class SupabaseUsersRepository implements UsersRepository {
     } as UserCollectionDto;
   }
 
-  async findById(id: string): Promise<UserDataDto> {
+  async findById(id: string): Promise<UserDataDto | null> {
     const { data, error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .select()
       .eq('id', id)
-      .single<UserDataDto>();
+      .maybeSingle<UserDataDto>();
 
+    // for any unexpected error apart from null
     if (error) {
       throw error;
     }
@@ -132,7 +133,7 @@ export class SupabaseUsersRepository implements UsersRepository {
 
   async updatePrivilegeById(id: string): Promise<UserDataDto> {
     const user = await this.findById(id);
-    const newRole = user.role == ROLE.Admin ? ROLE.User : ROLE.Admin;
+    const newRole = user!.role == ROLE.Admin ? ROLE.User : ROLE.Admin;
 
     // Update user role in profiles table
     const { data: updatedUser, error } = await this.supabase
@@ -164,16 +165,16 @@ export class SupabaseUsersRepository implements UsersRepository {
       throw authError;
     }
 
-    return await this.findById(changePasswordDto.id);
+    const updatedUser = await this.findById(changePasswordDto.id);
+    return updatedUser!;
   }
 
   async deleteById(id: string): Promise<boolean> {
-    // Delete user from profiles table first
-    const { data, error } = await this.supabase
+    // Delete user from profiles table first, else DB error since no cascade
+    const { error } = await this.supabase
       .from(this.PROFILES_TABLE)
       .delete()
-      .eq('id', id)
-      .single<UserDataDto>();
+      .eq('id', id);
 
     if (error) {
       throw error;
@@ -181,10 +182,11 @@ export class SupabaseUsersRepository implements UsersRepository {
 
     // Then delete user from auth table
     const { error: authError } = await this.supabase.auth.admin.deleteUser(id);
+
     if (authError) {
       throw authError;
     }
 
-    return data == null;
+    return true;
   }
 }

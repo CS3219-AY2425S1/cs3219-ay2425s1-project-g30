@@ -19,7 +19,7 @@ export const collabQuestionSchema = z.object({
 
 // Optional TODO: Do we want to also keep track of the number of question the user has done?
 export const collaboratorSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable(),
   username: z.string(),
 });
 
