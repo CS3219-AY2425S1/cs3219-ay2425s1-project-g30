@@ -24,7 +24,7 @@ export class CollaborationController {
 
   @Get('active-exists')
   @UsePipes(new ZodValidationPipe(activeCollabExistsSchema))
-  async getActivieCollaborationExists(
+  async getActiveCollaborationExists(
     @Query() collabExistDto: ActiveCollabExistsDto,
   ) {
     return this.collaborationServiceClient.send(
