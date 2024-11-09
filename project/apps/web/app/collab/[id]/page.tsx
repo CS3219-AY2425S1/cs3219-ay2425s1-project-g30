@@ -50,8 +50,9 @@ const CollabPageContent = ({ id }: { id: string }) => {
       : collabInfo.collab_user1.username;
 
   const question = {
-    title: collabInfo.question.q_title || 'Untitled Question',
-    description: collabInfo.question.q_desc || 'No description',
+    title: collabInfo.question.q_title,
+    description: collabInfo.question.q_desc,
+    id: collabInfo.question.id,
   };
 
   return (
@@ -81,7 +82,12 @@ const CollabPageContent = ({ id }: { id: string }) => {
         </div>
 
         {/* Code editor */}
-        <CollaborativeEditor ref={editorRef} id={id} className="w-1/2" />
+        <CollaborativeEditor
+          ref={editorRef}
+          collabId={id}
+          questionId={question.id}
+          className="w-1/2"
+        />
       </div>
       {collabInfo && (
         <ActionModals

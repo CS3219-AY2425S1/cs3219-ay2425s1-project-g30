@@ -21,14 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LANGUAGES, Runtime } from '@/constants/languages';
+import {
+  EXECUTION_TEMPLATES,
+  LANGUAGES,
+  RESULT_FLAG,
+  Runtime,
+} from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
 import { Button } from '../ui/button';
-import { LoadingSpinner } from '../ui/spinner';
 
 import EditorSkeleton, {
   LanguageSelectSkeleton,
@@ -36,9 +40,15 @@ import EditorSkeleton, {
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
+import { fetchTestCasesByQuestionId } from '@/lib/api/testCases';
+import { TestCasesDto } from '@repo/dtos/testCases';
+import TestCasesOutputSection, { TestResult } from './TestCasesOutputSection';
+import { LoadingSpinner } from '../ui/spinner';
+import { formatInputsForLanguage } from '@/utils/formatInputForLanguages';
 
 interface CollaborativeEditorProps {
-  id: string;
+  collabId: string;
+  questionId: string;
   className?: string;
 }
 
@@ -49,7 +59,7 @@ export interface CollaborativeEditorRef {
 const CollaborativeEditor = forwardRef<
   CollaborativeEditorRef,
   CollaborativeEditorProps
->(({ id, className }, ref) => {
+>(({ collabId, questionId, className }, ref) => {
   const user = useAuthStore.use.user();
   const setCollaboration = useCollabStore.use.setCollaboration();
   const [languages, setLanguages] = useState<Runtime[]>([]);
@@ -57,7 +67,9 @@ const CollaborativeEditor = forwardRef<
   const [collabLoading, setCollabLoading] = useState(true);
   const [languageLoading, setLanguageLoading] = useState(true);
   const [runLoading, setRunLoading] = useState(false);
-  const [output, setOutput] = useState('');
+  const [testCases, setTestCases] = useState<TestCasesDto | null>(null);
+  const [testResults, setTestResults] = useState<TestResult[] | null>(null);
+  const [output, setOutput] = useState<string | null>(null);
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const ydocRef = useRef(new Y.Doc());
@@ -105,6 +117,26 @@ const CollaborativeEditor = forwardRef<
     fetchRuntimes();
   }, []);
 
+  // Fetch test cases on mount
+  useEffect(() => {
+    const loadTestCases = async () => {
+      try {
+        const fetchedTestCases = await fetchTestCasesByQuestionId(questionId);
+        setTestCases(fetchedTestCases);
+        console.log('Fetched test cases:', fetchedTestCases);
+      } catch (error) {
+        console.error('Failed to fetch test cases:', error);
+        toast({
+          variant: 'error',
+          title: 'Error',
+          description: 'Failed to fetch test cases.',
+        });
+      }
+    };
+
+    loadTestCases();
+  }, [questionId, toast]);
+
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor as monaco.editor.IStandaloneCodeEditor;
     setCollabLoading(true);
@@ -113,7 +145,7 @@ const CollaborativeEditor = forwardRef<
       const ydoc = ydocRef.current;
       const provider = new HocuspocusProvider({
         url: env.NEXT_PUBLIC_COLLAB_SOCKET_URL,
-        name: id,
+        name: collabId,
         document: ydoc,
       });
       providerRef.current = provider;
@@ -199,37 +231,114 @@ const CollaborativeEditor = forwardRef<
 
   const runCode = async () => {
     const code = editorRef.current?.getModel()?.getValue();
-    if (!selectedRuntime || !code) return;
+    if (!selectedRuntime) return;
 
     setRunLoading(true);
 
     try {
-      const response = await axios.post(
-        'https://emkc.org/api/v2/piston/execute',
-        {
-          language: selectedRuntime.language,
-          version: selectedRuntime.version,
-          files: [
-            {
-              name: 'main',
-              content: code,
-            },
-          ],
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      );
+      const results: TestResult[] = [];
 
-      const output =
-        response.data?.run?.output ||
-        response.data?.run?.stderr ||
-        'Error: Empty code input.';
-      setOutput(output);
+      if (testCases) {
+        const { schema, cases } = testCases;
+        const inputKeys = schema.required.filter(
+          (key: string) => key !== 'output',
+        );
+
+        for (const testCase of cases) {
+          const formattedInputs = inputKeys
+            .map((key: string | number) =>
+              formatInputsForLanguage(
+                testCase[key],
+                schema,
+                selectedRuntime.language,
+              ),
+            )
+            .join(', ');
+
+          const expectedOutput = testCase.output;
+
+          const inputData = Object.fromEntries(
+            inputKeys.map((key: string | number) => [key, testCase[key]]),
+          );
+
+          const codeTemplate = EXECUTION_TEMPLATES[selectedRuntime.language];
+          if (!codeTemplate) {
+            throw new Error(
+              `Execution template not found for language: ${selectedRuntime.language}`,
+            );
+          }
+
+          console.log({ formattedInputs });
+
+          const codeToRun = codeTemplate(code || '', formattedInputs);
+          console.log('Running code:', codeToRun);
+
+          const response = await axios.post(
+            'https://emkc.org/api/v2/piston/execute',
+            {
+              language: selectedRuntime.language,
+              version: selectedRuntime.version,
+              files: [
+                {
+                  name: 'main',
+                  content: codeToRun,
+                },
+              ],
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+            },
+          );
+
+          const rawStdout =
+            response.data?.run?.stdout || response.data?.run?.stderr || '';
+          const functionOutput = rawStdout.includes(RESULT_FLAG)
+            ? rawStdout.split(`${RESULT_FLAG} `).pop()?.trim() || 'undefined'
+            : 'undefined';
+
+          const isSuccess = functionOutput === expectedOutput.toString();
+          results.push({
+            input: inputData,
+            stdout: rawStdout
+              .replace(new RegExp(`${RESULT_FLAG}.+`), '')
+              .trim(),
+            expectedOutput,
+            functionOutput,
+            passed: isSuccess,
+          });
+        }
+        setTestResults(results);
+      } else {
+        console.log('Running code:', code);
+
+        const response = await axios.post(
+          'https://emkc.org/api/v2/piston/execute',
+          {
+            language: selectedRuntime.language,
+            version: selectedRuntime.version,
+            files: [
+              {
+                name: 'main',
+                content: code || '',
+              },
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          },
+        );
+
+        const output = response.data?.run?.output || response.data?.run?.stderr;
+        setOutput(output);
+      }
     } catch (error: any) {
+      setTestResults(null);
       setOutput(`Error: ${error.message}`);
     } finally {
       setRunLoading(false);
@@ -242,7 +351,7 @@ const CollaborativeEditor = forwardRef<
 
   return (
     <div className={className}>
-      <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
+      <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
           <div className="flex items-center gap-2">
             {collabLoading ? (
@@ -315,14 +424,19 @@ const CollaborativeEditor = forwardRef<
       {collabLoading ? (
         <OutputSectionSkeleton />
       ) : (
-        <div className="flex flex-col mt-8 h-[184px] border border-1 rounded-md shadow-md">
-          <div className="px-6 py-4 font-semibold border-b border-gray-300">
-            Output
+        <div className="flex flex-col mt-8 h-[290px] border border-1 rounded-md shadow-md">
+          <div className="p-4 font-semibold border-b border-gray-300">
+            {testCases ? 'Test Cases' : 'Output'}
           </div>
           {runLoading ? (
             <div className="flex items-center justify-center flex-grow w-full">
               <LoadingSpinner />
             </div>
+          ) : testCases ? (
+            <TestCasesOutputSection
+              testResults={testResults}
+              testCases={testCases}
+            />
           ) : (
             <div className="h-full px-6 py-4 overflow-auto whitespace-pre-wrap">
               {output}

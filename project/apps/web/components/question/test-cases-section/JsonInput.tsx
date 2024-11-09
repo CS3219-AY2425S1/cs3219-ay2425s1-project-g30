@@ -20,28 +20,24 @@ interface JsonInputProps {
  * Infers the type of a value to build a schema structure.
  * Handles simple types, arrays, and nested objects, and ensures uniform array types.
  */
-const inferType = (value: any): any => {
-  // Handle empty arrays
+const inferType = (value: any, fallbackType: any = null): any => {
   if (Array.isArray(value)) {
     if (value.length === 0) {
-      return { type: 'array', items: {} };
+      // Use the fallback type if provided to ensure consistent type inference for empty arrays
+      return { type: 'array', items: fallbackType ? fallbackType : {} };
     }
 
-    // Check if all items in the array have the same type
-    const itemTypes = value.map((item) => JSON.stringify(inferType(item)));
-    const uniqueItemTypes = Array.from(new Set(itemTypes));
-    if (uniqueItemTypes.length > 1) {
-      throw new Error(
-        `Inconsistent types detected in array: ${uniqueItemTypes.join(
-          ', ',
-        )}. Ensure all elements in the array are of the same type.`,
-      );
+    const itemType = inferType(value[0]);
+
+    // Check consistency across all elements in the array
+    for (let i = 1; i < value.length; i++) {
+      const currentItemType = inferType(value[i]);
+      if (JSON.stringify(currentItemType) !== JSON.stringify(itemType)) {
+        throw new Error('Inconsistent types detected in array elements.');
+      }
     }
 
-    return {
-      type: 'array',
-      items: inferType(value[0]),
-    };
+    return { type: 'array', items: itemType };
   }
 
   if (value !== null && typeof value === 'object') {
@@ -137,7 +133,6 @@ const inferSchemaFromTestCases = (testCases: any[]) => {
   for (let i = 1; i < testCases.length; i++) {
     const currentTestCase = testCases[i];
 
-    // Ensure required keys are present in each test case
     Object.keys(inferredSchema.properties).forEach((key) => {
       if (!currentTestCase.hasOwnProperty(key) && key !== 'output') {
         throw new Error(`Missing property "${key}" in test case ${i + 1}.`);
@@ -146,14 +141,21 @@ const inferSchemaFromTestCases = (testCases: any[]) => {
 
     // Check for type consistency across properties
     Object.entries(currentTestCase).forEach(([key, value]) => {
-      const expectedType = inferType(value);
-      if (
-        JSON.stringify(inferredSchema.properties[key]) !==
-        JSON.stringify(expectedType)
-      ) {
-        throw new Error(
-          `Inconsistent types for property "${key}" detected at test case ${i + 1}.`,
+      if (Array.isArray(value) && value.length === 0) {
+        inferredSchema.properties[key] = inferType(
+          value,
+          inferredSchema.properties[key].items,
         );
+      } else {
+        const expectedType = inferType(value);
+        if (
+          JSON.stringify(inferredSchema.properties[key]) !==
+          JSON.stringify(expectedType)
+        ) {
+          throw new Error(
+            `Inconsistent types for property "${key}" detected at test case ${i + 1}.`,
+          );
+        }
       }
     });
   }
