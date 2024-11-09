@@ -37,6 +37,8 @@ import EditorSkeleton, {
   OutputSectionSkeleton,
 } from './EditorSkeleton';
 import Timer, { TimerState } from './Timer';
+import './CollabCursor/Cursors.css';
+import { Cursors } from './CollabCursor/Cursors';
 
 interface CollaborativeEditorProps {
   id: string;
@@ -127,9 +129,16 @@ const CollaborativeEditor = forwardRef<
       const elapsedTime = yTimer.get('elapsedTime') as number;
       const lastStartTime = yTimer.get('lastStartTime') as number | null;
 
+      let newElapsedTime = elapsedTime;
+
+      if (isRunning && lastStartTime) {
+        const currentTime = Date.now();
+        newElapsedTime += Math.floor((currentTime - lastStartTime) / 1000);
+      }
+
       setTimerState({
         isRunning,
-        elapsedTime,
+        elapsedTime: newElapsedTime,
         lastStartTime,
       });
     };
@@ -372,7 +381,7 @@ const CollaborativeEditor = forwardRef<
           )}
         </div>
         {/* Monaco Editor */}
-        <div className="flex h-full p-6">
+        <div className="flex h-full p-6 relative">
           <Editor
             theme="light"
             defaultLanguage={selectedRuntime?.language || 'javascript'}
@@ -387,9 +396,17 @@ const CollaborativeEditor = forwardRef<
               readOnly: collabLoading,
               automaticLayout: true,
               quickSuggestions: { other: true, comments: false, strings: true },
+              glyphMargin: true,
             }}
             className="w-full"
           />
+          {!collabLoading && (
+            <Cursors
+              provider={providerRef.current!}
+              editor={editorRef.current}
+              user={user!}
+            />
+          )}
         </div>
       </div>
 
