@@ -174,4 +174,17 @@ export class CollaborationService {
       this.handleError('end collaboration', error);
     }
   }
+
+  /**
+   * Checks if a user has an active collaboration
+   * @param userId The unique identifier of the user.
+   */
+  async checkActiveCollabs(userId: string): Promise<boolean> {
+    try {
+      this.logger.log(`Checking Active Collaborations: ${userId}`);
+      return await this.collabRepository.checkActiveCollabs(userId);
+    } catch (error) {
+      this.handleError('checking active collaborations', error);
+    }
+  }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { MatchCancelDto, MatchRequestMsgDto } from '@repo/dtos/match';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -9,8 +9,10 @@ import { useStopwatch } from 'react-timer-hook';
 
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/spinner';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
@@ -20,9 +22,11 @@ const Search = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const matchDataParam = searchParams.get('matchData');
+  const queryClient = useQueryClient();
 
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
+  const user = useAuthStore.use.user();
   const collaboration = useCollabStore.use.collaboration();
   const fetchCollab = useCollabStore.use.fetchCollab();
   const connect = useSocketStore((state) => state.connect);
@@ -106,32 +110,32 @@ const Search = () => {
     if (!socket) return;
 
     const handleMatchFound = (collabId: string) => {
-      console.log('Match found, collabId:', collabId);
       toast({
         variant: 'success',
         title: 'Match Found',
         description: 'Your match was successful.',
       });
       fetchCollab(collabId);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.Collab, user?.id],
+      });
       router.push(`/collab/${collabId}`);
     };
 
     const handleMatchInvalid = (message: string) => {
-      console.log('Match invalid:', message);
       toast({
         variant: 'error',
         title: 'Match Invalid',
-        description: 'Your match was invalid.',
+        description: `Your match was invalid. ${message}`,
       });
       stopMatching();
     };
 
     const handleMatchRequestExpired = (message: string) => {
-      console.log('Match request expired:', message);
       toast({
         variant: 'error',
         title: 'Match Expired',
-        description: 'Your match request has expired. Please try again.',
+        description: `Your match request has expired. Please try again. ${message}`,
       });
       stopMatching();
     };
@@ -152,7 +156,6 @@ const Search = () => {
     if (matchDataParam) {
       const isValidMatchData = validateMatchParam(matchDataParam);
       if (!isValidMatchData) {
-        console.log('Invalid search params');
         router.push('/');
         return;
       }
@@ -161,7 +164,6 @@ const Search = () => {
         handleCreateMatch(matchData);
       }
     } else {
-      console.log('No match data params found');
       router.push('/');
     }
   }, [matchDataParam, handleCreateMatch, isConnected]);
