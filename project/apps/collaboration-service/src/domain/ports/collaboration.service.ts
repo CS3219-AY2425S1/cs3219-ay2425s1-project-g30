@@ -172,8 +172,9 @@ export class CollaborationService {
         id: collabId,
         name: 'Final Submission',
         created_at: collab.ended_at,
-        code: null,
         document: document_data,
+        code: null,
+        output: null,
       };
 
       // code execution attempts
@@ -183,11 +184,12 @@ export class CollaborationService {
         (snapshot, index) => {
           return {
             id: snapshot.id,
-            name: `Attempt ${index + 1}`,
+            name: `Attempt ${snapshotCollection.metadata.count - index}`, // in descending order
             created_at: snapshot.created_at,
-            code: snapshot.code,
             document: null,
-          } as AttemptDto;
+            code: snapshot.code,
+            output: snapshot.output,
+          } satisfies AttemptDto;
         },
       );
 

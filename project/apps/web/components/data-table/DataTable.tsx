@@ -55,6 +55,7 @@ interface DataTableProps<TData, TValue> {
   confirmLoading: boolean;
   controlledState?: ControlledTableStateProps;
   TableToolbar?: React.FC<{ table: ReactTable<TData> }>;
+  showPagination?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -63,6 +64,7 @@ export function DataTable<TData, TValue>({
   confirmLoading,
   controlledState,
   TableToolbar,
+  showPagination = true,
 }: DataTableProps<TData, TValue>) {
   let tableState: Partial<TableState> = {};
 
@@ -169,7 +171,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      {showPagination && <DataTablePagination table={table} />}
     </div>
   );
 }

@@ -98,7 +98,7 @@ export abstract class CollaborationRepository {
   abstract endCollab(id: string): Promise<CollabDto>;
 
   /**
-   * Retrieves all snapshots for a given collaboration id.
+   * Retrieves all snapshots for a given collaboration id, sorted by creation date in descending order.
    * @param id The unique identifier of the collaboration to fetch snapshots for.
    * @returns A promise that resolves to an array of snapshot data transfer objects.
    */

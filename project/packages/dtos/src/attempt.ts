@@ -6,6 +6,7 @@ export const attemptSchema = z.object({
   name: z.string(),
   document: z.array(z.number()).nullable(), // document stores the Y.js document state
   code: z.string().nullable(), // code stores the raw code text in string format
+  output: z.string().nullable(),
   created_at: z.date(),
 });
 

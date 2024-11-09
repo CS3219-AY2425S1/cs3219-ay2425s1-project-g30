@@ -396,7 +396,7 @@ export class CollaborationSupabase implements CollaborationRepository {
       .from(this.SNAPSHOT_TABLE)
       .select()
       .eq('collaboration_id', id)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw error;

@@ -39,7 +39,7 @@ export const columns: ColumnDef<AttemptDto>[] = [
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => {
-      return <span>{dayjs(row.original.created_at).format(DATE_FORMAT)}</span>;
+      return <span>{dayjs(row.original.created_at).format(DATE_FORMAT)}</span>; // need to update this to use the correct date format
     },
     enableColumnFilter: false,
     enableSorting: false,

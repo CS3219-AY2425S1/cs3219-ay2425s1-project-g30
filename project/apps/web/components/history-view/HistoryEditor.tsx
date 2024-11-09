@@ -68,26 +68,38 @@ const HistoryEditor = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
+    <div>
       {/* Monaco Editor */}
-      <div className="flex h-full p-6">
-        <Editor
-          theme="light"
-          // Potential enhancement: persist the language of the document and use it here
-          defaultLanguage="plaintext"
-          loading={
-            <div className="flex items-start justify-start w-full h-full">
-              <EditorAreaSkeleton />
-            </div>
-          }
-          onMount={handleEditorDidMount}
-          options={{
-            minimap: { enabled: false },
-            readOnly: true,
-            automaticLayout: true,
-          }}
-          className="w-full"
-        />
+      <div className="flex flex-col h-[calc(100vh-385px)] border border-1 rounded-md shadow-md">
+        <div className="flex h-full p-6">
+          <Editor
+            theme="light"
+            // Potential enhancement: persist the language of the document and use it here
+            defaultLanguage="plaintext"
+            loading={
+              <div className="flex items-start justify-start w-full h-full">
+                <EditorAreaSkeleton />
+              </div>
+            }
+            onMount={handleEditorDidMount}
+            options={{
+              minimap: { enabled: false },
+              readOnly: true,
+              automaticLayout: true,
+            }}
+            className="w-full"
+          />
+        </div>
+      </div>
+
+      {/* Output Area */}
+      <div className="flex flex-col mt-8 h-[184px] border border-1 rounded-md shadow-md">
+        <div className="px-6 py-4 font-semibold border-b border-gray-300">
+          Output
+        </div>
+        <div className="h-full px-6 py-4 overflow-auto whitespace-pre-wrap">
+          {selectedAttempt?.output}
+        </div>
       </div>
     </div>
   );
