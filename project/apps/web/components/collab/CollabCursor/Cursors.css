@@ -1,0 +1,132 @@
+/* Remote Cursor */
+.remote-cursor {
+  border-left: 2px solid;
+  border-left-color: currentColor;
+  animation: blink 1s step-start infinite;
+  pointer-events: none;
+  position: relative;
+}
+
+/* Blinking Animation */
+@keyframes blink {
+  50% {
+    border-left-color: transparent;
+  }
+}
+
+/* Remote Cursor Glyph - Positioned Relative to Cursor */
+.remote-cursor-glyph-1::after,
+.remote-cursor-glyph-2::after,
+.remote-cursor-glyph-3::after,
+.remote-cursor-glyph-4::after,
+.remote-cursor-glyph-5::after,
+.remote-cursor-glyph-6::after,
+.remote-cursor-glyph-7::after,
+.remote-cursor-glyph-8::after,
+.remote-cursor-glyph-9::after {
+  content: attr(data-username); /* Display username */
+  position: absolute;
+  top: -20px; /* Position above the cursor */
+  left: -1px;
+  background-color: var(--cursor-color);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Assign colors via CSS variables */
+.remote-cursor-glyph-1 {
+  --cursor-color: #ff5733; /* Red */
+}
+
+.remote-cursor-glyph-2 {
+  --cursor-color: #33ff57; /* Green */
+}
+
+.remote-cursor-glyph-3 {
+  --cursor-color: #3357ff; /* Blue */
+}
+
+.remote-cursor-glyph-4 {
+  --cursor-color: #ff33a8; /* Pink */
+}
+
+.remote-cursor-glyph-5 {
+  --cursor-color: #a833ff; /* Purple */
+}
+
+.remote-cursor-glyph-6 {
+  --cursor-color: #33fff6; /* Cyan */
+}
+
+.remote-cursor-glyph-7 {
+  --cursor-color: #ff8c33; /* Orange */
+}
+
+.remote-cursor-glyph-8 {
+  --cursor-color: #8c33ff; /* Indigo */
+}
+
+.remote-cursor-glyph-9 {
+  --cursor-color: #33ff8c; /* Mint */
+}
+
+/* Remote Selection */
+.remote-selection {
+  background-color: rgba(0, 0, 255, 0.2); /* Semi-transparent blue */
+  pointer-events: none;
+}
+
+/* Optional: Adjust cursor z-index to appear above text */
+.monaco-editor .remote-cursor {
+  z-index: 10;
+}
+
+[class^='cursor-']::after {
+  animation: blink 1s ease infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+[class^='cursor-']::before {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+[class^='cursor-']:hover::before {
+  opacity: 1;
+}
+
+[class^='selection-'] {
+  transition: background-color 0.1s ease;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Prevent text selection on cursor labels */
+[class^='cursor-label-'] {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Smooth transitions for selections */
+[class^='selection-'] {
+  transition: background-color 0.1s ease;
+}
+
+/* Ensure cursor labels are always visible */
+.monaco-editor .cursors-layer {
+  z-index: 100;
+}
