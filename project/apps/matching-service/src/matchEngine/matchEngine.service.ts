@@ -8,6 +8,11 @@ import { CollabRequestDto } from '@repo/dtos/collab';
 import { MATCH_TIMEOUT } from 'src/constants/queue';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import {
+  CATEGORY,
+  COMPLEXITY,
+} from '@repo/dtos/generated/enums/questions.enums';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MatchEngineService {
@@ -33,7 +38,7 @@ export class MatchEngineService {
     const { userId, category, complexity } = matchRequest;
 
     try {
-      const matchedData = await this.matchRedis.findPotentialMatch(
+      const matchedData = await this.findPotentialMatch(
         userId,
         category,
         complexity,
@@ -108,5 +113,112 @@ export class MatchEngineService {
       this.collabServiceClient.send({ cmd: 'create_collab' }, collabReqData),
     );
     return collabId;
+  }
+
+  /**
+   * Finds a potential match in redis based on one of the selected categories and complexity
+   * 1. Fetches all the matching match_req_Ids from the sorted set for each category
+   * 2. Checks if the match_req_Id is in the cancelled list
+   * 3. Sort the list of potential matches by earliest timestamp and choose the oldest request
+   * 4. Removes the match request from redis
+   * @param criteria Match requester's selected categories and complexity
+   * @returns The userId and matchId of the potential match if found, otherwise null
+   */
+
+  async findPotentialMatch(
+    userId: string,
+    categories: CATEGORY[],
+    complexity: COMPLEXITY,
+  ): Promise<{ userId: string; category: CATEGORY[]; matchId: string } | null> {
+    const responses = await this.matchRedis.addMatchCategoryRequest(
+      categories,
+      complexity,
+    );
+    if (!responses) return null;
+
+    const fetchPromises = responses.map(async ([err, res], index) => {
+      if (err) {
+        this.logger.error(
+          `Error fetching match_req_Id(s) from category ${categories[index]}:`,
+          err,
+        );
+        return null;
+      }
+
+      for (const match_req_Id of res as string[]) {
+        if (!match_req_Id) continue;
+
+        const matchRequest =
+          await this.matchRedis.getMatchRequest(match_req_Id);
+        if (!matchRequest || matchRequest.userId === userId) continue;
+
+        // Also need to check if the match_req_Id is in the cancelled list
+        const isCancelled =
+          await this.matchRedis.isMatchRequestCancelled(match_req_Id);
+        if (isCancelled) {
+          this.logger.debug(
+            `Match request ${match_req_Id} is cancelled, removing match request and skipping`,
+          );
+          // Remove the cancelled match request from the sorted set
+          await this.matchRedis.removeMatchRequest(match_req_Id);
+          continue;
+        }
+
+        // Check if the partner has a matching socket connection
+        const partnerSocketId = await this.matchRedis.getSocketByUserId(
+          matchRequest.userId,
+        );
+        if (!partnerSocketId || partnerSocketId !== matchRequest.socketId) {
+          this.logger.debug(
+            `Partner ${matchRequest.userId} does not have a socket connection, skipping`,
+          );
+          // Remove the partner match request from the sorted set
+          await this.matchRedis.removeMatchRequest(match_req_Id);
+          continue;
+        }
+
+        if (matchRequest) {
+          // Check if the match requester is alive
+          const validSocket =
+            await this.matchGateway.isSocketAlive(partnerSocketId);
+          if (!validSocket) {
+            this.logger.warn(
+              `Peer web socket ${matchRequest.userId} no longer connected: socketId: ${partnerSocketId}, skipping`,
+            );
+            await this.matchRedis.removeMatchRequest(match_req_Id);
+            continue;
+          }
+          // Partner match request found
+          this.logger.debug(`Partner match request found: ${match_req_Id}`);
+
+          // Remove the partner match request from the sorted set
+          await this.matchRedis.removeMatchRequest(match_req_Id);
+          return matchRequest;
+        }
+      }
+
+      // No match found for this category
+      return null;
+    });
+
+    const matchResults = await Promise.all(fetchPromises);
+
+    const validResults = matchResults.filter((req) => req !== null);
+
+    if (validResults.length === 0) return null; // No matches found
+
+    // sort by earliest first
+    validResults.sort((a, b) => a.timestamp - b.timestamp);
+    const oldestMatch = validResults[0];
+
+    const match_id = uuidv4();
+
+    await this.matchRedis.removeMatchRequest(oldestMatch.match_req_id);
+
+    return {
+      userId: oldestMatch.userId,
+      category: oldestMatch.category,
+      matchId: match_id,
+    };
   }
 }
