@@ -30,8 +30,6 @@ import { useCollabStore } from '@/stores/useCollabStore';
 import { Button } from '../ui/button';
 import { LoadingSpinner } from '../ui/spinner';
 
-import { Cursors } from './CollabCursor/Cursors';
-import './CollabCursor/Cursors.css';
 import EditorSkeleton, {
   LanguageSelectSkeleton,
   RunButtonSkeleton,
@@ -39,6 +37,8 @@ import EditorSkeleton, {
   OutputSectionSkeleton,
 } from './EditorSkeleton';
 import Timer, { TimerState } from './Timer';
+import './CollabCursor/Cursors.css';
+import { Cursors } from './CollabCursor/Cursors';
 
 interface CollaborativeEditorProps {
   id: string;
