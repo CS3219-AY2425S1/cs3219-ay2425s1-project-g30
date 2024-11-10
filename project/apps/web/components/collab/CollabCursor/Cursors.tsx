@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { UserDataDto } from '@repo/dtos/users';
 import debounce from 'lodash/debounce';
 import CursorWidget from './CursorWidget';
-import { hashCode, injectCursorStyle, removeStyles } from '@/utils/CursorStyle';
+import { hashCode, injectCursorStyle, removeStyles } from '@/utils/cursorStyle';
 
 interface CursorsProps {
   provider: HocuspocusProvider;
