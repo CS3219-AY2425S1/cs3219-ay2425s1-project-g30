@@ -44,6 +44,9 @@ import EditorSkeleton, {
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
+import Timer, { TimerState } from './Timer';
+import './CollabCursor/Cursors.css';
+import { Cursors } from './CollabCursor/Cursors';
 import TestCasesOutputSection, { TestResult } from './TestCasesOutputSection';
 
 interface CollaborativeEditorProps {
@@ -70,7 +73,11 @@ const CollaborativeEditor = forwardRef<
   const [testCases, setTestCases] = useState<TestCasesDto | null>(null);
   const [testResults, setTestResults] = useState<TestResult[] | null>(null);
   const [output, setOutput] = useState<string | null>(null);
-
+  const [timerState, setTimerState] = useState<TimerState>({
+    isRunning: false,
+    elapsedTime: 0,
+    lastStartTime: null,
+  });
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -115,6 +122,48 @@ const CollaborativeEditor = forwardRef<
     };
 
     fetchRuntimes();
+  }, []);
+
+  // Initialize Yjs timer state
+  useEffect(() => {
+    const yTimer = ydocRef.current.getMap('timer');
+
+    // Initialize timer state if not present
+    if (!yTimer.has('isRunning')) {
+      yTimer.set('isRunning', false);
+      yTimer.set('elapsedTime', 0);
+      yTimer.set('lastStartTime', null);
+    }
+
+    // Observe changes to the timer state
+    const updateTimer = () => {
+      const isRunning = yTimer.get('isRunning') as boolean;
+      const elapsedTime = yTimer.get('elapsedTime') as number;
+      const lastStartTime = yTimer.get('lastStartTime') as number | null;
+
+      let newElapsedTime = elapsedTime;
+
+      if (isRunning && lastStartTime) {
+        const currentTime = Date.now();
+        newElapsedTime += Math.floor((currentTime - lastStartTime) / 1000);
+      }
+
+      setTimerState({
+        isRunning,
+        elapsedTime: newElapsedTime,
+        lastStartTime,
+      });
+    };
+
+    yTimer.observeDeep(updateTimer);
+
+    // Initial timer update
+    updateTimer();
+
+    // Cleanup
+    return () => {
+      yTimer.unobserveDeep(updateTimer);
+    };
   }, []);
 
   // Fetch test cases on mount
@@ -349,10 +398,51 @@ const CollaborativeEditor = forwardRef<
     return <EditorSkeleton />;
   }
 
+  // Timer Controls
+  const startTimer = () => {
+    const yTimer = ydocRef.current.getMap('timer');
+    ydocRef.current.transact(() => {
+      yTimer.set('isRunning', true);
+      yTimer.set('lastStartTime', Date.now());
+    });
+  };
+
+  const pauseTimer = () => {
+    const yTimer = ydocRef.current.getMap('timer');
+    ydocRef.current.transact(() => {
+      yTimer.set('isRunning', false);
+      const lastStartTime = yTimer.get('lastStartTime') as number | null;
+      if (lastStartTime) {
+        const currentTime = Date.now();
+        const additionalTime = Math.floor((currentTime - lastStartTime) / 1000);
+        yTimer.set(
+          'elapsedTime',
+          (yTimer.get('elapsedTime') as number) + additionalTime,
+        );
+        yTimer.set('lastStartTime', null);
+      }
+    });
+  };
+
+  const resetTimer = () => {
+    const yTimer = ydocRef.current.getMap('timer');
+    ydocRef.current.transact(() => {
+      yTimer.set('isRunning', false);
+      yTimer.set('elapsedTime', 0);
+      yTimer.set('lastStartTime', null);
+    });
+  };
+
   return (
     <div className={className}>
       <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
+          <Timer
+            timerState={timerState}
+            startTimer={startTimer}
+            pauseTimer={pauseTimer}
+            resetTimer={resetTimer}
+          />
           <div className="flex items-center gap-2">
             {collabLoading ? (
               <LanguageSelectSkeleton />
@@ -400,7 +490,7 @@ const CollaborativeEditor = forwardRef<
           )}
         </div>
         {/* Monaco Editor */}
-        <div className="flex h-full p-6">
+        <div className="relative flex h-full p-6">
           <Editor
             theme="light"
             defaultLanguage={selectedRuntime?.language || 'javascript'}
@@ -415,9 +505,17 @@ const CollaborativeEditor = forwardRef<
               readOnly: collabLoading,
               automaticLayout: true,
               quickSuggestions: { other: true, comments: false, strings: true },
+              glyphMargin: true,
             }}
             className="w-full"
           />
+          {!collabLoading && (
+            <Cursors
+              provider={providerRef.current!}
+              editor={editorRef.current}
+              user={user!}
+            />
+          )}
         </div>
       </div>
 
