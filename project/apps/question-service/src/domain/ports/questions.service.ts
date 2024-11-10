@@ -91,7 +91,7 @@ export class QuestionsService {
           `fetched random question ${randomQuestionId} for filters: ${JSON.stringify(filters)}`,
         );
       } else {
-        this.logger.log(
+        this.logger.warn(
           `no random question found for filters: ${JSON.stringify(filters)}`,
         );
       }

@@ -26,6 +26,7 @@ export const matchRequestMsgSchema = matchCriteriaSchema.extend({
 });
 
 export const matchRequestSchema = matchRequestMsgSchema.extend({
+  socketId: z.string(),
   match_req_id: z.string().uuid(),
   timestamp: z.number().int(),
 });

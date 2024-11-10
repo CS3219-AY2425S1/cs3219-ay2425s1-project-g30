@@ -133,7 +133,7 @@ export class SupabaseQuestionsRepository implements QuestionsRepository {
       .from(this.RANDOM_ORDERED_QUESTIONS_TABLE)
       .select('id')
       .eq('q_complexity', complexity)
-      .filter('q_category', 'ov', categories)
+      .overlaps('q_category', categories)
       .limit(1)
       .maybeSingle<QuestionDto>();
 

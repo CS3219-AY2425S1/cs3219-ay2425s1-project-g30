@@ -5,6 +5,9 @@ import { MatchingModule } from './matching.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(MatchingModule);
+
+  app.enableShutdownHooks();
+
   app.enableCors({
     origin: true,
     credentials: true,
