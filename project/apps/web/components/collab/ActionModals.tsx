@@ -1,12 +1,14 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import EndSessionModal from '@/components/collab/EndSessionModal';
 import LeaveSessionModal from '@/components/collab/LeaveSessionModal';
 import NotifyEndCollabModal from '@/components/collab/NotifyEndCollabModal';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
 interface ActionModalsProps {
@@ -20,6 +22,9 @@ export const ActionModals = ({
   collabPartner,
   notifyPartner,
 }: ActionModalsProps) => {
+  const user = useAuthStore.use.user();
+  const queryClient = useQueryClient();
+  const setConfirmLoading = useCollabStore.use.setConfirmLoading();
   const endCollab = useCollabStore.use.endCollab();
   const leaveSession = useCollabStore.use.leaveSession();
   const setConfirmLoading = useCollabStore.use.setConfirmLoading();
@@ -32,6 +37,9 @@ export const ActionModals = ({
     onMutate: () => setConfirmLoading(true),
     onSuccess: async () => {
       notifyPartner();
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.Collab, user?.id],
+      });
       router.replace('/');
       toast({
         variant: 'success',

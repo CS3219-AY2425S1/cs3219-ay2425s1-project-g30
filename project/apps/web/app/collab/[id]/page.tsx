@@ -5,6 +5,9 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { notFound, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 
 import { ActionModals } from '@/components/collab/ActionModals';
 import CollaborativeEditor, {
@@ -100,9 +103,11 @@ const CollabPageContent = ({ id }: { id: string }) => {
 
       <div className="flex gap-8 max-h-fit">
         {/* Question info */}
-        <div className="w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white">
+        <div className="markdown w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white overflow-y-auto">
           <h2 className="mb-4 text-xl font-semibold">{question.title}</h2>
-          {question.description}
+          <ReactMarkdown remarkPlugins={[[remarkGfm]]}>
+            {question.description}
+          </ReactMarkdown>
         </div>
 
         {/* Code editor */}

@@ -3,14 +3,14 @@ import { MatchRequestDto, MatchRequestMsgDto } from '@repo/dtos/match';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
 import { MATCH_QUEUE } from 'src/constants/queue';
-import { EnvService } from 'src/env/env.service';
+import { MatchRedis } from 'src/db/match.redis';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MatchRequestService {
   private readonly logger = new Logger(MatchRequestService.name);
   private channelWrapper: ChannelWrapper;
-  constructor(private readonly envService: EnvService) {
+  constructor(private readonly matchRedis: MatchRedis) {
     // const connection_url = envService.get('RABBITMQ_URL');
 
     // temp fix for milestone D4
@@ -48,9 +48,16 @@ export class MatchRequestService {
    */
   async enqueueMatchRequest(matchReqMsg: MatchRequestMsgDto) {
     const match_req_id = uuidv4();
-
+    const match_user_socketId = await this.matchRedis.getSocketByUserId(
+      matchReqMsg.userId,
+    );
+    if (!match_user_socketId) {
+      this.logger.error(`Socket not found for user ${matchReqMsg.userId}`);
+      return { success: false, match_req_id: match_req_id };
+    }
     const matchReq: MatchRequestDto = {
       match_req_id,
+      socketId: match_user_socketId,
       userId: matchReqMsg.userId,
       category: matchReqMsg.category,
       complexity: matchReqMsg.complexity,

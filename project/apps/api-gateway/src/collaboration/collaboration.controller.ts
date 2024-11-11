@@ -9,13 +9,29 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
-import { collabFiltersSchema, CollabFiltersDto } from '@repo/dtos/collab';
+import {
+  collabFiltersSchema,
+  CollabFiltersDto,
+  activeCollabExistsSchema,
+  ActiveCollabExistsDto,
+} from '@repo/dtos/collab';
 @Controller('collaboration')
 export class CollaborationController {
   constructor(
     @Inject('COLLABORATION_SERVICE')
     private readonly collaborationServiceClient: ClientProxy,
   ) {}
+
+  @Get('active-exists')
+  @UsePipes(new ZodValidationPipe(activeCollabExistsSchema))
+  async getActiveCollaborationExists(
+    @Query() collabExistDto: ActiveCollabExistsDto,
+  ) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'check_active_collabs' },
+      collabExistDto.user_id,
+    );
+  }
 
   @Get(':id')
   async getCollaborationInfoById(@Param('id') collabId: string) {
