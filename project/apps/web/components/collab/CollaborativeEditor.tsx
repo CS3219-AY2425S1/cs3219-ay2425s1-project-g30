@@ -1,6 +1,9 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
-import { ExecutionSnapshotCreateDto } from '@repo/dtos/collab';
+import {
+  collabUpdateLanguageDto,
+  ExecutionSnapshotCreateDto,
+} from '@repo/dtos/collab';
 import axios from 'axios';
 import { Play } from 'lucide-react';
 import * as monaco from 'monaco-editor';
@@ -25,7 +28,7 @@ import {
 import { LANGUAGES, Runtime } from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
-import { saveExecutionSnapshot } from '@/lib/api/collab';
+import { saveExecutionSnapshot, updateCollabLanguage } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
 
@@ -222,6 +225,11 @@ const CollaborativeEditor = forwardRef<
         ) {
           setSelectedRuntime({ language, version });
 
+          updateCollabLanguage({
+            collab_id: id,
+            language,
+          } satisfies collabUpdateLanguageDto);
+
           if (editorRef.current && language) {
             const currentModel = editorRef.current.getModel();
             monaco.editor.setModelLanguage(currentModel!, language);
@@ -282,7 +290,7 @@ const CollaborativeEditor = forwardRef<
       setOutput(output);
 
       // save code execution snapshot in its own try-catch block
-      await saveCodeExecutionSnapshot(code, output);
+      await saveCodeExecutionSnapshot(code, selectedRuntime.language, output);
     } catch (error: any) {
       setOutput(`Error: ${error.message}`);
     } finally {
@@ -290,13 +298,19 @@ const CollaborativeEditor = forwardRef<
     }
   };
 
-  const saveCodeExecutionSnapshot = async (code: string, output: string) => {
+  const saveCodeExecutionSnapshot = async (
+    code: string,
+    language: string,
+    output: string,
+  ) => {
     try {
       // save code execution snapshot
       const snapshot: ExecutionSnapshotCreateDto = {
         collaboration_id: id,
         code,
         output,
+        language,
+        user_id: user!.id,
       };
       await saveExecutionSnapshot(snapshot);
     } catch (error) {

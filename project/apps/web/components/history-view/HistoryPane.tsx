@@ -1,10 +1,12 @@
 'use client';
 
+import { AttemptFiltersDto } from '@repo/dtos/attempt';
 import { CollabInfoDto } from '@repo/dtos/collab';
 import { Code, FolderClock } from 'lucide-react';
 import { useState } from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { HistoryPaneView, useHistoryStore } from '@/stores/useHistoryStore';
 
 import { AttemptTable } from './attempt-table/AttemptTable';
@@ -16,13 +18,19 @@ interface HistoryPaneProps {
 }
 
 const HistoryPane = ({ collabInfo, className }: HistoryPaneProps) => {
+  const user = useAuthStore.use.user();
+
   const attempts = useHistoryStore.use.attemptCollection();
   const fetchAttempts = useHistoryStore.use.fetchAttempts();
   const historyPaneView = useHistoryStore.use.historyPaneView();
   const setHistoryPaneView = useHistoryStore.use.setHistoryPaneView();
 
-  if (!attempts) {
-    fetchAttempts(collabInfo.id);
+  if (!attempts && user) {
+    const filters: AttemptFiltersDto = {
+      collab_id: collabInfo.id,
+      user_id: user.id,
+    };
+    fetchAttempts(filters);
   }
 
   return (

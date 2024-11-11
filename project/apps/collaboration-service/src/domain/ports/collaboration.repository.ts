@@ -1,3 +1,4 @@
+import { AttemptFiltersDto } from '@repo/dtos/attempt';
 import {
   CollabCollectionDto,
   CollabCreateDto,
@@ -5,6 +6,7 @@ import {
   CollabFiltersDto,
   CollabInfoDto,
   CollabQuestionDto,
+  collabUpdateLanguageDto,
   ExecutionSnapshotCollectionDto,
   ExecutionSnapshotCreateDto,
   ExecutionSnapshotDto,
@@ -92,6 +94,15 @@ export abstract class CollaborationRepository {
   abstract fetchCollabInfo(id: string): Promise<CollabInfoDto | null>;
 
   /**
+   * Updates the language of a collaboration by its unique identifier.
+   * @param collabLanguageData The data transfer object containing the details of the language update.
+   * @returns A promise that resolves to the updated collaboration data transfer object.
+   */
+  abstract updateCollabLanguage(
+    collabLanguageData: collabUpdateLanguageDto,
+  ): Promise<CollabDto>;
+
+  /**
    * Ends a collaboration by its unique identifier.
    * @param id The unique identifier of the collaboration to end.
    */
@@ -104,12 +115,12 @@ export abstract class CollaborationRepository {
   abstract checkActiveCollabs(userId: string): Promise<boolean>;
 
   /**
-   * Retrieves all snapshots for a given collaboration id, sorted by creation date in descending order.
-   * @param id The unique identifier of the collaboration to fetch snapshots for.
-   * @returns A promise that resolves to an array of snapshot data transfer objects.
+   * Fetches all attempts for a collaboration that match the given filters.
+   * @param filters The filters to apply when fetching attempts.
+   * @returns A promise that resolves to a collection of attempts.
    */
-  abstract getSnapshotsByCollabId(
-    id: string,
+  abstract getSnapshots(
+    filters: AttemptFiltersDto,
   ): Promise<ExecutionSnapshotCollectionDto>;
 
   /**

@@ -8,9 +8,14 @@ import {
   CollabInfoDto,
   CollabQuestionDto,
   CollabRequestDto,
+  collabUpdateLanguageDto,
   ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
-import { AttemptCollectionDto, AttemptDto } from '@repo/dtos/attempt';
+import {
+  AttemptCollectionDto,
+  AttemptDto,
+  AttemptFiltersDto,
+} from '@repo/dtos/attempt';
 import { CollaborationRepository } from 'src/domain/ports/collaboration.repository';
 
 @Injectable()
@@ -134,6 +139,23 @@ export class CollaborationService {
   }
 
   /**
+   * Updates the language of a collaboration by its unique identifier.
+   *
+   * @param collabLanguageData - The data transfer object containing the details of the language update.
+   * @returns A promise that resolves to the updated collaboration information data transfer object.
+   * @throws Will handle and log any errors that occur during the update process.
+   */
+  async updateCollabLanguage(collabLanguageData: collabUpdateLanguageDto) {
+    try {
+      return await this.collabRepository.updateCollabLanguage(
+        collabLanguageData,
+      );
+    } catch (error) {
+      this.handleError('update collaboration language', error);
+    }
+  }
+
+  /**
    * Ends a collaboration by its unique identifier.
    * @param collabId - The unique identifier of the collaboration to be ended.
    *
@@ -165,8 +187,9 @@ export class CollaborationService {
    * @param collabId - The unique identifier of the collaboration to fetch attempts for.
    * @returns A promise that resolves to a collection of attempts.
    */
-  async getAttempts(collabId: string): Promise<AttemptCollectionDto> {
+  async getAttempts(filters: AttemptFiltersDto): Promise<AttemptCollectionDto> {
     try {
+      const collabId = filters.collab_id;
       const collab = await this.collabRepository.fetchCollabInfo(collabId);
 
       if (!collab) {
@@ -185,6 +208,7 @@ export class CollaborationService {
         id: collabId,
         name: 'Final Submission',
         created_at: collab.ended_at,
+        language: collab.language,
         document: document_data,
         code: null,
         output: null,
@@ -192,13 +216,14 @@ export class CollaborationService {
 
       // code execution attempts
       const snapshotCollection =
-        await this.collabRepository.getSnapshotsByCollabId(collabId);
+        await this.collabRepository.getSnapshots(filters);
       const codeExecutionAttempts = snapshotCollection.snapshots.map(
         (snapshot, index) => {
           return {
             id: snapshot.id,
             name: `Attempt ${snapshotCollection.metadata.count - index}`, // in descending order
             created_at: snapshot.created_at,
+            language: snapshot.language,
             document: null,
             code: snapshot.code,
             output: snapshot.output,

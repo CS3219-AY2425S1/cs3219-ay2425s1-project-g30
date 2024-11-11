@@ -11,6 +11,7 @@ import {
   CollabFiltersDto,
   CollabInfoDto,
   CollabQuestionDto,
+  collabUpdateLanguageDto,
   ExecutionSnapshotCollectionDto,
   ExecutionSnapshotCreateDto,
   ExecutionSnapshotDto,
@@ -29,6 +30,7 @@ import {
 } from '@repo/dtos/questions';
 import { UserDataDto } from '@repo/dtos/users';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
+import { AttemptFiltersDto } from '@repo/dtos/attempt';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
@@ -356,9 +358,32 @@ export class CollaborationSupabase implements CollaborationRepository {
         username: user2Data ? user2Data.username : 'DELETED USER',
       },
       question: selectedQuestionData,
+      language: collab.language,
     };
 
     return collabInfoData;
+  }
+
+  async updateCollabLanguage(collabLanguageData: collabUpdateLanguageDto) {
+    const { collab_id, language } = collabLanguageData;
+
+    if (!(await this.checkActiveCollaborationById(collab_id))) {
+      throw new BadRequestException(
+        `Collaboration with id ${collabLanguageData.collab_id} is not active`,
+      );
+    }
+
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .update({ language })
+      .eq('id', collab_id)
+      .select()
+      .single<CollabDto>();
+
+    if (error) {
+      throw error;
+    }
+    return data;
   }
 
   async endCollab(collabId: string): Promise<CollabDto> {
@@ -396,13 +421,16 @@ export class CollaborationSupabase implements CollaborationRepository {
     return data && data.length > 0;
   }
 
-  async getSnapshotsByCollabId(
-    id: string,
+  async getSnapshots(
+    filters: AttemptFiltersDto,
   ): Promise<ExecutionSnapshotCollectionDto> {
+    const collabId = filters.collab_id;
+    const userId = filters.user_id;
     const { data: snapshots, error } = await this.supabase
       .from(this.SNAPSHOT_TABLE)
       .select()
-      .eq('collaboration_id', id)
+      .eq('collaboration_id', collabId)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
     if (error) {

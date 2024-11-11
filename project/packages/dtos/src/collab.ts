@@ -31,6 +31,7 @@ export const collabInfoSchema = z.object({
   collab_user2: collaboratorSchema,
   partner: collaboratorSchema.optional(),
   question: questionSchema,
+  language: z.string(),
 });
 
 export const collabCreateSchema = z.object({
@@ -48,6 +49,7 @@ export const collabRequestSchema = collabQuestionSchema.extend({
 
 export const collabSchema = collabCreateSchema.extend({
   id: z.string().uuid(),
+  language: z.string(), // default value provided by the database
   started_at: z.date(),
   ended_at: z.date().nullable(),
 });
@@ -55,6 +57,11 @@ export const collabSchema = collabCreateSchema.extend({
 export const collabCollectionSchema = z.object({
   metadata: collectionMetadataSchema,
   collaborations: z.array(collabInfoSchema),
+});
+
+export const collabUpdateLanguageSchema = z.object({
+  collab_id: z.string().uuid(),
+  language: z.string(),
 });
 
 export const sortCollaborationsQuerySchema = z.object({
@@ -93,6 +100,8 @@ export const executionSnapshotSchema = z.object({
   collaboration_id: z.string().uuid(),
   code: z.string(),
   output: z.string(),
+  language: z.string(),
+  user_id: z.string().uuid(),
   created_at: z.date(),
 });
 
@@ -115,6 +124,9 @@ export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
 export type CollabDto = z.infer<typeof collabSchema>;
 export type CollabCollectionDto = z.infer<typeof collabCollectionSchema>;
 export type ActiveCollabExistsDto = z.infer<typeof activeCollabExistsSchema>;
+export type collabUpdateLanguageDto = z.infer<
+  typeof collabUpdateLanguageSchema
+>;
 
 export type ExecutionSnapshotDto = z.infer<typeof executionSnapshotSchema>;
 export type ExecutionSnapshotCollectionDto = z.infer<

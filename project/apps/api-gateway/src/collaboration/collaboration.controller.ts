@@ -17,7 +17,10 @@ import {
   ActiveCollabExistsDto,
   executionSnapshotCreateSchema,
   ExecutionSnapshotDto,
+  collabUpdateLanguageDto,
+  collabUpdateLanguageSchema,
 } from '@repo/dtos/collab';
+import { AttemptFiltersDto, attemptFiltersSchema } from '@repo/dtos/attempt';
 @Controller('collaboration')
 export class CollaborationController {
   constructor(
@@ -33,6 +36,16 @@ export class CollaborationController {
     return this.collaborationServiceClient.send(
       { cmd: 'check_active_collabs' },
       collabExistDto.user_id,
+    );
+  }
+
+  // needs to be placed before :id to avoid ambiguity
+  @Get('attempts')
+  @UsePipes(new ZodValidationPipe(attemptFiltersSchema))
+  async getAttempts(@Query() filters: AttemptFiltersDto) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'get_attempts' },
+      filters,
     );
   }
 
@@ -61,18 +74,21 @@ export class CollaborationController {
     );
   }
 
+  @Post('language')
+  @UsePipes(new ZodValidationPipe(collabUpdateLanguageSchema))
+  async updateCollaborationLanguage(
+    @Body() collabUpdateLanguage: collabUpdateLanguageDto,
+  ) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'update_collab_language' },
+      collabUpdateLanguage,
+    );
+  }
+
   @Post('end/:id')
   async endCollaboration(@Param('id') collabId: string) {
     return this.collaborationServiceClient.send(
       { cmd: 'end_collab' },
-      collabId,
-    );
-  }
-
-  @Get('/attempts/:id')
-  async getAttempts(@Param('id') collabId: string) {
-    return this.collaborationServiceClient.send(
-      { cmd: 'get_attempts' },
       collabId,
     );
   }

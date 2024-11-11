@@ -1,4 +1,4 @@
-import { AttemptCollectionDto } from '@repo/dtos/attempt';
+import { AttemptCollectionDto, AttemptFiltersDto } from '@repo/dtos/attempt';
 import {
   CollabCollectionDto,
   CollabDto,
@@ -6,6 +6,7 @@ import {
   CollabInfoDto,
   ExecutionSnapshotCreateDto,
   ActiveCollabExistsDto,
+  collabUpdateLanguageDto,
 } from '@repo/dtos/collab';
 
 import { apiCall } from '@/lib/api/apiClient';
@@ -24,6 +25,16 @@ export const verifyCollab = async (id: string): Promise<boolean> => {
   return await apiCall('get', `/collaboration/verify/${id}`);
 };
 
+export const updateCollabLanguage = async (
+  collabUpdateLanguageDto: collabUpdateLanguageDto,
+): Promise<CollabDto> => {
+  return await apiCall(
+    'post',
+    `/collaboration/language/`,
+    collabUpdateLanguageDto,
+  );
+};
+
 export const endCollab = async (id: string): Promise<CollabDto> => {
   return await apiCall('post', `/collaboration/end/${id}`);
 };
@@ -35,9 +46,9 @@ export const saveExecutionSnapshot = async (
 };
 
 export const getAttempts = async (
-  collabId: string,
+  filters: AttemptFiltersDto,
 ): Promise<AttemptCollectionDto> => {
-  return await apiCall('get', `/collaboration/attempts/${collabId}`);
+  return await apiCall('get', `/collaboration/attempts`, null, filters);
 };
 
 export const checkActiveCollabs = async (

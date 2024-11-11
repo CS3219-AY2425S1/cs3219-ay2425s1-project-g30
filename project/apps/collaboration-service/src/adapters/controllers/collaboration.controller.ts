@@ -1,8 +1,10 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { AttemptFiltersDto } from '@repo/dtos/attempt';
 import {
   CollabFiltersDto,
   CollabRequestDto,
+  collabUpdateLanguageDto,
   ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
 
@@ -37,6 +39,15 @@ export class CollaborationController {
     return await this.collaborationService.getCollabInfo(collabId);
   }
 
+  @MessagePattern({ cmd: 'update_collab_language' })
+  async updateCollabLanguage(
+    @Payload() collabLanguageData: collabUpdateLanguageDto,
+  ) {
+    return await this.collaborationService.updateCollabLanguage(
+      collabLanguageData,
+    );
+  }
+
   @MessagePattern({ cmd: 'end_collab' })
   async endCollab(@Payload() collabId: string) {
     return await this.collaborationService.endCollab(collabId);
@@ -48,8 +59,8 @@ export class CollaborationController {
   }
 
   @MessagePattern({ cmd: 'get_attempts' })
-  async getAttempts(@Payload() collabId: string) {
-    return await this.collaborationService.getAttempts(collabId);
+  async getAttempts(@Payload() filters: AttemptFiltersDto) {
+    return await this.collaborationService.getAttempts(filters);
   }
 
   @MessagePattern({ cmd: 'create_snapshot' })

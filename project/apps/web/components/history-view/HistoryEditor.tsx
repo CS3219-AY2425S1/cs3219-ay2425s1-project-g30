@@ -6,6 +6,8 @@ import * as Y from 'yjs';
 
 import { useHistoryStore } from '@/stores/useHistoryStore';
 
+import { Select, SelectTrigger, SelectValue } from '../ui/select';
+
 import { EditorAreaSkeleton } from './HistoryEditorSkeleton';
 
 const HistoryEditor = () => {
@@ -68,14 +70,13 @@ const HistoryEditor = () => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
       {/* Monaco Editor */}
       <div className="flex flex-col h-[calc(100vh-385px)] border border-1 rounded-md shadow-md">
         <div className="flex h-full p-6">
           <Editor
             theme="light"
-            // Potential enhancement: persist the language of the document and use it here
-            defaultLanguage="plaintext"
+            defaultLanguage={selectedAttempt?.language ?? 'plaintext'}
             loading={
               <div className="flex items-start justify-start w-full h-full">
                 <EditorAreaSkeleton />

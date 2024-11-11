@@ -1,4 +1,8 @@
-import { AttemptCollectionDto, AttemptDto } from '@repo/dtos/attempt';
+import {
+  AttemptCollectionDto,
+  AttemptDto,
+  AttemptFiltersDto,
+} from '@repo/dtos/attempt';
 import { create } from 'zustand';
 
 import { getAttempts } from '@/lib/api/collab';
@@ -11,7 +15,7 @@ export enum HistoryPaneView {
 
 interface HistoryState {
   attemptCollection: AttemptCollectionDto | null;
-  fetchAttempts: (collabId: string) => Promise<AttemptCollectionDto>;
+  fetchAttempts: (filters: AttemptFiltersDto) => Promise<AttemptCollectionDto>;
   selectedAttempt: AttemptDto | null;
   setSelectedAttempt: (value: AttemptDto) => void;
   confirmLoading: boolean;
@@ -24,13 +28,14 @@ const useHistoryStoreBase = create<HistoryState>((set) => ({
   attemptCollection: null,
   selectedAttempt: null,
   confirmLoading: false,
-  fetchAttempts: async (collabId: string) => {
+  fetchAttempts: async (filters: AttemptFiltersDto) => {
     try {
-      console.log('calling fetchAttempts');
       set({ confirmLoading: true });
-      const attempts = await getAttempts(collabId);
+      const attempts = await getAttempts(filters);
       set({ attemptCollection: attempts });
-      const finalSubmission = attempts?.attempts.find((a) => a.id === collabId);
+      const finalSubmission = attempts?.attempts.find(
+        (a) => a.id === filters.collab_id,
+      );
       if (finalSubmission) {
         set({ selectedAttempt: finalSubmission });
       }
