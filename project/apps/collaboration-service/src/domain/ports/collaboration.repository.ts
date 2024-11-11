@@ -98,6 +98,12 @@ export abstract class CollaborationRepository {
   abstract endCollab(id: string): Promise<CollabDto>;
 
   /**
+   * Checks if a user has an active collaboration
+   * @param userId The unique identifier of the user.
+   */
+  abstract checkActiveCollabs(userId: string): Promise<boolean>;
+
+  /**
    * Retrieves all snapshots for a given collaboration id, sorted by creation date in descending order.
    * @param id The unique identifier of the collaboration to fetch snapshots for.
    * @returns A promise that resolves to an array of snapshot data transfer objects.

@@ -148,6 +148,19 @@ export class CollaborationService {
   }
 
   /**
+   * Checks if a user has an active collaboration
+   * @param userId The unique identifier of the user.
+   */
+  async checkActiveCollabs(userId: string): Promise<boolean> {
+    try {
+      this.logger.log(`Checking Active Collaborations: ${userId}`);
+      return await this.collabRepository.checkActiveCollabs(userId);
+    } catch (error) {
+      this.handleError('checking active collaborations', error);
+    }
+  }
+
+  /**
    * Retrieves all attempts for a collaboration by its unique identifier.
    * @param collabId - The unique identifier of the collaboration to fetch attempts for.
    * @returns A promise that resolves to a collection of attempts.

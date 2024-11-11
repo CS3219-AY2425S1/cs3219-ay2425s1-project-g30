@@ -341,14 +341,6 @@ export class CollaborationSupabase implements CollaborationRepository {
       throw new NotFoundException(`Question with id ${question_id} not found`);
     }
 
-    if (!user1Data) {
-      throw new NotFoundException(`User with id ${user1_id} not found`);
-    }
-
-    if (!user2Data) {
-      throw new NotFoundException(`User with id ${user2_id} not found`);
-    }
-
     const collabInfoData: CollabInfoDto = {
       id: collabId,
 
@@ -356,12 +348,12 @@ export class CollaborationSupabase implements CollaborationRepository {
       ended_at: collab.ended_at,
 
       collab_user1: {
-        id: user1Data.id,
-        username: user1Data.username,
+        id: user1Data ? user1Data.id : null,
+        username: user1Data ? user1Data.username : 'DELETED USER',
       },
       collab_user2: {
-        id: user2Data.id,
-        username: user2Data.username,
+        id: user2Data ? user2Data.id : null,
+        username: user2Data ? user2Data.username : 'DELETED USER',
       },
       question: selectedQuestionData,
     };
@@ -387,6 +379,21 @@ export class CollaborationSupabase implements CollaborationRepository {
       throw error;
     }
     return data;
+  }
+
+  async checkActiveCollabs(userId: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .select()
+      .is('ended_at', null)
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+      .limit(1);
+
+    if (error) {
+      throw error;
+    }
+
+    return data && data.length > 0;
   }
 
   async getSnapshotsByCollabId(

@@ -5,6 +5,8 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import HistoryPane from '@/components/history-view/HistoryPane';
 import HistoryViewSkeleton from '@/components/history-view/HistoryViewSkeleton';
@@ -58,16 +60,18 @@ const HistoryViewContent = ({ id }: { id: string }) => {
           <AvatarFallback>{partnerUsername[0]}</AvatarFallback>
         </Avatar>
         <span className="ml-2 mr-2 font-medium text-md">{partnerUsername}</span>
-        <span className="ml-6 font-thin italic text-slate-500">
+        <span className="ml-6 italic font-thin text-slate-500">
           Read-only View
         </span>
       </div>
 
       <div className="flex gap-8 max-h-fit">
         {/* Question info */}
-        <div className="w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white">
+        <div className="markdown w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white overflow-y-auto">
           <h2 className="mb-4 text-xl font-semibold">{question.title}</h2>
-          <p>{question.description}</p>
+          <ReactMarkdown remarkPlugins={[[remarkGfm]]}>
+            {question.description}
+          </ReactMarkdown>
         </div>
         {/* Snapshot selection and code editor */}
         <HistoryPane collabInfo={collabInfo} className="w-1/2" />

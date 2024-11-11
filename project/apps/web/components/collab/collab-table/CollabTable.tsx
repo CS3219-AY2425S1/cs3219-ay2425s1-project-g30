@@ -25,10 +25,14 @@ import { useMe } from '@/hooks/useMe';
 import { getCollabs } from '@/lib/api/collab';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
 
-import { columns } from './columns';
-import { HistoryTableToolbar } from './HistoryTableToolbar';
+import { CollabTableToolbar } from './CollabTableToolbar';
+import { getColumns } from './columns';
 
-export function HistoryTable() {
+interface CollabTableProps {
+  showEndedSessions: boolean;
+}
+
+export function CollabTable({ showEndedSessions }: CollabTableProps) {
   const { userData } = useMe();
   const confirmLoading = useQuestionsStore.use.confirmLoading();
   const setConfirmLoading = useQuestionsStore.use.setConfirmLoading();
@@ -105,7 +109,7 @@ export function HistoryTable() {
 
       const queryParams: CollabFiltersDto = {
         user_id,
-        has_ended: true,
+        has_ended: showEndedSessions,
         q_title,
         q_category,
         q_complexity,
@@ -154,10 +158,10 @@ export function HistoryTable() {
   return (
     <DataTable
       data={collaborations}
-      columns={columns}
+      columns={getColumns(showEndedSessions)}
       confirmLoading={confirmLoading || isDebouncing}
       controlledState={controlledState}
-      TableToolbar={HistoryTableToolbar}
+      TableToolbar={CollabTableToolbar}
     />
   );
 }

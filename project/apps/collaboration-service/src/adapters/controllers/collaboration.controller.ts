@@ -42,6 +42,11 @@ export class CollaborationController {
     return await this.collaborationService.endCollab(collabId);
   }
 
+  @MessagePattern({ cmd: 'check_active_collabs' })
+  async checkActiveCollabs(@Payload() userId: string) {
+    return await this.collaborationService.checkActiveCollabs(userId);
+  }
+
   @MessagePattern({ cmd: 'get_attempts' })
   async getAttempts(@Payload() collabId: string) {
     return await this.collaborationService.getAttempts(collabId);

@@ -1,4 +1,4 @@
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   OnGatewayConnection,
@@ -30,7 +30,7 @@ export enum MatchEvent {
   path: '/matching-service',
 })
 export class MatchingGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy
 {
   @WebSocketServer() server: Server;
 
@@ -41,6 +41,11 @@ export class MatchingGateway
     private readonly matchRedis: MatchRedis,
     private readonly matchCancelService: MatchCancelService,
   ) {}
+
+  async onModuleDestroy() {
+    this.logger.log('WebSocket gateway destroyed, flushing Redis DB');
+    await this.matchRedis.flushRedisDB();
+  }
 
   afterInit(server: Server) {
     if (!server) {
@@ -209,5 +214,10 @@ export class MatchingGateway
         event: MatchEvent.MATCH_INVALID,
       });
     }
+  }
+
+  async isSocketAlive(socketId: string): Promise<boolean> {
+    const socket = this.server.sockets.sockets.get(socketId);
+    return socket?.connected || false;
   }
 }

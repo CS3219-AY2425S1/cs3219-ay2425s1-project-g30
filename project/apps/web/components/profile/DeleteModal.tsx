@@ -28,7 +28,9 @@ export default function DeleteModal({ onDelete, username }: DeleteModalProps) {
           <DialogTitle>Delete Profile</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <div>Are you sure you want to delete your account {username}?</div>
+          <div>Are you sure you want to delete your account, {username}?</div>
+          <div>All associated data will be permanently deleted.</div>
+          <br />
           <div>This action cannot be undone.</div>
         </DialogDescription>
         <DialogFooter>

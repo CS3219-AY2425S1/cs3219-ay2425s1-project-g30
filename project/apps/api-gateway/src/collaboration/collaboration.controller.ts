@@ -13,8 +13,10 @@ import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 import {
   collabFiltersSchema,
   CollabFiltersDto,
-  ExecutionSnapshotDto,
+  activeCollabExistsSchema,
+  ActiveCollabExistsDto,
   executionSnapshotCreateSchema,
+  ExecutionSnapshotDto,
 } from '@repo/dtos/collab';
 @Controller('collaboration')
 export class CollaborationController {
@@ -22,6 +24,17 @@ export class CollaborationController {
     @Inject('COLLABORATION_SERVICE')
     private readonly collaborationServiceClient: ClientProxy,
   ) {}
+
+  @Get('active-exists')
+  @UsePipes(new ZodValidationPipe(activeCollabExistsSchema))
+  async getActiveCollaborationExists(
+    @Query() collabExistDto: ActiveCollabExistsDto,
+  ) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'check_active_collabs' },
+      collabExistDto.user_id,
+    );
+  }
 
   @Get(':id')
   async getCollaborationInfoById(@Param('id') collabId: string) {
@@ -34,7 +47,6 @@ export class CollaborationController {
   @Get()
   @UsePipes(new ZodValidationPipe(collabFiltersSchema))
   async getCollaborationInfos(@Query() filters: CollabFiltersDto) {
-    console.log('filters', filters);
     return this.collaborationServiceClient.send(
       { cmd: 'get_all_collabs' },
       filters,

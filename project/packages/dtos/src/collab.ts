@@ -19,7 +19,7 @@ export const collabQuestionSchema = z.object({
 
 // Optional TODO: Do we want to also keep track of the number of question the user has done?
 export const collaboratorSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().nullable(),
   username: z.string(),
 });
 
@@ -84,6 +84,10 @@ export const collabFiltersSchema = z.object({
   sort: z.array(sortCollaborationsQuerySchema).optional(),
 });
 
+export const activeCollabExistsSchema = z.object({
+  user_id: z.string().uuid(),
+});
+
 export const executionSnapshotSchema = z.object({
   id: z.string().uuid(),
   collaboration_id: z.string().uuid(),
@@ -110,6 +114,7 @@ export type CollabQuestionDto = z.infer<typeof collabQuestionSchema>;
 export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
 export type CollabDto = z.infer<typeof collabSchema>;
 export type CollabCollectionDto = z.infer<typeof collabCollectionSchema>;
+export type ActiveCollabExistsDto = z.infer<typeof activeCollabExistsSchema>;
 
 export type ExecutionSnapshotDto = z.infer<typeof executionSnapshotSchema>;
 export type ExecutionSnapshotCollectionDto = z.infer<

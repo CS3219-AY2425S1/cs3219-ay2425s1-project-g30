@@ -5,6 +5,7 @@ import {
   CollabFiltersDto,
   CollabInfoDto,
   ExecutionSnapshotCreateDto,
+  ActiveCollabExistsDto,
 } from '@repo/dtos/collab';
 
 import { apiCall } from '@/lib/api/apiClient';
@@ -37,4 +38,15 @@ export const getAttempts = async (
   collabId: string,
 ): Promise<AttemptCollectionDto> => {
   return await apiCall('get', `/collaboration/attempts/${collabId}`);
+};
+
+export const checkActiveCollabs = async (
+  checkActiveCollabsDto: ActiveCollabExistsDto,
+): Promise<boolean> => {
+  return await apiCall(
+    'get',
+    `/collaboration/active-exists`,
+    null,
+    checkActiveCollabsDto,
+  );
 };
