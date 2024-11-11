@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 
 export interface TimerState {
@@ -57,7 +58,7 @@ const Timer: React.FC<TimerProps> = ({
 
   return (
     <div className="flex items-center gap-4">
-      <span className="text-2xl font-mono">{displayTime}</span>
+      <span className="font-mono text-2xl">{displayTime}</span>
       {timerState.isRunning ? (
         <Button onClick={pauseTimer} variant="destructive">
           Pause

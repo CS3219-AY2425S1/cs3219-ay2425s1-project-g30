@@ -14,6 +14,7 @@ export type Database = {
           document: string | null;
           ended_at: string | null;
           id: string;
+          language: string;
           match_id: string;
           question_id: string;
           started_at: string | null;
@@ -24,6 +25,7 @@ export type Database = {
           document?: string | null;
           ended_at?: string | null;
           id?: string;
+          language?: string;
           match_id: string;
           question_id: string;
           started_at?: string | null;
@@ -34,6 +36,7 @@ export type Database = {
           document?: string | null;
           ended_at?: string | null;
           id?: string;
+          language?: string;
           match_id?: string;
           question_id?: string;
           started_at?: string | null;
@@ -48,21 +51,27 @@ export type Database = {
           collaboration_id: string;
           created_at: string;
           id: string;
+          language: string;
           output: string | null;
+          user_id: string;
         };
         Insert: {
           code?: string | null;
           collaboration_id: string;
           created_at?: string;
           id?: string;
+          language: string;
           output?: string | null;
+          user_id: string;
         };
         Update: {
           code?: string | null;
           collaboration_id?: string;
           created_at?: string;
           id?: string;
+          language?: string;
           output?: string | null;
+          user_id?: string;
         };
         Relationships: [
           {

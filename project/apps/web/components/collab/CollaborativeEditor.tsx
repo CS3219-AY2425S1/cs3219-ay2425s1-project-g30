@@ -28,6 +28,7 @@ import { useCollabStore } from '@/stores/useCollabStore';
 import { Button } from '../ui/button';
 import { LoadingSpinner } from '../ui/spinner';
 
+import { Cursors } from './CollabCursor/Cursors';
 import EditorSkeleton, {
   LanguageSelectSkeleton,
   RunButtonSkeleton,
@@ -36,7 +37,6 @@ import EditorSkeleton, {
 } from './EditorSkeleton';
 import Timer, { TimerState } from './Timer';
 import './CollabCursor/Cursors.css';
-import { Cursors } from './CollabCursor/Cursors';
 
 interface CollaborativeEditorProps {
   id: string;
@@ -125,7 +125,7 @@ const CollaborativeEditor = forwardRef<
       }
     }
   };
-    
+
   // Initialize Yjs timer state
   useEffect(() => {
     const yTimer = ydocRef.current.getMap('timer');
@@ -377,7 +377,7 @@ const CollaborativeEditor = forwardRef<
           )}
         </div>
         {/* Monaco Editor */}
-        <div className="flex h-full p-6 relative">
+        <div className="relative flex h-full p-6">
           <Editor
             theme="light"
             defaultLanguage={selectedRuntime?.language || 'javascript'}

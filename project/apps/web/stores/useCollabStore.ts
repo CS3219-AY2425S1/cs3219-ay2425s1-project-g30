@@ -1,6 +1,5 @@
 import { CollabInfoDto } from '@repo/dtos/collab';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 import { endCollab, getCollabInfoById } from '@/lib/api/collab';
 import { createSelectors } from '@/lib/zustand';
