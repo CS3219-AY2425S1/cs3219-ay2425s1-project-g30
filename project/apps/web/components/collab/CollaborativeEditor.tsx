@@ -112,8 +112,9 @@ const CollaborativeEditor = forwardRef<
       if (sessionEnded && sessionEnded.endedBy !== user?.id) {
         notifyEndSession();
 
-        // Properly remove the listener
+        // Properly remove the listener and disconnect the provider
         providerRef.current?.awareness?.off('change', handleAwarenessChange);
+        providerRef.current?.disconnect();
       }
     }
   };
