@@ -27,7 +27,6 @@ export const ActionModals = ({
   const setConfirmLoading = useCollabStore.use.setConfirmLoading();
   const endCollab = useCollabStore.use.endCollab();
   const leaveSession = useCollabStore.use.leaveSession();
-  const setConfirmLoading = useCollabStore.use.setConfirmLoading();
 
   const router = useRouter();
   const { toast } = useToast();
