@@ -15,7 +15,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useCollabStore } from '@/stores/useCollabStore';
 
 import './globals.css';
 
@@ -37,24 +36,18 @@ const LayoutWithSidebarAndTopbar = ({
 }) => {
   const pathname = usePathname();
   const user = useAuthStore.use.user();
-  const setCollaboration = useCollabStore.use.setCollaboration();
   const signOut = useAuthStore.use.signOut();
   const renderSidebarAndTopbar =
     !pathname.startsWith('/collab') &&
     !pathname.startsWith('/login') &&
     !pathname.startsWith('/search');
 
-  const handleSignOut = () => {
-    setCollaboration([]);
-    signOut();
-  };
-
   return (
     <div className="flex h-screen overflow-hidden transition-opacity duration-500 ease-out">
       {user && renderSidebarAndTopbar && (
         <>
           <Topbar user={user} />
-          <Sidebar signOut={handleSignOut} user={user} />
+          <Sidebar signOut={signOut} user={user} />
         </>
       )}
       <main

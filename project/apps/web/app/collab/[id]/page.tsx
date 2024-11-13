@@ -28,9 +28,7 @@ interface CollabPageProps {
 
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
-  const collaboration = useCollabStore.use.collaboration();
   const collabEnded = useCollabStore.use.collabEnded();
-  const leaveSession = useCollabStore.use.leaveSession();
   const setEndSessionModalOpen = useCollabStore.use.setEndSessionModalOpen();
   const setIsLeaveSessionModalOpen =
     useCollabStore.use.setIsLeaveSessionModalOpen();
@@ -64,15 +62,6 @@ const CollabPageContent = ({ id }: { id: string }) => {
 
   // Disallow user from entering collab sessions without a valid session
   useEffect(() => {
-    // If no collaboration session is found
-    if (!collaboration?.some((collab) => collab.id == id)) {
-      console.log('no such collab found');
-      console.log('current collabs', collaboration);
-      console.log('current ID', id);
-      leaveSession();
-      router.replace('/');
-    }
-
     // If url valid, but user is not any of the matched users
     if (
       collabInfo.collab_user1.id != user!.id &&

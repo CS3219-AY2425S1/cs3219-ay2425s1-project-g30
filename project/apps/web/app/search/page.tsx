@@ -13,7 +13,6 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useCollabStore } from '@/stores/useCollabStore';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
 
@@ -27,7 +26,6 @@ const Search = () => {
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
   const user = useAuthStore.use.user();
-  const initialiseCollab = useCollabStore.use.initialiseCollab();
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
   const disconnect = useSocketStore((state) => state.disconnect);
@@ -116,7 +114,6 @@ const Search = () => {
         description: 'Your match was successful.',
       });
       setIsMatchFound(true);
-      initialiseCollab(collabId);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.Collab, user?.id],
       });
