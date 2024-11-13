@@ -16,6 +16,7 @@ export enum HistoryPaneView {
 interface HistoryState {
   attemptCollection: AttemptCollectionDto | null;
   fetchAttempts: (filters: AttemptFiltersDto) => Promise<AttemptCollectionDto>;
+
   selectedAttempt: AttemptDto | null;
   setSelectedAttempt: (value: AttemptDto) => void;
   confirmLoading: boolean;
@@ -30,11 +31,20 @@ const useHistoryStoreBase = create<HistoryState>((set) => ({
   confirmLoading: false,
   fetchAttempts: async (filters: AttemptFiltersDto) => {
     try {
-      set({ confirmLoading: true });
+      // set({ selectedAttempt: null });
+      // set({ historyPaneView: HistoryPaneView.Attempts });
+      // set({ confirmLoading: true });
+      set({
+        confirmLoading: true,
+        selectedAttempt: null,
+        historyPaneView: HistoryPaneView.Attempts,
+      });
+
       const attempts = await getAttempts(filters);
       set({ attemptCollection: attempts });
       return attempts;
     } finally {
+      // reset selected attempt and view
       set({ confirmLoading: false });
     }
   },

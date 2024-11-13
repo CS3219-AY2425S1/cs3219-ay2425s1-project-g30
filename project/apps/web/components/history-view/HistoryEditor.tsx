@@ -5,7 +5,6 @@ import * as Y from 'yjs';
 
 import { useHistoryStore } from '@/stores/useHistoryStore';
 
-import { OutputSectionSkeleton } from '../collab/EditorSkeleton';
 import TestCasesOutputSection from '../collab/TestCasesOutputSection';
 
 import { EditorAreaSkeleton } from './HistoryEditorSkeleton';
@@ -61,8 +60,7 @@ const HistoryEditor = () => {
         bindingRef.current = binding;
       } else {
         editorRef.current.setValue(
-          `// Please refresh the page later, 
-           // your code may take some time to save from your collaboration session.`,
+          `// Please refresh the page later, \n// your code may take some time \n// to save from your collaboration session.`,
         );
       }
     }
