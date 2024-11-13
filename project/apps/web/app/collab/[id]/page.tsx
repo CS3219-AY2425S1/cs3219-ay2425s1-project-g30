@@ -14,9 +14,9 @@ import CollabSkeleton from '@/components/collab/CollabSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
+import { getCollabInfoById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
-import { getCollabInfoById } from '@/lib/api/collab';
 
 interface CollabPageProps {
   params: {

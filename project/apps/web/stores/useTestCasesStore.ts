@@ -1,6 +1,7 @@
-import { create } from 'zustand';
-import { createSelectors } from '@/lib/zustand';
 import { CreateTestCasesDto } from '@repo/dtos/testCases';
+import { create } from 'zustand';
+
+import { createSelectors } from '@/lib/zustand';
 
 interface TestCasesState {
   testCases: CreateTestCasesDto['cases'];

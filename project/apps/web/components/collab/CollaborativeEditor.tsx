@@ -1,5 +1,6 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
+import { TestCasesDto } from '@repo/dtos/testCases';
 import axios from 'axios';
 import { Play } from 'lucide-react';
 import * as monaco from 'monaco-editor';
@@ -29,10 +30,13 @@ import {
 } from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
+import { fetchTestCasesByQuestionId } from '@/lib/api/testCases';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
+import { formatInputsForLanguage } from '@/utils/formatInputForLanguages';
 
 import { Button } from '../ui/button';
+import { LoadingSpinner } from '../ui/spinner';
 
 import EditorSkeleton, {
   LanguageSelectSkeleton,
@@ -40,11 +44,7 @@ import EditorSkeleton, {
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
-import { fetchTestCasesByQuestionId } from '@/lib/api/testCases';
-import { TestCasesDto } from '@repo/dtos/testCases';
 import TestCasesOutputSection, { TestResult } from './TestCasesOutputSection';
-import { LoadingSpinner } from '../ui/spinner';
-import { formatInputsForLanguage } from '@/utils/formatInputForLanguages';
 
 interface CollaborativeEditorProps {
   collabId: string;

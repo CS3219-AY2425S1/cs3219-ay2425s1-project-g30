@@ -3,8 +3,10 @@
 import { Inter, Roboto } from 'next/font/google';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
+import ErrorFallback from '@/components/ErrorFallback';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 import Sidebar from '@/components/Sidebar';
 import Suspense from '@/components/Suspense';
@@ -15,8 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 import './globals.css';
-import { ErrorBoundary } from 'react-error-boundary';
-import ErrorFallback from '@/components/ErrorFallback';
 
 const inter = Inter({
   subsets: ['latin'],

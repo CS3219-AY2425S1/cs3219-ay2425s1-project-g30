@@ -4,11 +4,11 @@ import { CollabInfoDto } from '@repo/dtos/collab';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 
-import dayjs from '@/lib/dayjs';
 import { DataTableColumnHeader } from '@/components/data-table/DataTableColumnHeader';
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import dayjs from '@/lib/dayjs';
 
 const DATE_FORMAT = 'D MMM YY, H:mm';
 

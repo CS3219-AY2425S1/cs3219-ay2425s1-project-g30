@@ -10,13 +10,13 @@ import { Suspense } from 'react';
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { ActionModals } from '@/components/question/ActionModals';
 import QuestionSkeleton from '@/components/question/QuestionSkeleton';
+import TestCasesSection from '@/components/question/test-cases-section/TestCasesSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
-import TestCasesSection from '@/components/question/test-cases-section/TestCasesSection';
 
 interface QuestionPageProps {
   params: {
