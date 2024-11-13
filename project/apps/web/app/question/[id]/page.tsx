@@ -10,6 +10,7 @@ import { Suspense } from 'react';
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { ActionModals } from '@/components/question/ActionModals';
 import QuestionSkeleton from '@/components/question/QuestionSkeleton';
+import TestCasesSection from '@/components/question/test-cases-section/TestCasesSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
@@ -94,6 +95,7 @@ const QuestionPageContent = ({ id }: { id: string }) => {
         </div>
       </div>
       {question && <ActionModals question={question} id={id} />}
+      {user?.role === 'Admin' && <TestCasesSection questionId={id} />}
     </div>
   );
 };

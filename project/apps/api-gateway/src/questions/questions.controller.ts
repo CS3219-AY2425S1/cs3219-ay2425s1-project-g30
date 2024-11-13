@@ -27,6 +27,12 @@ import {
   UpdateQuestionDto,
   updateQuestionSchema,
 } from '@repo/dtos/questions';
+import {
+  CreateTestCasesDto,
+  createTestCasesSchema,
+  UpdateTestCasesDto,
+  updateTestCasesSchema,
+} from '@repo/dtos/testCases';
 import { ZodValidationPipe } from '@repo/pipes/zod-validation-pipe.pipe';
 
 @Controller('questions')
@@ -78,5 +84,54 @@ export class QuestionsController {
   @Roles(ROLE.Admin)
   async deleteQuestion(@Param('id') id: string) {
     return this.questionsServiceClient.send({ cmd: 'delete_question' }, id);
+  }
+
+  @Get('/test-cases/:id')
+  async getTestCasesByQuestionId(@Param('id') questionId: string) {
+    return this.questionsServiceClient.send(
+      { cmd: 'get_test_cases' },
+      questionId,
+    );
+  }
+
+  @Post('/test-cases/:id')
+  @Roles(ROLE.Admin)
+  async createTestCases(
+    @Body(new ZodValidationPipe(createTestCasesSchema))
+    createTestCasesDto: CreateTestCasesDto,
+  ) {
+    console.log('Received payload before validation:', createTestCasesDto);
+    return this.questionsServiceClient.send(
+      { cmd: 'create_test_cases' },
+      { ...createTestCasesDto, question_id: createTestCasesDto.question_id },
+    );
+  }
+
+  @Delete('/test-cases/:testCaseId')
+  @Roles(ROLE.Admin)
+  async deleteTestCases(@Param('testCaseId') testCaseId: string) {
+    return this.questionsServiceClient.send(
+      { cmd: 'delete_test_cases' },
+      testCaseId,
+    );
+  }
+
+  @Put('/test-cases/:testCaseId')
+  @Roles(ROLE.Admin)
+  async updateTestCases(
+    @Param('testCaseId') testCaseId: string,
+    @Body(new ZodValidationPipe(updateTestCasesSchema))
+    updateTestCasesDto: UpdateTestCasesDto,
+  ) {
+    console.log('Received payload before validation:', updateTestCasesDto);
+    if (testCaseId !== updateTestCasesDto.id) {
+      throw new BadRequestException(
+        'Test case ID in URL does not match ID in body',
+      );
+    }
+    return this.questionsServiceClient.send(
+      { cmd: 'update_test_cases' },
+      { ...updateTestCasesDto, question_id: updateTestCasesDto.question_id },
+    );
   }
 }

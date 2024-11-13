@@ -20,7 +20,7 @@ import projects from "./supabase-config.json";
  *
  * This script is intended to be used in CI/CD pipelines or local development environments to ensure
  * that types are kept in sync with Supabase schemas. If differences are found, developers are
- * instructed to run the `pnpm gen:all` command to regenerate the types.
+ * instructed to run the `pnpm --filter dtos gen:types-and-enums` command to regenerate the types.
  */
 
 const GENERATED_DIR = __dirname;
@@ -133,7 +133,7 @@ const main = () => {
 
     if (hasDifferences) {
       console.error(
-        "There are differences between the existing and generated types. Please run `pnpm gen:all` to update.",
+        "There are differences between the existing and generated types. Please run `pnpm --filter dtos gen:types-and-enums` to update.",
       );
       process.exit(1); // Fail the process if differences are found
     } else {

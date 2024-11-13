@@ -8,6 +8,11 @@ import {
   QuestionDto,
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
+import {
+  TestCasesDto,
+  CreateTestCasesDto,
+  UpdateTestCasesDto,
+} from '@repo/dtos/testCases';
 
 import { QuestionsRepository } from 'src/domain/ports/questions.repository';
 
@@ -203,6 +208,75 @@ export class QuestionsService {
       return deletedQuestion;
     } catch (error) {
       this.handleError('delete question', error);
+    }
+  }
+
+  /**
+   * Creates new test cases for a question.
+   * @param {CreateTestCasesDto} testCases - The test cases data transfer object to create.
+   * @returns {Promise<TestCasesDto>} - A promise that resolves to the created test cases.
+   */
+  async createTestCases(testCases: CreateTestCasesDto): Promise<TestCasesDto> {
+    try {
+      const createdTestCases =
+        await this.questionsRepository.createTestCases(testCases);
+      this.logger.log(
+        `created test cases for question with id ${testCases.question_id}`,
+      );
+      return createdTestCases;
+    } catch (error) {
+      this.handleError('create test cases', error);
+    }
+  }
+
+  /**
+   * Deletes test cases by their unique identifier.
+   *
+   * @param {string} testCaseId - The unique identifier of the test cases to be deleted.
+   * @returns {Promise<boolean>} - A promise that resolves to true if deletion was successful.
+   * @throws Will throw an error if the deletion fails.
+   */
+  async deleteTestCases(testCaseId: string): Promise<boolean> {
+    try {
+      const result = await this.questionsRepository.deleteTestCases(testCaseId);
+      this.logger.log(`Deleted test cases with id ${testCaseId}`);
+      return result;
+    } catch (error) {
+      this.handleError('delete test cases', error);
+    }
+  }
+
+  /**
+   * Updates existing test cases for a question.
+   * @param {UpdateTestCasesDto} testCases - The updated test cases data transfer object.
+   * @returns {Promise<TestCasesDto>} - A promise that resolves to the updated test cases.
+   */
+  async updateTestCases(testCases: UpdateTestCasesDto): Promise<TestCasesDto> {
+    try {
+      const updatedTestCases =
+        await this.questionsRepository.updateTestCases(testCases);
+      this.logger.log(`updated test cases with id ${testCases.id}`);
+      return updatedTestCases;
+    } catch (error) {
+      this.handleError('update test cases', error);
+    }
+  }
+
+  /**
+   * Finds test cases by question ID.
+   * @param {string} questionId - The ID of the question.
+   * @returns {Promise<TestCasesDto | null>} - A promise that resolves to the test cases or null if not found.
+   */
+  async findTestCasesByQuestionId(
+    questionId: string,
+  ): Promise<TestCasesDto | null> {
+    try {
+      const testCases =
+        await this.questionsRepository.findTestCasesByQuestionId(questionId);
+      this.logger.log(`fetched test cases for question with id ${questionId}`);
+      return testCases;
+    } catch (error) {
+      this.handleError('fetch test cases by question id', error);
     }
   }
 }
