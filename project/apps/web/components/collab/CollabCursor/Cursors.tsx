@@ -6,8 +6,6 @@ import { useEffect, useRef } from 'react';
 
 import { hashCode, injectCursorStyle, removeStyles } from '@/utils/cursorStyle';
 
-import CursorWidget from './CursorWidget';
-
 interface CursorsProps {
   provider: HocuspocusProvider;
   editor: monaco.editor.IStandaloneCodeEditor | null;

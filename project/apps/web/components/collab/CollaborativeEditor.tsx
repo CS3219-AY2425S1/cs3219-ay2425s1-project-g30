@@ -83,7 +83,6 @@ const CollaborativeEditor = forwardRef<
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
 
-  const router = useRouter();
   const { toast } = useToast();
 
   function safeJsonParse(input: string) {
@@ -144,7 +143,7 @@ const CollaborativeEditor = forwardRef<
       )?.sessionEnded;
 
       if (sessionEnded && sessionEnded.endedBy !== user?.id) {
-        notifyEndSession(id);
+        notifyEndSession(collabId);
 
         // Properly remove the listener and disconnect the provider
         providerRef.current?.awareness?.off('change', handleAwarenessChange);

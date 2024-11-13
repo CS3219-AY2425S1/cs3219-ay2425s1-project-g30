@@ -54,7 +54,6 @@ export type Database = {
           language: string;
           output: string | null;
           test_cases_and_results: Json | null;
-
           user_id: string;
         };
         Insert: {
