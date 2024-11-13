@@ -74,7 +74,6 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ collabId, questionId, className }, ref) => {
   const user = useAuthStore.use.user();
-  const collabEnded = useCollabStore.use.collabEnded();
   const notifyEndSession = useCollabStore.use.notifyEndSession();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
