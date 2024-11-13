@@ -73,7 +73,7 @@ const UpdateModal = ({ onSubmit, initialValues }: UpdateModalProps) => {
       form.reset();
       form.clearErrors();
     }
-  }, [open, form, initialValues]);
+  }, [open, form, initialValues, isUpdateModalOpen]);
 
   return (
     <Dialog open={isUpdateModalOpen} onOpenChange={setUpdateModalOpen}>
