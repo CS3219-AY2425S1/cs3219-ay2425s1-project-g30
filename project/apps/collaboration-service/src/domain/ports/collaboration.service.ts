@@ -212,6 +212,7 @@ export class CollaborationService {
         document: document_data,
         code: null,
         output: null,
+        testCasesAndResults: null,
       };
 
       // code execution attempts
@@ -227,6 +228,7 @@ export class CollaborationService {
             document: null,
             code: snapshot.code,
             output: snapshot.output,
+            testCasesAndResults: snapshot.test_cases_and_results,
           } satisfies AttemptDto;
         },
       );

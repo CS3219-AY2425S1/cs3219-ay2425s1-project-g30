@@ -2,6 +2,7 @@ import { z } from "zod";
 import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
 import { questionSchema } from "./questions";
 import { collectionMetadataSchema } from "./metadata";
+import { testCasesAndResultsSchema, testResultSchema } from "./testCases";
 
 const categoryEnum = z.nativeEnum(CATEGORY);
 const complexityEnum = z.nativeEnum(COMPLEXITY);
@@ -100,7 +101,7 @@ export const executionSnapshotSchema = z.object({
   collaboration_id: z.string().uuid(),
   code: z.string(),
   output: z.string().nullable(),
-  // test_results:
+  test_cases_and_results: testCasesAndResultsSchema.nullable(),
   language: z.string(),
   user_id: z.string().uuid(),
   created_at: z.date(),

@@ -1,12 +1,12 @@
 import { Editor } from '@monaco-editor/react';
-import { AttemptDto } from '@repo/dtos/attempt';
 import { useEffect, useRef } from 'react';
 import { MonacoBinding } from 'y-monaco';
 import * as Y from 'yjs';
 
 import { useHistoryStore } from '@/stores/useHistoryStore';
 
-import { Select, SelectTrigger, SelectValue } from '../ui/select';
+import { OutputSectionSkeleton } from '../collab/EditorSkeleton';
+import TestCasesOutputSection from '../collab/TestCasesOutputSection';
 
 import { EditorAreaSkeleton } from './HistoryEditorSkeleton';
 
@@ -17,6 +17,11 @@ const HistoryEditor = () => {
 
   const selectedAttempt = useHistoryStore.use.selectedAttempt();
   const confirmLoading = useHistoryStore.use.confirmLoading();
+
+  const output = selectedAttempt?.output;
+
+  const testCases = selectedAttempt?.testCasesAndResults?.testCases;
+  const testResults = selectedAttempt?.testCasesAndResults?.testResults;
 
   useEffect(() => {
     // Cleanup previous bindings/documents
@@ -35,9 +40,7 @@ const HistoryEditor = () => {
 
     if (typeof window !== 'undefined') {
       if (!selectedAttempt) {
-        editorRef.current.setValue(
-          '// Please refresh the page later, your code may take some time to save from your collaboration session.',
-        );
+        editorRef.current.setValue('// Please select an attempt to view');
         return;
       }
 
@@ -57,51 +60,56 @@ const HistoryEditor = () => {
           new Set([editor]),
         );
         bindingRef.current = binding;
+      } else {
+        editorRef.current.setValue(
+          `// Please refresh the page later, 
+           // your code may take some time to save from your collaboration session.`,
+        );
       }
     }
   };
 
-  if (confirmLoading) {
-    return (
-      <div className="flex items-start justify-start w-full h-full">
-        <EditorAreaSkeleton />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
+    <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
       {/* Monaco Editor */}
-      <div className="flex flex-col h-[calc(100vh-385px)] border border-1 rounded-md shadow-md">
-        <div className="flex h-full p-6">
-          <Editor
-            theme="light"
-            defaultLanguage={selectedAttempt?.language ?? 'plaintext'}
-            loading={
-              <div className="flex items-start justify-start w-full h-full">
-                <EditorAreaSkeleton />
-              </div>
-            }
-            onMount={handleEditorDidMount}
-            options={{
-              minimap: { enabled: false },
-              readOnly: true,
-              automaticLayout: true,
-            }}
-            className="w-full"
-          />
-        </div>
+      <div className="flex h-full p-6">
+        <Editor
+          theme="light"
+          defaultLanguage={selectedAttempt?.language ?? 'plaintext'}
+          loading={
+            <div className="flex items-start justify-start w-full h-full">
+              <EditorAreaSkeleton />
+            </div>
+          }
+          onMount={handleEditorDidMount}
+          options={{
+            minimap: { enabled: false },
+            readOnly: true,
+            automaticLayout: true,
+          }}
+          className="w-full"
+        />
       </div>
 
       {/* Output Area */}
-      <div className="flex flex-col mt-8 h-[184px] border border-1 rounded-md shadow-md">
-        <div className="px-6 py-4 font-semibold border-b border-gray-300">
-          Output
+      {output || testCases ? (
+        // Show output / test results if available
+        <div className="flex flex-col mt-8 h-[290px] border border-1 rounded-md shadow-md">
+          <div className="p-4 font-semibold border-b border-gray-300">
+            {testCases ? 'Test Cases' : 'Output'}
+          </div>
+          {testCases ? (
+            <TestCasesOutputSection
+              testResults={testResults!}
+              testCases={testCases}
+            />
+          ) : (
+            <div className="h-full px-6 py-4 overflow-auto whitespace-pre-wrap">
+              {output}
+            </div>
+          )}
         </div>
-        <div className="h-full px-6 py-4 overflow-auto whitespace-pre-wrap">
-          {selectedAttempt?.output}
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 };

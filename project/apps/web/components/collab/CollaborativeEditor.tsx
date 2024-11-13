@@ -4,7 +4,11 @@ import {
   collabUpdateLanguageDto,
   ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
-import { TestCasesDto, TestResultDto } from '@repo/dtos/testCases';
+import {
+  TestCasesDto,
+  TestResultDto,
+  TestCasesAndResultsDto,
+} from '@repo/dtos/testCases';
 import axios from 'axios';
 import { isEqual } from 'lodash';
 import { SquareChevronRight } from 'lucide-react';
@@ -382,6 +386,19 @@ const CollaborativeEditor = forwardRef<
           });
         }
         setTestResults(results);
+
+        const testCasesAndResults: TestCasesAndResultsDto = {
+          testCases,
+          testResults: results,
+        };
+
+        // save code execution snapshot in its own try-catch block
+        await saveSnapshot(
+          code || '',
+          selectedRuntime.language,
+          testCasesAndResults,
+          null,
+        );
       } else {
         console.log('Running code:', code);
 
@@ -409,11 +426,7 @@ const CollaborativeEditor = forwardRef<
         setOutput(output);
 
         // save code execution snapshot in its own try-catch block
-        await saveCodeExecutionSnapshot(
-          code || '',
-          selectedRuntime.language,
-          output,
-        );
+        await saveSnapshot(code || '', selectedRuntime.language, null, output);
       }
     } catch (error: any) {
       setTestResults(null);
@@ -423,20 +436,22 @@ const CollaborativeEditor = forwardRef<
     }
   };
 
-  const saveCodeExecutionSnapshot = async (
+  const saveSnapshot = async (
     code: string,
     language: string,
-    output: string,
+    test_cases_and_results: TestCasesAndResultsDto | null,
+    output: string | null,
   ) => {
     try {
       // save code execution snapshot
-      const snapshot: ExecutionSnapshotCreateDto = {
+      const snapshot = {
         collaboration_id: collabId,
         code,
         output,
+        test_cases_and_results,
         language,
         user_id: user!.id,
-      };
+      } satisfies ExecutionSnapshotCreateDto;
       await saveExecutionSnapshot(snapshot);
     } catch (error) {
       console.error('Failed to save code execution snapshot:', error);

@@ -1,6 +1,6 @@
 import z from "zod";
 import { collectionMetadataSchema } from "./metadata";
-import { testResultSchema } from "./testCases";
+import { testCasesAndResultsSchema } from "./testCases";
 
 export const attemptFiltersSchema = z.object({
   collab_id: z.string().uuid(),
@@ -14,7 +14,7 @@ export const attemptSchema = z.object({
   document: z.array(z.number()).nullable(), // document stores the Y.js document state
   code: z.string().nullable(), // code stores the raw code text in string format
   output: z.string().nullable(),
-  test_results: z.array(testResultSchema).nullable(),
+  testCasesAndResults: testCasesAndResultsSchema.nullable(),
   created_at: z.date(),
 });
 

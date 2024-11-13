@@ -39,6 +39,8 @@ const QuestionPageContent = ({ id }: { id: string }) => {
     return notFound();
   }
 
+  console.log('question', question);
+
   return (
     <div className="container p-6 mx-auto">
       {/* Back Button */}

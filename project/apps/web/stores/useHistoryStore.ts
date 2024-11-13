@@ -33,19 +33,13 @@ const useHistoryStoreBase = create<HistoryState>((set) => ({
       set({ confirmLoading: true });
       const attempts = await getAttempts(filters);
       set({ attemptCollection: attempts });
-      const finalSubmission = attempts?.attempts.find(
-        (a) => a.id === filters.collab_id,
-      );
-      if (finalSubmission) {
-        set({ selectedAttempt: finalSubmission });
-      }
       return attempts;
     } finally {
       set({ confirmLoading: false });
     }
   },
   setSelectedAttempt: (value) => set({ selectedAttempt: value }),
-  historyPaneView: HistoryPaneView.Code,
+  historyPaneView: HistoryPaneView.Attempts, // default view to show attempts
   setHistoryPaneView: (value) => set({ historyPaneView: value }),
 }));
 
