@@ -2,7 +2,7 @@ import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { TestCasesDto } from '@repo/dtos/testCases';
 import axios from 'axios';
-import { Play } from 'lucide-react';
+import { SquareChevronRight } from 'lucide-react';
 import * as monaco from 'monaco-editor';
 import { useRouter } from 'next/navigation';
 import {
@@ -160,7 +160,6 @@ const CollaborativeEditor = forwardRef<
     // Initial timer update
     updateTimer();
 
-    // Cleanup
     return () => {
       yTimer.unobserveDeep(updateTimer);
     };
@@ -437,13 +436,7 @@ const CollaborativeEditor = forwardRef<
     <div className={className}>
       <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
-          <Timer
-            timerState={timerState}
-            startTimer={startTimer}
-            pauseTimer={pauseTimer}
-            resetTimer={resetTimer}
-          />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {collabLoading ? (
               <LanguageSelectSkeleton />
             ) : (
@@ -475,6 +468,12 @@ const CollaborativeEditor = forwardRef<
                 </SelectContent>
               </Select>
             )}
+            <Timer
+              timerState={timerState}
+              startTimer={startTimer}
+              pauseTimer={pauseTimer}
+              resetTimer={resetTimer}
+            />
           </div>
           {collabLoading ? (
             <RunButtonSkeleton />
@@ -485,7 +484,7 @@ const CollaborativeEditor = forwardRef<
               variant="ghost"
               className="select-none"
             >
-              <Play className="w-4 h-4 mr-2" /> Run Code
+              <SquareChevronRight className="w-4 h-4 mr-2" /> Run Code
             </Button>
           )}
         </div>
