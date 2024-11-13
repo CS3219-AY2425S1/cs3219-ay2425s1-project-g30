@@ -117,7 +117,7 @@ const CollaborativeEditor = forwardRef<
       )?.sessionEnded;
 
       if (sessionEnded && sessionEnded.endedBy !== user?.id) {
-        notifyEndSession();
+        notifyEndSession(id);
 
         // Properly remove the listener and disconnect the provider
         providerRef.current?.awareness?.off('change', handleAwarenessChange);
