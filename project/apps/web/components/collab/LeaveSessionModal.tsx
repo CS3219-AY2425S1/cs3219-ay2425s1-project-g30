@@ -11,42 +11,45 @@ import {
 } from '@/components/ui/dialog';
 import { useCollabStore } from '@/stores/useCollabStore';
 
-interface TerminateModalProps {
-  collabPartner: string;
-  onTerminate: () => void;
+interface LeaveSessionModalProps {
+  onLeaveSession: () => void;
 }
 
-export default function TerminateModal({
-  collabPartner,
-  onTerminate,
-}: TerminateModalProps) {
+export default function LeaveSessionModal({
+  onLeaveSession,
+}: LeaveSessionModalProps) {
   const confirmLoading = useCollabStore.use.confirmLoading();
-  const isTerminateModalOpen = useCollabStore.use.isTerminateModalOpen();
-  const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
+  const isLeaveSessionModalOpen = useCollabStore.use.isLeaveSessionModalOpen();
+  const setIsLeaveSessionModalOpen =
+    useCollabStore.use.setIsLeaveSessionModalOpen();
 
   return (
-    <Dialog open={isTerminateModalOpen} onOpenChange={setTerminateModalOpen}>
+    <Dialog
+      open={isLeaveSessionModalOpen}
+      onOpenChange={setIsLeaveSessionModalOpen}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>End Collaboration Session</DialogTitle>
+          <DialogTitle>Leave Collaboration Session</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Are you sure you want to end the current session with {collabPartner}?
+          Are you sure you want to leave the session now?
         </DialogDescription>
+
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => setTerminateModalOpen(false)}
+            onClick={() => setIsLeaveSessionModalOpen(false)}
             disabled={confirmLoading}
           >
             Cancel
           </Button>
           <Button
             variant="destructive"
-            onClick={onTerminate}
+            onClick={onLeaveSession}
             disabled={confirmLoading}
           >
-            End
+            Leave
           </Button>
         </DialogFooter>
       </DialogContent>

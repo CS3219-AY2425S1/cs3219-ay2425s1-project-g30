@@ -5,7 +5,6 @@ import axios from 'axios';
 import { isEqual } from 'lodash';
 import { SquareChevronRight } from 'lucide-react';
 import * as monaco from 'monaco-editor';
-import { useRouter } from 'next/navigation';
 import {
   useState,
   useEffect,
@@ -58,7 +57,7 @@ interface CollaborativeEditorProps {
 }
 
 export interface CollaborativeEditorRef {
-  endSession: () => void;
+  handleEndSession: () => void;
 }
 
 const CollaborativeEditor = forwardRef<
@@ -66,7 +65,7 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ collabId, questionId, className }, ref) => {
   const user = useAuthStore.use.user();
-  const setCollaboration = useCollabStore.use.setCollaboration();
+  const notifyEndSession = useCollabStore.use.notifyEndSession();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
   const [collabLoading, setCollabLoading] = useState(true);
@@ -84,7 +83,6 @@ const CollaborativeEditor = forwardRef<
   const ydocRef = useRef(new Y.Doc());
   const providerRef = useRef<HocuspocusProvider | null>(null);
 
-  const router = useRouter();
   const { toast } = useToast();
 
   function safeJsonParse(input: string) {
@@ -97,7 +95,7 @@ const CollaborativeEditor = forwardRef<
   }
 
   useImperativeHandle(ref, () => ({
-    endSession,
+    handleEndSession,
   }));
 
   // Fetch available languages on mount
@@ -134,6 +132,25 @@ const CollaborativeEditor = forwardRef<
 
     fetchRuntimes();
   }, []);
+
+  const handleAwarenessChange = () => {
+    if (providerRef.current?.awareness?.getStates().values()) {
+      const states = Array.from(
+        providerRef.current.awareness.getStates().values(),
+      );
+      const sessionEnded = states.find(
+        (state) => state.sessionEnded,
+      )?.sessionEnded;
+
+      if (sessionEnded && sessionEnded.endedBy !== user?.id) {
+        notifyEndSession();
+
+        // Properly remove the listener and disconnect the provider
+        providerRef.current?.awareness?.off('change', handleAwarenessChange);
+        providerRef.current?.disconnect();
+      }
+    }
+  };
 
   // Initialize Yjs timer state
   useEffect(() => {
@@ -208,26 +225,7 @@ const CollaborativeEditor = forwardRef<
         document: ydoc,
       });
       providerRef.current = provider;
-
-      provider.awareness?.on('change', () => {
-        if (provider.awareness?.getStates().values()) {
-          const states = Array.from(provider.awareness?.getStates().values());
-          const sessionEnded = states.find(
-            (state) => state.sessionEnded,
-          )?.sessionEnded;
-
-          if (sessionEnded && sessionEnded.endedBy !== user?.id) {
-            toast({
-              variant: 'error',
-              title: 'Session Ended',
-              description: 'Your collaborator ended the session.',
-            });
-            setCollaboration(null);
-            provider.disconnect();
-            router.push('/');
-          }
-        }
-      });
+      provider.awareness?.on('change', handleAwarenessChange);
 
       // Mark loading as false once synced
       provider.on('synced', () => {
@@ -274,13 +272,14 @@ const CollaborativeEditor = forwardRef<
       return () => {
         provider.disconnect();
         yRuntime.unobserve(handleYRuntimeChange);
+        provider.awareness?.off('change', handleAwarenessChange);
       };
     } else {
       setCollabLoading(false);
     }
   };
 
-  const endSession = () => {
+  const handleEndSession = () => {
     if (providerRef.current) {
       providerRef.current.setAwarenessField('sessionEnded', {
         endedBy: user?.id,
