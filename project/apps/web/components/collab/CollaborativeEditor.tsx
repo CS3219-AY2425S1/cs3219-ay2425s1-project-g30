@@ -74,6 +74,7 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ collabId, questionId, className }, ref) => {
   const user = useAuthStore.use.user();
+  const collabEnded = useCollabStore.use.collabEnded();
   const notifyEndSession = useCollabStore.use.notifyEndSession();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
@@ -442,6 +443,11 @@ const CollaborativeEditor = forwardRef<
     output: string | null,
   ) => {
     try {
+      // do nothing if the collaboration has ended
+      if (collabEnded) {
+        return;
+      }
+
       // save code execution snapshot
       const snapshot = {
         collaboration_id: collabId,
