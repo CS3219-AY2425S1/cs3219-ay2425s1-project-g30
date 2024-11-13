@@ -3,8 +3,8 @@
 import { CollabInfoDto } from '@repo/dtos/collab';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
-import { notFound } from 'next/navigation';
-import { Suspense, useRef } from 'react';
+import { notFound, useRouter } from 'next/navigation';
+import { Suspense, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -28,8 +28,13 @@ interface CollabPageProps {
 
 const CollabPageContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
-  const setTerminateModalOpen = useCollabStore.use.setTerminateModalOpen();
+  const collabEnded = useCollabStore.use.collabEnded();
+  const setEndSessionModalOpen = useCollabStore.use.setEndSessionModalOpen();
+  const setIsLeaveSessionModalOpen =
+    useCollabStore.use.setIsLeaveSessionModalOpen();
   const editorRef = useRef<CollaborativeEditorRef>(null);
+
+  const router = useRouter();
 
   const { data: collabInfo } = useSuspenseQuery<CollabInfoDto>({
     queryKey: [QUERY_KEYS.Collab, id],
@@ -40,14 +45,8 @@ const CollabPageContent = ({ id }: { id: string }) => {
     return notFound();
   }
 
-  const endSession = () => {
-    if (editorRef.current) {
-      editorRef.current.endSession();
-    }
-  };
-
   const partnerUsername =
-    user && collabInfo.collab_user1.id == user.id
+    collabInfo.collab_user1.id == user!.id
       ? collabInfo.collab_user2.username
       : collabInfo.collab_user1.username;
 
@@ -57,13 +56,31 @@ const CollabPageContent = ({ id }: { id: string }) => {
     id: collabInfo.question.id,
   };
 
+  const handleEndSession = () => {
+    if (editorRef.current) editorRef.current.handleEndSession();
+  };
+
+  // Disallow user from entering collab sessions without a valid session
+  useEffect(() => {
+    // If url valid, but user is not any of the matched users
+    if (
+      collabInfo.collab_user1.id != user!.id &&
+      collabInfo.collab_user2.id != user!.id
+    )
+      return notFound();
+  }, [collabInfo, router]);
+
   return (
     <div className="h-screen px-8 py-4">
       {/* Header with Back button */}
       <div className="flex items-center mb-4">
         <Button
           variant="link"
-          onClick={() => setTerminateModalOpen(true)}
+          onClick={() =>
+            collabEnded
+              ? setIsLeaveSessionModalOpen(true)
+              : setEndSessionModalOpen(true)
+          }
           className="flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -95,7 +112,7 @@ const CollabPageContent = ({ id }: { id: string }) => {
       </div>
       {collabInfo && (
         <ActionModals
-          onEndSession={endSession}
+          notifyPartner={handleEndSession}
           collabPartner={partnerUsername}
           collabId={id}
         />

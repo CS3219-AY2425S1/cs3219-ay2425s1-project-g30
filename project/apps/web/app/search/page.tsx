@@ -13,7 +13,6 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { cancelMatch, createMatch } from '@/lib/api/match';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useCollabStore } from '@/stores/useCollabStore';
 import useSocketStore from '@/stores/useSocketStore';
 import { validateMatchParam } from '@/utils/validateMatchParam';
 
@@ -27,13 +26,12 @@ const Search = () => {
   const { totalSeconds, reset } = useStopwatch({ autoStart: true });
 
   const user = useAuthStore.use.user();
-  const collaboration = useCollabStore.use.collaboration();
-  const fetchCollab = useCollabStore.use.fetchCollab();
   const connect = useSocketStore((state) => state.connect);
   const isConnected = useSocketStore((state) => state.isConnected);
   const disconnect = useSocketStore((state) => state.disconnect);
   const socket = useSocketStore((state) => state.socket);
 
+  const [isMatchFound, setIsMatchFound] = useState(false);
   const [matchReqId, setMatchReqId] = useState<string | null>(null);
   const isCreateMutatingRef = useRef(false);
   const isCancelMutatingRef = useRef(false);
@@ -115,7 +113,7 @@ const Search = () => {
         title: 'Match Found',
         description: 'Your match was successful.',
       });
-      fetchCollab(collabId);
+      setIsMatchFound(true);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.Collab, user?.id],
       });
@@ -195,15 +193,15 @@ const Search = () => {
           >
             <div className="flex flex-row">
               <div className="mr-2 text-lg font-medium">
-                {collaboration
+                {isMatchFound
                   ? 'Redirecting you to your match...'
                   : 'Searching...'}
               </div>
               <div className="text-lg font-medium text-gray-600">
-                {collaboration ? <LoadingSpinner /> : `${totalSeconds}s`}
+                {isMatchFound ? <LoadingSpinner /> : `${totalSeconds}s`}
               </div>
             </div>
-            {!collaboration && (
+            {!isMatchFound && (
               <Button variant="default" onClick={stopMatching}>
                 Cancel
               </Button>

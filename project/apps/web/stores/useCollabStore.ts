@@ -1,37 +1,61 @@
-import { CollabInfoDto } from '@repo/dtos/collab';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-import { endCollab, getCollabInfoById } from '@/lib/api/collab';
+import { endCollab } from '@/lib/api/collab';
 import { createSelectors } from '@/lib/zustand';
 
 interface CollabState {
-  collaboration: CollabInfoDto | null;
-  setCollaboration: (collab: CollabInfoDto | null) => void;
-  fetchCollab: (id: string) => Promise<CollabInfoDto>;
   endCollab: (id: string) => Promise<void>;
-  isTerminateModalOpen: boolean;
-  setTerminateModalOpen: (isOpen: boolean) => void;
+  notifyEndSession: () => void;
+  leaveSession: () => void;
+  isEndSessionModalOpen: boolean;
+  setEndSessionModalOpen: (isOpen: boolean) => void;
+  isNotifyEndCollabModalOpen: boolean;
+  setNotifyEndCollabModalOpen: (isOpen: boolean) => void;
+  isLeaveSessionModalOpen: boolean;
+  setIsLeaveSessionModalOpen: (isOpen: boolean) => void;
+  collabEnded: boolean;
+  setCollabEnded: (value: boolean) => void;
   confirmLoading: boolean;
   setConfirmLoading: (value: boolean) => void;
 }
 
 export const useCollabStoreBase = create<CollabState>()((set) => ({
-  collaboration: null,
-  setCollaboration: (collab) => set({ collaboration: collab }),
-  fetchCollab: async (id: string) => {
-    const collab = await getCollabInfoById(id);
-    set({ collaboration: collab });
-    return collab;
-  },
+  // For the user who initiated to end the session
   endCollab: async (id: string) => {
     await endCollab(id);
-    set({ collaboration: null });
+    set({ isEndSessionModalOpen: false });
   },
-  isTerminateModalOpen: false,
-  setTerminateModalOpen: (value) => set({ isTerminateModalOpen: value }),
+  notifyEndSession: () => {
+    set({
+      collabEnded: true,
+      isNotifyEndCollabModalOpen: true,
+    });
+  },
+
+  // For the other user
+  leaveSession: async () => {
+    set({
+      collabEnded: false,
+      isLeaveSessionModalOpen: false,
+      isNotifyEndCollabModalOpen: false,
+    });
+  },
+
+  isEndSessionModalOpen: false,
+  setEndSessionModalOpen: (value) => set({ isEndSessionModalOpen: value }),
+  isNotifyEndCollabModalOpen: false,
+  setNotifyEndCollabModalOpen: (value) => {
+    set({ isNotifyEndCollabModalOpen: value });
+  },
+  isLeaveSessionModalOpen: false,
+  setIsLeaveSessionModalOpen: (value) =>
+    set({ isLeaveSessionModalOpen: value }),
   confirmLoading: false,
   setConfirmLoading: (value) => set({ confirmLoading: value }),
+  collabEnded: false,
+  setCollabEnded: (value) => {
+    set({ collabEnded: value });
+  },
 }));
 
 export const useCollabStore = createSelectors(useCollabStoreBase);
