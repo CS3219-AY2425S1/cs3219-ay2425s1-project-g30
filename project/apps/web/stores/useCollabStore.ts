@@ -5,7 +5,7 @@ import { createSelectors } from '@/lib/zustand';
 
 interface CollabState {
   endCollab: (id: string) => Promise<void>;
-  notifyEndSession: (id: string) => void;
+  notifyEndSession: () => void;
   leaveSession: () => void;
   isEndSessionModalOpen: boolean;
   setEndSessionModalOpen: (isOpen: boolean) => void;
