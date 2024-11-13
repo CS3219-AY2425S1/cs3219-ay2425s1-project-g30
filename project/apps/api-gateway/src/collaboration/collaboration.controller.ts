@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Inject,
@@ -14,7 +15,12 @@ import {
   CollabFiltersDto,
   activeCollabExistsSchema,
   ActiveCollabExistsDto,
+  executionSnapshotCreateSchema,
+  ExecutionSnapshotDto,
+  collabUpdateLanguageDto,
+  collabUpdateLanguageSchema,
 } from '@repo/dtos/collab';
+import { AttemptFiltersDto, attemptFiltersSchema } from '@repo/dtos/attempt';
 @Controller('collaboration')
 export class CollaborationController {
   constructor(
@@ -33,18 +39,20 @@ export class CollaborationController {
     );
   }
 
+  // needs to be placed before :id to avoid ambiguity
+  @Get('attempts')
+  @UsePipes(new ZodValidationPipe(attemptFiltersSchema))
+  async getAttempts(@Query() filters: AttemptFiltersDto) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'get_attempts' },
+      filters,
+    );
+  }
+
   @Get(':id')
   async getCollaborationInfoById(@Param('id') collabId: string) {
     return this.collaborationServiceClient.send(
       { cmd: 'get_collab_info' },
-      collabId,
-    );
-  }
-
-  @Get('history/:id')
-  async getCollaborationHistoryById(@Param('id') collabId: string) {
-    return this.collaborationServiceClient.send(
-      { cmd: 'get_collab_history' },
       collabId,
     );
   }
@@ -66,11 +74,31 @@ export class CollaborationController {
     );
   }
 
+  @Post('language')
+  @UsePipes(new ZodValidationPipe(collabUpdateLanguageSchema))
+  async updateCollaborationLanguage(
+    @Body() collabUpdateLanguage: collabUpdateLanguageDto,
+  ) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'update_collab_language' },
+      collabUpdateLanguage,
+    );
+  }
+
   @Post('end/:id')
   async endCollaboration(@Param('id') collabId: string) {
     return this.collaborationServiceClient.send(
       { cmd: 'end_collab' },
       collabId,
+    );
+  }
+
+  @Post('snapshot')
+  @UsePipes(new ZodValidationPipe(executionSnapshotCreateSchema))
+  async createExecutionSnapshot(@Body() snapshot: ExecutionSnapshotDto) {
+    return this.collaborationServiceClient.send(
+      { cmd: 'create_snapshot' },
+      snapshot,
     );
   }
 }

@@ -1,6 +1,12 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CollabFiltersDto, CollabRequestDto } from '@repo/dtos/collab';
+import { AttemptFiltersDto } from '@repo/dtos/attempt';
+import {
+  CollabFiltersDto,
+  CollabRequestDto,
+  collabUpdateLanguageDto,
+  ExecutionSnapshotCreateDto,
+} from '@repo/dtos/collab';
 
 import { CollaborationService } from 'src/domain/ports/collaboration.service';
 
@@ -29,13 +35,17 @@ export class CollaborationController {
   }
 
   @MessagePattern({ cmd: 'get_collab_info' })
-  async getActiveCollabInfo(@Payload() collabId: string) {
-    return await this.collaborationService.getActiveCollabInfo(collabId);
+  async getCollabInfo(@Payload() collabId: string) {
+    return await this.collaborationService.getCollabInfo(collabId);
   }
 
-  @MessagePattern({ cmd: 'get_collab_history' })
-  async getCollabDocument(@Payload() collabId: string) {
-    return await this.collaborationService.getCollabInfoAndDocument(collabId);
+  @MessagePattern({ cmd: 'update_collab_language' })
+  async updateCollabLanguage(
+    @Payload() collabLanguageData: collabUpdateLanguageDto,
+  ) {
+    return await this.collaborationService.updateCollabLanguage(
+      collabLanguageData,
+    );
   }
 
   @MessagePattern({ cmd: 'end_collab' })
@@ -46,5 +56,15 @@ export class CollaborationController {
   @MessagePattern({ cmd: 'check_active_collabs' })
   async checkActiveCollabs(@Payload() userId: string) {
     return await this.collaborationService.checkActiveCollabs(userId);
+  }
+
+  @MessagePattern({ cmd: 'get_attempts' })
+  async getAttempts(@Payload() filters: AttemptFiltersDto) {
+    return await this.collaborationService.getAttempts(filters);
+  }
+
+  @MessagePattern({ cmd: 'create_snapshot' })
+  async createSnapshot(@Payload() snapshot: ExecutionSnapshotCreateDto) {
+    return await this.collaborationService.createSnapshot(snapshot);
   }
 }

@@ -41,7 +41,7 @@ const CollabPageContent = ({ id }: { id: string }) => {
     queryFn: () => getCollabInfoById(id),
   });
 
-  if (!collabInfo) {
+  if (!collabInfo || collabInfo.ended_at) {
     return notFound();
   }
 

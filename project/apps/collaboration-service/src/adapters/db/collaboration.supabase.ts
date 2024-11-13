@@ -10,8 +10,11 @@ import {
   CollabDto,
   CollabFiltersDto,
   CollabInfoDto,
-  CollabInfoWithDocumentDto,
   CollabQuestionDto,
+  collabUpdateLanguageDto,
+  ExecutionSnapshotCollectionDto,
+  ExecutionSnapshotCreateDto,
+  ExecutionSnapshotDto,
 } from '@repo/dtos/collab';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -27,12 +30,14 @@ import {
 } from '@repo/dtos/questions';
 import { UserDataDto } from '@repo/dtos/users';
 import { collectionMetadataDto } from '@repo/dtos/metadata';
+import { AttemptFiltersDto } from '@repo/dtos/attempt';
 
 @Injectable()
 export class CollaborationSupabase implements CollaborationRepository {
   private supabase: SupabaseClient;
 
   private readonly COLLABORATION_TABLE = 'collaboration';
+  private readonly SNAPSHOT_TABLE = 'snapshots';
 
   constructor(
     private envService: EnvService,
@@ -312,84 +317,73 @@ export class CollaborationSupabase implements CollaborationRepository {
     return selectedQuestionId;
   }
 
-  async fetchCollabInfo(collabId: string): Promise<CollabInfoDto> {
+  async fetchCollabInfo(collabId: string): Promise<CollabInfoDto | null> {
     const collab = await this.findById(collabId);
     if (!collab) {
-      throw new NotFoundException(
-        `Collaboration with id ${collabId} not found`,
-      );
+      return null;
     }
 
     const { question_id, user1_id, user2_id } = collab;
-    try {
-      const [selectedQuestionData, user1Data, user2Data] = await Promise.all([
-        firstValueFrom(
-          this.questionServiceClient.send<QuestionDto>(
-            { cmd: 'get_question' },
-            question_id,
-          ),
+    const [selectedQuestionData, user1Data, user2Data] = await Promise.all([
+      firstValueFrom(
+        this.questionServiceClient.send<QuestionDto>(
+          { cmd: 'get_question' },
+          question_id,
         ),
-        firstValueFrom(
-          this.userServiceClient.send<UserDataDto>(
-            { cmd: 'get_user' },
-            user1_id,
-          ),
-        ),
-        firstValueFrom(
-          this.userServiceClient.send<UserDataDto>(
-            { cmd: 'get_user' },
-            user2_id,
-          ),
-        ),
-      ]);
+      ),
+      firstValueFrom(
+        this.userServiceClient.send<UserDataDto>({ cmd: 'get_user' }, user1_id),
+      ),
+      firstValueFrom(
+        this.userServiceClient.send<UserDataDto>({ cmd: 'get_user' }, user2_id),
+      ),
+    ]);
 
-      if (!selectedQuestionData) {
-        throw new NotFoundException(
-          `Question with id ${question_id} not found`,
-        );
-      }
-
-      const collabInfoData: CollabInfoDto = {
-        id: collabId,
-
-        started_at: collab.started_at,
-        ended_at: collab.ended_at,
-
-        collab_user1: {
-          id: user1Data ? user1Data.id : null,
-          username: user1Data ? user1Data.username : 'DELETED USER',
-        },
-        collab_user2: {
-          id: user2Data ? user2Data.id : null,
-          username: user2Data ? user2Data.username : 'DELETED USER',
-        },
-        question: selectedQuestionData,
-      };
-
-      return collabInfoData;
-    } catch (error) {
-      throw new Error(`Failed to fetch collaboration info: ${error}`);
+    if (!selectedQuestionData) {
+      throw new NotFoundException(`Question with id ${question_id} not found`);
     }
+
+    const collabInfoData: CollabInfoDto = {
+      id: collabId,
+
+      started_at: collab.started_at,
+      ended_at: collab.ended_at,
+
+      collab_user1: {
+        id: user1Data ? user1Data.id : null,
+        username: user1Data ? user1Data.username : 'DELETED USER',
+      },
+      collab_user2: {
+        id: user2Data ? user2Data.id : null,
+        username: user2Data ? user2Data.username : 'DELETED USER',
+      },
+      question: selectedQuestionData,
+      language: collab.language,
+    };
+
+    return collabInfoData;
   }
 
-  async fetchCollabInfoWithDocument(
-    collabId: string,
-  ): Promise<CollabInfoWithDocumentDto> {
-    try {
-      const collabInfo = await this.fetchCollabInfo(collabId);
-      const document = await this.fetchDocumentById(collabId);
+  async updateCollabLanguage(collabLanguageData: collabUpdateLanguageDto) {
+    const { collab_id, language } = collabLanguageData;
 
-      const document_data = document ? Array.from(document) : null;
-
-      return {
-        ...collabInfo,
-        document_data,
-      } as CollabInfoWithDocumentDto;
-    } catch (error) {
+    if (!(await this.checkActiveCollaborationById(collab_id))) {
       throw new BadRequestException(
-        `Failed to fetch collaboration info with document: ${error}`,
+        `Collaboration with id ${collabLanguageData.collab_id} is not active`,
       );
     }
+
+    const { data, error } = await this.supabase
+      .from(this.COLLABORATION_TABLE)
+      .update({ language })
+      .eq('id', collab_id)
+      .select()
+      .single<CollabDto>();
+
+    if (error) {
+      throw error;
+    }
+    return data;
   }
 
   async endCollab(collabId: string): Promise<CollabDto> {
@@ -425,5 +419,63 @@ export class CollaborationSupabase implements CollaborationRepository {
     }
 
     return data && data.length > 0;
+  }
+
+  async getSnapshots(
+    filters: AttemptFiltersDto,
+  ): Promise<ExecutionSnapshotCollectionDto> {
+    const collabId = filters.collab_id;
+    const userId = filters.user_id;
+    const { data: snapshots, error } = await this.supabase
+      .from(this.SNAPSHOT_TABLE)
+      .select()
+      .eq('collaboration_id', collabId)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    const count = snapshots ? snapshots.length : 0;
+
+    return {
+      metadata: {
+        count,
+        totalCount: count,
+      },
+      snapshots,
+    };
+  }
+
+  async createSnapshot(
+    data: ExecutionSnapshotCreateDto,
+  ): Promise<ExecutionSnapshotDto> {
+    // Check if the collaboration exists
+    const collab = await this.findById(data.collaboration_id);
+    if (!collab) {
+      throw new NotFoundException(
+        `Collaboration with id ${data.collaboration_id} not found`,
+      );
+    }
+
+    // Check if the collaboration has ended
+    if (collab.ended_at) {
+      throw new BadRequestException(
+        `Collaboration with id ${data.collaboration_id} has ended`,
+      );
+    }
+
+    const { data: snapshot, error } = await this.supabase
+      .from(this.SNAPSHOT_TABLE)
+      .insert(data)
+      .select()
+      .single<ExecutionSnapshotDto>();
+
+    if (error) {
+      throw error;
+    }
+
+    return snapshot;
   }
 }

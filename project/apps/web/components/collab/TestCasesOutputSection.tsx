@@ -1,19 +1,11 @@
-import { TestCasesDto } from '@repo/dtos/testCases';
+import { TestCasesDto, TestResultDto } from '@repo/dtos/testCases';
 import React, { useState } from 'react';
 
 import { Button } from '../ui/button';
 
-export interface TestResult {
-  input: Record<string, any>;
-  stdout: string;
-  expectedOutput: any;
-  functionOutput: any;
-  passed: boolean;
-}
-
 interface TestCasesOutputSectionProps {
   testCases: TestCasesDto;
-  testResults: TestResult[] | null;
+  testResults: TestResultDto[] | null;
 }
 
 const TestCasesOutputSection = ({

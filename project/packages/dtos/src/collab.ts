@@ -2,6 +2,7 @@ import { z } from "zod";
 import { CATEGORY, COMPLEXITY } from "./generated/enums/questions.enums";
 import { questionSchema } from "./questions";
 import { collectionMetadataSchema } from "./metadata";
+import { testCasesAndResultsSchema } from "./testCases";
 
 const categoryEnum = z.nativeEnum(CATEGORY);
 const complexityEnum = z.nativeEnum(COMPLEXITY);
@@ -31,10 +32,7 @@ export const collabInfoSchema = z.object({
   collab_user2: collaboratorSchema,
   partner: collaboratorSchema.optional(),
   question: questionSchema,
-});
-
-export const collabInfoWithDocumentSchema = collabInfoSchema.extend({
-  document_data: z.array(z.number()).nullable(),
+  language: z.string(),
 });
 
 export const collabCreateSchema = z.object({
@@ -52,6 +50,7 @@ export const collabRequestSchema = collabQuestionSchema.extend({
 
 export const collabSchema = collabCreateSchema.extend({
   id: z.string().uuid(),
+  language: z.string(), // default value provided by the database
   started_at: z.date(),
   ended_at: z.date().nullable(),
 });
@@ -59,6 +58,11 @@ export const collabSchema = collabCreateSchema.extend({
 export const collabCollectionSchema = z.object({
   metadata: collectionMetadataSchema,
   collaborations: z.array(collabInfoSchema),
+});
+
+export const collabUpdateLanguageSchema = z.object({
+  collab_id: z.string().uuid(),
+  language: z.string(),
 });
 
 export const sortCollaborationsQuerySchema = z.object({
@@ -92,15 +96,44 @@ export const activeCollabExistsSchema = z.object({
   user_id: z.string().uuid(),
 });
 
+export const executionSnapshotSchema = z.object({
+  id: z.string().uuid(),
+  collaboration_id: z.string().uuid(),
+  code: z.string(),
+  output: z.string().nullable(),
+  test_cases_and_results: testCasesAndResultsSchema.nullable(),
+  language: z.string(),
+  user_id: z.string().uuid(),
+  created_at: z.date(),
+});
+
+export const executionSnapshotCollectionSchema = z.object({
+  metadata: collectionMetadataSchema,
+  snapshots: z.array(executionSnapshotSchema),
+});
+
+export const executionSnapshotCreateSchema = executionSnapshotSchema.omit({
+  id: true,
+  created_at: true,
+});
+
 export type CollabFiltersDto = z.infer<typeof collabFiltersSchema>;
 export type CollabUserDto = z.infer<typeof collaboratorSchema>;
 export type CollabInfoDto = z.infer<typeof collabInfoSchema>;
-export type CollabInfoWithDocumentDto = z.infer<
-  typeof collabInfoWithDocumentSchema
->;
 export type CollabRequestDto = z.infer<typeof collabRequestSchema>;
 export type CollabQuestionDto = z.infer<typeof collabQuestionSchema>;
 export type CollabCreateDto = z.infer<typeof collabCreateSchema>;
 export type CollabDto = z.infer<typeof collabSchema>;
 export type CollabCollectionDto = z.infer<typeof collabCollectionSchema>;
 export type ActiveCollabExistsDto = z.infer<typeof activeCollabExistsSchema>;
+export type collabUpdateLanguageDto = z.infer<
+  typeof collabUpdateLanguageSchema
+>;
+
+export type ExecutionSnapshotDto = z.infer<typeof executionSnapshotSchema>;
+export type ExecutionSnapshotCollectionDto = z.infer<
+  typeof executionSnapshotCollectionSchema
+>;
+export type ExecutionSnapshotCreateDto = z.infer<
+  typeof executionSnapshotCreateSchema
+>;

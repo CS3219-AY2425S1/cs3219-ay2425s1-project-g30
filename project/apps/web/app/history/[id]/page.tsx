@@ -1,6 +1,6 @@
 'use client';
 
-import { CollabInfoWithDocumentDto } from '@repo/dtos/collab';
+import { CollabInfoDto } from '@repo/dtos/collab';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -8,12 +8,12 @@ import { Suspense } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-import HistoryEditor from '@/components/history-view/HistoryEditor';
+import HistoryPane from '@/components/history-view/HistoryPane';
 import HistoryViewSkeleton from '@/components/history-view/HistoryViewSkeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { QUERY_KEYS } from '@/constants/queryKeys';
-import { fetchCollabHistorybById } from '@/lib/api/collab';
+import { getCollabInfoById } from '@/lib/api/collab';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 interface HistoryViewProps {
@@ -25,22 +25,22 @@ interface HistoryViewProps {
 const HistoryViewContent = ({ id }: { id: string }) => {
   const user = useAuthStore.use.user();
 
-  const { data: collab } = useSuspenseQuery<CollabInfoWithDocumentDto>({
+  const { data: collabInfo } = useSuspenseQuery<CollabInfoDto>({
     queryKey: [QUERY_KEYS.Collab, id],
-    queryFn: () => fetchCollabHistorybById(id),
+    queryFn: () => getCollabInfoById(id),
   });
 
-  if (!collab) {
+  if (!collabInfo) {
     return notFound();
   }
 
   const partnerUsername =
-    collab.collab_user1.id == user?.id
-      ? collab.collab_user2.username
-      : collab.collab_user1.username;
+    collabInfo.collab_user1.id == user?.id
+      ? collabInfo.collab_user2.username
+      : collabInfo.collab_user1.username;
   const question = {
-    title: collab.question.q_title || 'Untitled Question',
-    description: collab.question.q_desc || 'No description',
+    title: collabInfo.question.q_title || 'Untitled Question',
+    description: collabInfo.question.q_desc || 'No description',
   };
 
   return (
@@ -73,8 +73,8 @@ const HistoryViewContent = ({ id }: { id: string }) => {
             {question.description}
           </ReactMarkdown>
         </div>
-        {/* Code editor */}
-        <HistoryEditor collab={collab} className="w-1/2" />
+        {/* Snapshot selection and code editor */}
+        <HistoryPane collabInfo={collabInfo} className="w-1/2" />
       </div>
     </div>
   );

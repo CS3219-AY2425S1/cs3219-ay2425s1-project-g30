@@ -1,6 +1,14 @@
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
-import { TestCasesDto } from '@repo/dtos/testCases';
+import {
+  collabUpdateLanguageDto,
+  ExecutionSnapshotCreateDto,
+} from '@repo/dtos/collab';
+import {
+  TestCasesDto,
+  TestResultDto,
+  TestCasesAndResultsDto,
+} from '@repo/dtos/testCases';
 import axios from 'axios';
 import { isEqual } from 'lodash';
 import { SquareChevronRight } from 'lucide-react';
@@ -30,6 +38,7 @@ import {
 } from '@/constants/languages';
 import { env } from '@/env.mjs';
 import { useToast } from '@/hooks/use-toast';
+import { saveExecutionSnapshot, updateCollabLanguage } from '@/lib/api/collab';
 import { fetchTestCasesByQuestionId } from '@/lib/api/testCases';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCollabStore } from '@/stores/useCollabStore';
@@ -45,7 +54,7 @@ import EditorSkeleton, {
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
-import TestCasesOutputSection, { TestResult } from './TestCasesOutputSection';
+import TestCasesOutputSection from './TestCasesOutputSection';
 import Timer, { TimerState } from './Timer';
 
 import './CollabCursor/Cursors.css';
@@ -65,6 +74,7 @@ const CollaborativeEditor = forwardRef<
   CollaborativeEditorProps
 >(({ collabId, questionId, className }, ref) => {
   const user = useAuthStore.use.user();
+  const collabEnded = useCollabStore.use.collabEnded();
   const notifyEndSession = useCollabStore.use.notifyEndSession();
   const [languages, setLanguages] = useState<Runtime[]>([]);
   const [selectedRuntime, setSelectedRuntime] = useState<Runtime | null>(null);
@@ -72,7 +82,7 @@ const CollaborativeEditor = forwardRef<
   const [languageLoading, setLanguageLoading] = useState(true);
   const [runLoading, setRunLoading] = useState(false);
   const [testCases, setTestCases] = useState<TestCasesDto | null>(null);
-  const [testResults, setTestResults] = useState<TestResult[] | null>(null);
+  const [testResults, setTestResults] = useState<TestResultDto[] | null>(null);
   const [output, setOutput] = useState<string | null>(null);
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
@@ -260,6 +270,11 @@ const CollaborativeEditor = forwardRef<
         ) {
           setSelectedRuntime({ language, version });
 
+          updateCollabLanguage({
+            collab_id: collabId,
+            language,
+          } satisfies collabUpdateLanguageDto);
+
           if (editorRef.current && language) {
             const currentModel = editorRef.current.getModel();
             monaco.editor.setModelLanguage(currentModel!, language);
@@ -294,7 +309,7 @@ const CollaborativeEditor = forwardRef<
     setRunLoading(true);
 
     try {
-      const results: TestResult[] = [];
+      const results: TestResultDto[] = [];
 
       if (testCases) {
         const { schema, cases } = testCases;
@@ -371,6 +386,19 @@ const CollaborativeEditor = forwardRef<
           });
         }
         setTestResults(results);
+
+        const testCasesAndResults: TestCasesAndResultsDto = {
+          testCases,
+          testResults: results,
+        };
+
+        // save code execution snapshot in its own try-catch block
+        await saveSnapshot(
+          code || '',
+          selectedRuntime.language,
+          testCasesAndResults,
+          null,
+        );
       } else {
         console.log('Running code:', code);
 
@@ -396,12 +424,42 @@ const CollaborativeEditor = forwardRef<
 
         const output = response.data?.run?.output || response.data?.run?.stderr;
         setOutput(output);
+
+        // save code execution snapshot in its own try-catch block
+        await saveSnapshot(code || '', selectedRuntime.language, null, output);
       }
     } catch (error: any) {
       setTestResults(null);
       setOutput(`Error: ${error.message}`);
     } finally {
       setRunLoading(false);
+    }
+  };
+
+  const saveSnapshot = async (
+    code: string,
+    language: string,
+    test_cases_and_results: TestCasesAndResultsDto | null,
+    output: string | null,
+  ) => {
+    try {
+      // do nothing if the collaboration has ended
+      if (collabEnded) {
+        return;
+      }
+
+      // save code execution snapshot
+      const snapshot = {
+        collaboration_id: collabId,
+        code,
+        output,
+        test_cases_and_results,
+        language,
+        user_id: user!.id,
+      } satisfies ExecutionSnapshotCreateDto;
+      await saveExecutionSnapshot(snapshot);
+    } catch (error) {
+      console.error('Failed to save code execution snapshot:', error);
     }
   };
 

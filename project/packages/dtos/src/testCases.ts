@@ -22,8 +22,14 @@ export const testCasesSchema = z.object({
       .array(z.string())
       .min(1, { message: "Schema must have at least one required field" }),
   }),
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date(),
+  ),
+  updated_at: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date(),
+  ),
 });
 
 export const createTestCasesSchema = testCasesSchema.omit({
@@ -36,6 +42,23 @@ export const updateTestCasesSchema = createTestCasesSchema.extend({
   id: z.string().uuid(),
 });
 
+export const testResultSchema = z.object({
+  input: z.record(z.any()),
+  stdout: z.string(),
+  expectedOutput: z.any(),
+  functionOutput: z.any(),
+  passed: z.boolean(),
+});
+
+export const testCasesAndResultsSchema = z.object({
+  testCases: testCasesSchema,
+  testResults: z.array(testResultSchema).nullable(),
+});
+
 export type TestCasesDto = z.infer<typeof testCasesSchema>;
 export type CreateTestCasesDto = z.infer<typeof createTestCasesSchema>;
 export type UpdateTestCasesDto = z.infer<typeof updateTestCasesSchema>;
+
+export type TestResultDto = z.infer<typeof testResultSchema>;
+
+export type TestCasesAndResultsDto = z.infer<typeof testCasesAndResultsSchema>;
