@@ -70,27 +70,28 @@ const HistoryEditor = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
-      {/* Monaco Editor */}
-      <div className="flex h-full p-6">
-        <Editor
-          theme="light"
-          defaultLanguage={selectedAttempt?.language ?? 'plaintext'}
-          loading={
-            <div className="flex items-start justify-start w-full h-full">
-              <EditorAreaSkeleton />
-            </div>
-          }
-          onMount={handleEditorDidMount}
-          options={{
-            minimap: { enabled: false },
-            readOnly: true,
-            automaticLayout: true,
-          }}
-          className="w-full"
-        />
+    <>
+      <div className="flex flex-col h-[calc(100vh-490px)] border border-1 rounded-md shadow-md">
+        {/* Monaco Editor */}
+        <div className="flex h-full p-6">
+          <Editor
+            theme="light"
+            defaultLanguage={selectedAttempt?.language ?? 'plaintext'}
+            loading={
+              <div className="flex items-start justify-start w-full h-full">
+                <EditorAreaSkeleton />
+              </div>
+            }
+            onMount={handleEditorDidMount}
+            options={{
+              minimap: { enabled: false },
+              readOnly: true,
+              automaticLayout: true,
+            }}
+            className="w-full"
+          />
+        </div>
       </div>
-
       {/* Output Area */}
       {output || testCases ? (
         // Show output / test results if available
@@ -110,7 +111,7 @@ const HistoryEditor = () => {
           )}
         </div>
       ) : null}
-    </div>
+    </>
   );
 };
 
