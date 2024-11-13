@@ -80,7 +80,7 @@ const EditModal = ({ onSubmit, initialValues }: EditModalProps) => {
       form.reset();
       form.clearErrors();
     }
-  }, [open, form, initialValues]);
+  }, [open, form, initialValues, isEditModalOpen]);
 
   return (
     <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
