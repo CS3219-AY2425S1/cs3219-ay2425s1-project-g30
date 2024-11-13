@@ -11,7 +11,7 @@ export const EditorAreaSkeleton = () => (
 );
 
 export const OutputSectionSkeleton = () => (
-  <div className="mt-8 h-[184px] p-6 border border-1 rounded-md shadow-md">
+  <div className="mt-8 h-[290px] p-6 border border-1 rounded-md shadow-md">
     <Skeleton className="w-1/4 h-8 mb-4" />
     <Skeleton className="w-full h-[60px] rounded-md" />
   </div>
@@ -21,7 +21,7 @@ const EditorSkeleton = () => {
   return (
     <div className="w-1/2">
       {/* Top bar with language select and Run Code button skeleton */}
-      <div className="h-[calc(100vh-336px)] border border-1 rounded-md shadow-md">
+      <div className="h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
           <LanguageSelectSkeleton />
           <RunButtonSkeleton />

@@ -6,6 +6,7 @@ import {
   UpdateQuestionDto,
 } from '@repo/dtos/questions';
 import { CollabQuestionDto } from '@repo/dtos/collab';
+import { CreateTestCasesDto, UpdateTestCasesDto } from '@repo/dtos/testCases';
 
 import { QuestionsService } from 'src/domain/ports/questions.service';
 @Controller()
@@ -40,5 +41,25 @@ export class QuestionsController {
   @MessagePattern({ cmd: 'delete_question' })
   async deleteQuestionById(@Payload() id: string) {
     return await this.questionsService.deleteById(id);
+  }
+
+  @MessagePattern({ cmd: 'create_test_cases' })
+  async createTestCases(@Payload() createTestCasesDto: CreateTestCasesDto) {
+    return await this.questionsService.createTestCases(createTestCasesDto);
+  }
+
+  @MessagePattern({ cmd: 'delete_test_cases' })
+  async deleteTestCases(@Payload() testCaseId: string) {
+    return await this.questionsService.deleteTestCases(testCaseId);
+  }
+
+  @MessagePattern({ cmd: 'update_test_cases' })
+  async updateTestCases(@Payload() updateTestCasesDto: UpdateTestCasesDto) {
+    return await this.questionsService.updateTestCases(updateTestCasesDto);
+  }
+
+  @MessagePattern({ cmd: 'get_test_cases' })
+  async getTestCasesByQuestionId(@Payload() questionId: string) {
+    return await this.questionsService.findTestCasesByQuestionId(questionId);
   }
 }

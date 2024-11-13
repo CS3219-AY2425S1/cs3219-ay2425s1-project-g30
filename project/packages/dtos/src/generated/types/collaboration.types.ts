@@ -53,6 +53,8 @@ export type Database = {
           id: string;
           language: string;
           output: string | null;
+          test_cases_and_results: Json | null;
+
           user_id: string;
         };
         Insert: {
@@ -62,6 +64,7 @@ export type Database = {
           id?: string;
           language: string;
           output?: string | null;
+          test_cases_and_results?: Json | null;
           user_id: string;
         };
         Update: {
@@ -71,6 +74,7 @@ export type Database = {
           id?: string;
           language?: string;
           output?: string | null;
+          test_cases_and_results?: Json | null;
           user_id?: string;
         };
         Relationships: [

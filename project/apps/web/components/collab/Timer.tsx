@@ -1,6 +1,5 @@
+import { PauseIcon, PlayIcon, TimerResetIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-
-import { Button } from '@/components/ui/button';
 
 export interface TimerState {
   isRunning: boolean;
@@ -57,24 +56,23 @@ const Timer: React.FC<TimerProps> = ({
   }, [timerState]);
 
   return (
-    <div className="flex items-center gap-4">
-      <span className="font-mono text-2xl">{displayTime}</span>
+    <div className="flex items-center gap-1">
+      <span className="text-gray-400 tex-sm">{displayTime}</span>
       {timerState.isRunning ? (
-        <Button onClick={pauseTimer} variant="destructive">
-          Pause
-        </Button>
+        <PauseIcon
+          onClick={pauseTimer}
+          className="w-4 h-4 text-gray-700 cursor-pointer"
+        />
       ) : (
-        <Button onClick={startTimer} variant="default">
-          Start
-        </Button>
+        <PlayIcon
+          onClick={startTimer}
+          className="w-4 h-4 text-gray-700 cursor-pointer"
+        />
       )}
-      <Button
+      <TimerResetIcon
         onClick={resetTimer}
-        variant="ghost"
-        disabled={timerState.elapsedTime === 0}
-      >
-        Reset
-      </Button>
+        className="w-4 h-4 text-gray-700 cursor-pointer"
+      />
     </div>
   );
 };

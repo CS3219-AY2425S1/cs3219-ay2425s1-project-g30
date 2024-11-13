@@ -2,7 +2,6 @@
 
 This folder contains auto-generated types and enums from Supabase. Do not edit these files manually.
 
-
 ### Directory Structure:
 
 ```text
@@ -15,9 +14,9 @@ generated/
 │   ├── auth.enums.ts
 │   ├── questions.enums.ts
 │   └── ... (generated .enums.ts files)
-├── supabase-config.json 
+├── supabase-config.json
 ├── check-types-script.ts
-├── generate-types-script.ts 
+├── generate-types-script.ts
 ├── generate-enums-script.ts
 └── README.md
 ```
@@ -40,10 +39,11 @@ The generated types will be written into the `/types` directory, with each file 
 1. Ensure that configurations in the `supabse-config.json` file is properly set up.
 2. Then, run the following command:
 
-    ```bash
-    pnpm gen:types
-    ```
-    which runs the `generate-types-script.ts` under the hood.
+   ```bash
+   pnpm gen:types
+   ```
+
+   which runs the `generate-types-script.ts` under the hood.
 
 ## Generating Enums
 
@@ -54,13 +54,14 @@ After generating the `.types.ts` files, the corresponding enums can be generated
 1. Ensure all your `.types.ts` files are located in the `/types` directory.
 2. Then, run the following command:
 
-    ```bash
-    pnpm gen:enums
-    ```
+   ```bash
+   pnpm gen:enums
+   ```
 
-    which runs the `generate-enums-script.ts` under the hood.
+   which runs the `generate-enums-script.ts` under the hood.
 
 This script will:
+
 - Process all `.types.ts` files from the `/types` directory.
 - Generate the corresponding `.enums.ts` files into the `/enums` directory.
 

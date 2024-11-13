@@ -94,7 +94,7 @@ export const getColumns = (
       cell: ({ row }) => {
         const username = row.original.partner?.username || 'Unknown';
         return (
-          <div className="flex items-center mb-4">
+          <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8">
               <AvatarImage />
               <AvatarFallback>{username[0]}</AvatarFallback>
