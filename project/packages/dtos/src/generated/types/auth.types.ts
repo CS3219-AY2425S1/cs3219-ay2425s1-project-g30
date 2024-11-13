@@ -12,24 +12,21 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string;
-          deleted_at: string | null;
-          email: string | null;
+          email: string;
           id: string;
           role: Database["public"]["Enums"]["Role"];
           username: string;
         };
         Insert: {
           created_at?: string;
-          deleted_at?: string | null;
-          email?: string | null;
+          email: string;
           id: string;
           role?: Database["public"]["Enums"]["Role"];
           username: string;
         };
         Update: {
           created_at?: string;
-          deleted_at?: string | null;
-          email?: string | null;
+          email?: string;
           id?: string;
           role?: Database["public"]["Enums"]["Role"];
           username?: string;

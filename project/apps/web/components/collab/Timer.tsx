@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { PauseIcon, PlayIcon, TimerResetIcon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 export interface TimerState {
   isRunning: boolean;

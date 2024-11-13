@@ -38,16 +38,17 @@ import { formatInputsForLanguage } from '@/utils/formatInputForLanguages';
 import { Button } from '../ui/button';
 import { LoadingSpinner } from '../ui/spinner';
 
+import { Cursors } from './CollabCursor/Cursors';
 import EditorSkeleton, {
   LanguageSelectSkeleton,
   RunButtonSkeleton,
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
-import Timer, { TimerState } from './Timer';
-import './CollabCursor/Cursors.css';
-import { Cursors } from './CollabCursor/Cursors';
 import TestCasesOutputSection, { TestResult } from './TestCasesOutputSection';
+import Timer, { TimerState } from './Timer';
+
+import './CollabCursor/Cursors.css';
 
 interface CollaborativeEditorProps {
   collabId: string;
@@ -436,12 +437,6 @@ const CollaborativeEditor = forwardRef<
     <div className={className}>
       <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
-          <Timer
-            timerState={timerState}
-            startTimer={startTimer}
-            pauseTimer={pauseTimer}
-            resetTimer={resetTimer}
-          />
           <div className="flex items-center gap-4">
             {collabLoading ? (
               <LanguageSelectSkeleton />
