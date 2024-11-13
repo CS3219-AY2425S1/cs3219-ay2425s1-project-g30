@@ -2,11 +2,13 @@ import { CollabInfoDto } from '@repo/dtos/collab';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { endCollab, getCollabInfoById } from '@/lib/api/collab';
+import { endCollab, getCollabInfoById, getCollabs } from '@/lib/api/collab';
 import { createSelectors } from '@/lib/zustand';
 
 interface CollabState {
   collaboration: CollabInfoDto[];
+  setCollaboration: (collaboration: CollabInfoDto[]) => void;
+  getActiveCollabs: (userId: string) => void;
   initialiseCollab: (id: string) => Promise<void>;
   endCollab: (id: string) => Promise<void>;
   notifyEndSession: (id: string) => void;
@@ -27,6 +29,17 @@ export const useCollabStoreBase = create<CollabState>()(
   persist(
     (set) => ({
       collaboration: [],
+      setCollaboration: (collabs: CollabInfoDto[]) =>
+        set({ collaboration: collabs }),
+
+      getActiveCollabs: async (userId: string) => {
+        const collection = await getCollabs({
+          user_id: userId,
+          has_ended: false,
+        });
+        set({ collaboration: collection.collaborations });
+      },
+
       initialiseCollab: async (id: string) => {
         const collab = await getCollabInfoById(id);
         set((state) => ({

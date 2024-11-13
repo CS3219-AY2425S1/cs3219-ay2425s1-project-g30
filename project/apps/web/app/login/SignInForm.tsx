@@ -18,6 +18,7 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { useToast } from '@/hooks/use-toast';
 import { useZodForm } from '@/lib/form';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useCollabStore } from '@/stores/useCollabStore';
 
 export function SignInForm() {
   const form = useZodForm({
@@ -30,13 +31,15 @@ export function SignInForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const signIn = useAuthStore.use.signIn();
+  const getActiveCollabs = useCollabStore.use.getActiveCollabs();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const mutation = useMutation({
     mutationFn: (values: SignInDto) => signIn(values),
-    onSuccess: async () => {
+    onSuccess: async (userId: string) => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.Me] });
+      await getActiveCollabs(userId);
       await router.push(searchParams.get('callbackUrl') || '/');
     },
     onError(error) {

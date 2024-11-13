@@ -9,7 +9,7 @@ import { createSelectors } from '@/lib/zustand';
 interface AuthState {
   user: UserDataDto | null;
   signUp: (signUpDto: SignUpDto) => Promise<void>;
-  signIn: (signInDto: SignInDto) => Promise<void>;
+  signIn: (signInDto: SignInDto) => Promise<string>;
   signOut: () => Promise<void>;
   fetchUser: () => Promise<void>;
 }
@@ -25,6 +25,7 @@ export const useAuthStoreBase = create<AuthState>()(
       signIn: async (signInDto: SignInDto) => {
         const { userData } = await signIn(signInDto);
         set({ user: userData });
+        return userData.id;
       },
       signOut: async () => {
         await signOut();
