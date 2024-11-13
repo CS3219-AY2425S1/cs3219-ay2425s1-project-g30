@@ -6,6 +6,8 @@ import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { ActionModals } from '@/components/question/ActionModals';
@@ -17,8 +19,6 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 interface QuestionPageProps {
   params: {

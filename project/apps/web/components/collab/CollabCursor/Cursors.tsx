@@ -1,10 +1,10 @@
+import { HocuspocusProvider } from '@hocuspocus/provider';
+import { UserDataDto } from '@repo/dtos/users';
 import debounce from 'lodash/debounce';
 import * as monaco from 'monaco-editor';
 import { useEffect, useRef } from 'react';
 
 import { hashCode, injectCursorStyle, removeStyles } from '@/utils/cursorStyle';
-import { HocuspocusProvider } from '@hocuspocus/provider';
-import { UserDataDto } from '@repo/dtos/users';
 
 interface CursorsProps {
   provider: HocuspocusProvider;
