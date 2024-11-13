@@ -3,7 +3,6 @@
 import { AttemptFiltersDto } from '@repo/dtos/attempt';
 import { CollabInfoDto } from '@repo/dtos/collab';
 import { Code, FolderClock } from 'lucide-react';
-import { useState } from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useAuthStore } from '@/stores/useAuthStore';

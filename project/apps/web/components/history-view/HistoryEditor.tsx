@@ -16,7 +16,6 @@ const HistoryEditor = () => {
   const bindingRef = useRef<MonacoBinding | null>(null);
 
   const selectedAttempt = useHistoryStore.use.selectedAttempt();
-  const confirmLoading = useHistoryStore.use.confirmLoading();
 
   const output = selectedAttempt?.output;
 
