@@ -41,7 +41,7 @@ const TestCasesOutputSection = ({
   const handleSelectTest = (index: number) => {
     setSelectedTestIndex(index);
   };
-
+  console.log(selectedTestResult);
   return (
     <div className="flex flex-col flex-1 h-full overflow-y-scroll">
       <div className="flex gap-2 px-4 mt-4 mb-2">

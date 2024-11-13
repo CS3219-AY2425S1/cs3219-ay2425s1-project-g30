@@ -2,6 +2,7 @@ import { HocuspocusProvider } from '@hocuspocus/provider';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { TestCasesDto } from '@repo/dtos/testCases';
 import axios from 'axios';
+import { isEqual } from 'lodash';
 import { SquareChevronRight } from 'lucide-react';
 import * as monaco from 'monaco-editor';
 import { useRouter } from 'next/navigation';
@@ -85,6 +86,15 @@ const CollaborativeEditor = forwardRef<
 
   const router = useRouter();
   const { toast } = useToast();
+
+  function safeJsonParse(input: string) {
+    try {
+      return JSON.parse(input);
+    } catch (error) {
+      console.error('Invalid JSON:', error);
+      return input; // or you could return an empty object or any fallback value
+    }
+  }
 
   useImperativeHandle(ref, () => ({
     endSession,
@@ -348,14 +358,16 @@ const CollaborativeEditor = forwardRef<
             ? rawStdout.split(`${RESULT_FLAG} `).pop()?.trim() || 'undefined'
             : 'undefined';
 
-          const isSuccess = functionOutput === expectedOutput.toString();
+          const transformedFunctionOutput = safeJsonParse(functionOutput);
+
+          const isSuccess = isEqual(transformedFunctionOutput, expectedOutput);
           results.push({
             input: inputData,
             stdout: rawStdout
               .replace(new RegExp(`${RESULT_FLAG}.+`), '')
               .trim(),
             expectedOutput,
-            functionOutput,
+            functionOutput: transformedFunctionOutput,
             passed: isSuccess,
           });
         }
