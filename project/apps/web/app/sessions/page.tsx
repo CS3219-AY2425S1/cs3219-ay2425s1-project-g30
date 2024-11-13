@@ -10,9 +10,7 @@ const SessionsRepositoryContent = () => {
     <div className="container p-6 mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between my-4">
-        <h1 className="text-xl font-semibold">
-          Active Collaboration Sessionss
-        </h1>
+        <h1 className="text-xl font-semibold">Active Collaboration Sessions</h1>
       </div>
 
       {/* Table */}

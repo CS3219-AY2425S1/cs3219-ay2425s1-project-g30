@@ -6,6 +6,8 @@ import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import DifficultyBadge from '@/components/DifficultyBadge';
 import { ActionModals } from '@/components/question/ActionModals';
@@ -82,7 +84,9 @@ const QuestionPageContent = ({ id }: { id: string }) => {
           </h1>
           <DifficultyBadge complexity={question.q_complexity} />
         </div>
-        <p className="mb-6 text-gray-600">{question.q_desc}</p>
+        <ReactMarkdown remarkPlugins={[[remarkGfm]]}>
+          {question.q_desc}
+        </ReactMarkdown>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="font-bold text-gray-700">Categories </div>
