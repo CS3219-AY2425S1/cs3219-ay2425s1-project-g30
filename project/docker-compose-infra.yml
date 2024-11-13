@@ -1,0 +1,31 @@
+services:
+  rabbitmq:
+    build:
+      context: ./infra/rabbitmq
+      dockerfile: Dockerfile
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672" # RabbitMQ message broker port
+      - "15672:15672" # RabbitMQ management plugin port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - 5540:5540
+    depends_on:
+      - redis
+volumes:
+  rabbitmq_data:
+  redis_data:
