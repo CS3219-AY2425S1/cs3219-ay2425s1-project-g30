@@ -99,7 +99,8 @@ export const executionSnapshotSchema = z.object({
   id: z.string().uuid(),
   collaboration_id: z.string().uuid(),
   code: z.string(),
-  output: z.string(),
+  output: z.string().nullable(),
+  // test_results:
   language: z.string(),
   user_id: z.string().uuid(),
   created_at: z.date(),

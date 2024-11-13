@@ -4,7 +4,7 @@ import {
   collabUpdateLanguageDto,
   ExecutionSnapshotCreateDto,
 } from '@repo/dtos/collab';
-import { TestCasesDto } from '@repo/dtos/testCases';
+import { TestCasesDto, TestResultDto } from '@repo/dtos/testCases';
 import axios from 'axios';
 import { isEqual } from 'lodash';
 import { SquareChevronRight } from 'lucide-react';
@@ -51,7 +51,7 @@ import EditorSkeleton, {
   EditorAreaSkeleton,
   OutputSectionSkeleton,
 } from './EditorSkeleton';
-import TestCasesOutputSection, { TestResult } from './TestCasesOutputSection';
+import TestCasesOutputSection from './TestCasesOutputSection';
 import Timer, { TimerState } from './Timer';
 
 import './CollabCursor/Cursors.css';
@@ -78,7 +78,7 @@ const CollaborativeEditor = forwardRef<
   const [languageLoading, setLanguageLoading] = useState(true);
   const [runLoading, setRunLoading] = useState(false);
   const [testCases, setTestCases] = useState<TestCasesDto | null>(null);
-  const [testResults, setTestResults] = useState<TestResult[] | null>(null);
+  const [testResults, setTestResults] = useState<TestResultDto[] | null>(null);
   const [output, setOutput] = useState<string | null>(null);
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
@@ -305,7 +305,7 @@ const CollaborativeEditor = forwardRef<
     setRunLoading(true);
 
     try {
-      const results: TestResult[] = [];
+      const results: TestResultDto[] = [];
 
       if (testCases) {
         const { schema, cases } = testCases;

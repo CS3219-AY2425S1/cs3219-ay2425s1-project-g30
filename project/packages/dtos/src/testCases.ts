@@ -36,6 +36,16 @@ export const updateTestCasesSchema = createTestCasesSchema.extend({
   id: z.string().uuid(),
 });
 
+export const TestResultSchema = z.object({
+  input: z.record(z.any()),
+  stdout: z.string(),
+  expectedOutput: z.any(),
+  functionOutput: z.any(),
+  passed: z.boolean(),
+});
+
 export type TestCasesDto = z.infer<typeof testCasesSchema>;
 export type CreateTestCasesDto = z.infer<typeof createTestCasesSchema>;
 export type UpdateTestCasesDto = z.infer<typeof updateTestCasesSchema>;
+
+export type TestResultDto = z.infer<typeof TestResultSchema>;
