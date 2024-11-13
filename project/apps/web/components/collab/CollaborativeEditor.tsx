@@ -436,6 +436,12 @@ const CollaborativeEditor = forwardRef<
     <div className={className}>
       <div className="flex flex-col h-[calc(100vh-442px)] border border-1 rounded-md shadow-md">
         <div className="flex flex-row justify-between gap-2 p-4 border-b border-gray-300">
+          <Timer
+            timerState={timerState}
+            startTimer={startTimer}
+            pauseTimer={pauseTimer}
+            resetTimer={resetTimer}
+          />
           <div className="flex items-center gap-4">
             {collabLoading ? (
               <LanguageSelectSkeleton />
