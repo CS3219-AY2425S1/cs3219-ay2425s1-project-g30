@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const testCasesItemSchema = z
   .object({
+    input: z.any(),
     output: z.any(),
   })
   .catchall(z.any());
@@ -13,10 +14,10 @@ export const testCasesSchema = z.object({
     .array(testCasesItemSchema)
     .min(1, { message: "At least one test case is required" }),
   schema: z.object({
-    type: z.string().refine((val) => val === "object", {
-      message: 'Schema type must be "object"',
+    type: z.literal("object", {
+      errorMap: () => ({ message: 'Schema type must be "object"' }),
     }),
-    properties: z.record(z.string(), z.any()),
+    properties: z.record(z.string(), z.any()), // Defines a flexible properties object with any values
     required: z
       .array(z.string())
       .min(1, { message: "Schema must have at least one required field" }),
