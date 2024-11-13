@@ -4,4 +4,5 @@ export enum QUERY_KEYS {
   Question = 'question',
   Match = 'match',
   Collab = 'collaboration',
+  TestCases = 'test-cases',
 }

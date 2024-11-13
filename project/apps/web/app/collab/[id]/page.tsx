@@ -52,8 +52,9 @@ const CollabPageContent = ({ id }: { id: string }) => {
       : collabInfo.collab_user1.username;
 
   const question = {
-    title: collabInfo.question.q_title || 'Untitled Question',
-    description: collabInfo.question.q_desc || 'No description',
+    title: collabInfo.question.q_title,
+    description: collabInfo.question.q_desc,
+    id: collabInfo.question.id,
   };
 
   return (
@@ -77,15 +78,20 @@ const CollabPageContent = ({ id }: { id: string }) => {
 
       <div className="flex gap-8 max-h-fit">
         {/* Question info */}
-        <div className="markdown w-1/2 h-[calc(100vh-120px)] p-6 border border-1 rounded-md shadow-md bg-white overflow-y-auto">
-          <h2 className="mb-4 text-xl font-semibold">{question.title}</h2>
+        <div className="markdown w-1/2 h-[calc(100vh-120px)] px-8 py-2 border border-1 rounded-md shadow-md bg-white overflow-y-auto">
+          <h2 className="text-xl font-semibold">{question.title}</h2>
           <ReactMarkdown remarkPlugins={[[remarkGfm]]}>
             {question.description}
           </ReactMarkdown>
         </div>
 
         {/* Code editor */}
-        <CollaborativeEditor ref={editorRef} id={id} className="w-1/2" />
+        <CollaborativeEditor
+          ref={editorRef}
+          collabId={id}
+          questionId={question.id}
+          className="w-1/2"
+        />
       </div>
       {collabInfo && (
         <ActionModals

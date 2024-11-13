@@ -3,8 +3,10 @@
 import { Inter, Roboto } from 'next/font/google';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { EnforceLoginStatePageWrapper } from '@/components/auth-wrappers/EnforceLoginStatePageWrapper';
+import ErrorFallback from '@/components/ErrorFallback';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 import Sidebar from '@/components/Sidebar';
 import Suspense from '@/components/Suspense';
@@ -89,16 +91,18 @@ const RootLayout = ({
   return (
     <html lang="en" className={inter.className}>
       <body className={roboto.className}>
-        <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
-          <ReactQueryProvider>
-            <EnforceLoginStatePageWrapper requireLogin={!isLoginPage}>
-              <LayoutWithSidebarAndTopbar>
-                {children}
-              </LayoutWithSidebarAndTopbar>
-            </EnforceLoginStatePageWrapper>
-          </ReactQueryProvider>
-          <Toaster />
-        </Suspense>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<Skeleton className="w-screen h-screen" />}>
+            <ReactQueryProvider>
+              <EnforceLoginStatePageWrapper requireLogin={!isLoginPage}>
+                <LayoutWithSidebarAndTopbar>
+                  {children}
+                </LayoutWithSidebarAndTopbar>
+              </EnforceLoginStatePageWrapper>
+            </ReactQueryProvider>
+            <Toaster />
+          </Suspense>
+        </ErrorBoundary>
       </body>
     </html>
   );
