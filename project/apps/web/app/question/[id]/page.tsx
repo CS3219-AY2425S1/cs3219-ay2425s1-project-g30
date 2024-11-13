@@ -17,6 +17,8 @@ import { QUERY_KEYS } from '@/constants/queryKeys';
 import { fetchQuestionById } from '@/lib/api/question';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useQuestionsStore } from '@/stores/useQuestionStore';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface QuestionPageProps {
   params: {
@@ -80,7 +82,9 @@ const QuestionPageContent = ({ id }: { id: string }) => {
           </h1>
           <DifficultyBadge complexity={question.q_complexity} />
         </div>
-        <p className="mb-6 text-gray-600">{question.q_desc}</p>
+        <ReactMarkdown remarkPlugins={[[remarkGfm]]}>
+          {question.q_desc}
+        </ReactMarkdown>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="font-bold text-gray-700">Categories </div>
